@@ -59,6 +59,6 @@ jobs:
            
           - name: Run ${{matrix.make}}
             env:
-                CMAKE_ARGS: -DUSERVER_FEATURE_PATCH_LIBPQ=OFF
+                CMAKE_CONFIGURE_ARGS: -DUSERVER_FEATURE_PATCH_LIBPQ=OFF
             run: |
                 make ${{matrix.make}}

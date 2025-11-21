@@ -57,20 +57,31 @@ components_manager:
             throttling_enabled: false
             url_trailing_slash: strict-match
 
-        handler-hello:                    # Finally! Our handler.
-            path: /hello                  # Registering handler by URL '/hello'.
-            method: GET,POST              # It will only reply to GET (HEAD) and POST requests.
-            task_processor: main-task-processor  # Run it on CPU bound task processor
+        # Components
+        user-service-component:
+            load-enabled: true
+            storage-type: postgres
+            postgres-component: chat-postgres-database
+            ydb-component: chat-ydb-database
 
-        handler-hello-postgres:          # Our postgres handler.
-            path: /hello-postgres         # Registering handler by URL '/hello-postgres'.
-            method: GET,POST              # It will only reply to GET (HEAD) and POST requests.
-            task_processor: main-task-processor  # Run it on CPU bound task processor
+        # Handlers 
+        # handler-auth-login:
+        #     path: /v1/auth/login
+        #     method: POST
+        #     task_processor: main-task-processor
 
-        postgres-db-1:
+        handler-user-register:
+            path: /v1/users/register
+            method: POST
+            task_processor: main-task-processor
+
+        # PostgreSQL
+        chat-postgres-database:
             dbconnection: $pg-connection
             dbconnection#env: DB_CONNECTION
             blocking_task_processor: fs-task-processor
             dns_resolver: async
             sync-start: true
             connlimit_mode: manual
+
+        

@@ -16,10 +16,10 @@ TUserRegistrationData Parse(const formats::json::Value& json, formats::parse::To
   using NChat::NInfrastructure::NHandlers::TValidationException;
 
   TUserRegistrationData dto{
-      .Username=json["username"].As<std::string>(""),
-      .Password=json["password"].As<std::string>(""),
-      .Biography=json["biography"].As<std::string>(""),
-      .DisplayName=json["display_name"].As<std::string>(""),
+      .Username = json["username"].As<std::string>(""),
+      .Password = json["password"].As<std::string>(""),
+      .Biography = json["biography"].As<std::string>(""),
+      .DisplayName = json["display_name"].As<std::string>(""),
   };
 
   // Only Syntax Validation

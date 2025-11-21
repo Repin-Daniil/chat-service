@@ -13,7 +13,7 @@ find_package(
 )
 if(NOT userver_FOUND)
     # Tries TRY_DIR first, falls back to downloading userver from GitHub using CPM.
-    download_userver(TRY_DIR third_party/userver)
+    download_userver(TRY_DIR third_party/userver GIT_TAG v2.13)
 endif()
 
 userver_setup_environment()

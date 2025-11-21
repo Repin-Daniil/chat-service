@@ -18,7 +18,7 @@ class Routes(str, Enum):
 
 class RequiredFields(tuple, Enum):
     LOGIN = 'username', 'password'
-    REGISTRATION = 'username', 'password', 'display_name'  #todo переделать
+    REGISTRATION = 'username', 'password', 'display_name'  # todo переделать
 
 
 def model_dump(model, **kwargs):

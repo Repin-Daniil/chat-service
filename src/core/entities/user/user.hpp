@@ -24,7 +24,7 @@ class TUser {
                        std::string password_salt, std::string biography);
 
   // Getters
-  TUserId GetId() const { return Id_; }
+  const TUserId& GetId() const { return Id_; }
   const std::string& GetUsername() const { return Username_; }
   const std::string& GetDisplayName() const { return DisplayName_; }
   const std::string& GetPasswordHash() const { return PasswordHash_; }

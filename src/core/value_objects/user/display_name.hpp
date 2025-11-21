@@ -46,7 +46,6 @@ class TDisplayName {
     }
 
     if (Value_.size() > MAX_DISPLAY_NAME_LENGTH) {
-      LOG_ERROR() << Value_;
       throw DisplayNameInvalidException(
           fmt::format("Display name must not exceed {} characters", MAX_DISPLAY_NAME_LENGTH));
     }

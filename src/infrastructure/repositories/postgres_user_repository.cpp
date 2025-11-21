@@ -14,16 +14,18 @@ TPostgresUserRepository::TPostgresUserRepository(userver::storages::postgres::Cl
     : PgCluster_(pg_cluster) {}
 
 void TPostgresUserRepository::InsertNewUser(const TUser& user) const {
-  // todo Добавить логирование
   try {
-    std::string password_hash_hex = userver::utils::encoding::ToHex(user.GetPasswordHash());
-    std::string password_salt_hex = userver::utils::encoding::ToHex(user.GetPasswordSalt());
-    LOG_CRITICAL() << "Хэш: " << password_hash_hex << " Соль: " << password_salt_hex;
-    PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kInsertNewUser,*user.GetId(), user.GetUsername(),
-                        user.GetDisplayName(), user.GetBiography(), password_hash_hex, password_salt_hex);
+    const auto id = *user.GetId();
+    const auto password_hash_hex = userver::utils::encoding::ToHex(user.GetPasswordHash());
+    const auto password_salt_hex = userver::utils::encoding::ToHex(user.GetPasswordSalt());
+
+    PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kInsertNewUser, id,
+                        user.GetUsername(), user.GetDisplayName(), user.GetBiography(), password_hash_hex,
+                        password_salt_hex);
+
   } catch (const userver::storages::postgres::UniqueViolation& ex) {
-    throw NApp::TUserIdAlreadyExists(fmt::format("Constraint: {}; Detail: {}", ex.GetServerMessage().GetConstraint(),
-                                                 ex.GetServerMessage().GetDetail()));
+    const auto& msg = ex.GetServerMessage();
+    throw NApp::TUserIdAlreadyExists(fmt::format("Constraint: {}; Detail: {}", msg.GetConstraint(), msg.GetDetail()));
   }
 }
 
@@ -33,7 +35,7 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
   if (result.IsEmpty()) {
     return std::nullopt;
   }
-  // todo для тестирования можено сделать LOG_DEBUG UserRecord
+
   return TUserId{result.AsSingleRow<std::string>()};
 }
 

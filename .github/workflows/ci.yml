@@ -56,6 +56,9 @@ jobs:
                 ccache -M 2.0GB
                 ccache -s
 
+           
           - name: Run ${{matrix.make}}
+            env:
+                CMAKE_ARGS: -DUSERVER_FEATURE_PATCH_LIBPQ=OFF
             run: |
                 make ${{matrix.make}}

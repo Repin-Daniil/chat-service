@@ -58,7 +58,7 @@ jobs:
 
           - name: Create local Makefile overrides
             run: |
-                echo 'CMAKE_OPTS += -DUSERVER_FEATURE_PATCH_LIBPQ=OFF' > Makefile.local
+                echo 'CMAKE_COMMON_FLAGS += -DUSERVER_FEATURE_PATCH_LIBPQ=OFF' > Makefile.local
 
           - name: Run ${{matrix.make}}
             run: |

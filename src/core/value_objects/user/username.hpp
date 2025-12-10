@@ -21,11 +21,17 @@ static_assert(kMaxUsernameLength >= kMinUsernameLength);
 
 class TUsername {
  public:
-  explicit TUsername(const std::string& value) : Value_(value) { Validate(); }
+  explicit TUsername(const std::string& value) : Value_(ToLower(value)) { Validate(); }
 
   const std::string& Value() const noexcept { return Value_; }
 
  private:
+  static std::string ToLower(const std::string& str) {
+    std::string result = str;
+    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) { return std::tolower(c); });
+    return result;
+  }
+
   void Validate() {
     const auto len = Value_.length();
 

@@ -68,8 +68,8 @@ userver::formats::json::Value TRegisterUserHandler::HandleRequestJsonThrow(
 
     userver::formats::json::ValueBuilder builder;
     builder["user"] = result;
-    return builder.ExtractValue();
 
+    return builder.ExtractValue();
   } catch (const NCore::TValidationException& ex) {
     throw TValidationException(ex.GetField(), ex.what());
   } catch (const NCore::NDomain::TUserAlreadyExistsException& ex) {

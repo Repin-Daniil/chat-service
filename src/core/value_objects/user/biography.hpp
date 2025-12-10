@@ -15,7 +15,7 @@ class BiographyInvalidException : public TValidationException {
   std::string GetField() const noexcept override { return "biography"; }
 };
 
-inline constexpr int MIN_BIO_LENGTH = 5;
+inline constexpr int MIN_BIO_LENGTH = 1;
 inline constexpr int MAX_BIO_LENGTH = 180;
 
 static_assert(MIN_BIO_LENGTH > 0);

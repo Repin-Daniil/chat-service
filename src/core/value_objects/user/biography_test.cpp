@@ -15,11 +15,6 @@ TEST(TBiographyTest, TooLong) {
   EXPECT_THROW(TBiography{longBio}, BiographyInvalidException);
 }
 
-TEST(TBiographyTest, TooShortNonEmpty) {
-  EXPECT_THROW(TBiography("aa"), BiographyInvalidException);
-  EXPECT_THROW(TBiography("a aa"), BiographyInvalidException);
-}
-
 TEST(TBiographyTest, EmptyIsValid) {
   EXPECT_NO_THROW(TBiography(""));
   TBiography bio("");

@@ -4,6 +4,8 @@ import pytest
 
 from testsuite.databases.pgsql import discover
 
+sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
+
 pytest_plugins = [
     'pytest_userver.plugins.core',
     'pytest_userver.plugins.postgresql',

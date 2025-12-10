@@ -12,38 +12,50 @@ tags:
     description: Аутентификация и регистрация
   - name: Users
     description: Управление пользователями
-  - name: Chats
-    description: (Пока не используется)
   - name: Messages
     description: Отправка и получение сообщений
+  - name: Chats
+    description: (Пока не используется)
 
-# 1. Определение компонентов (моделей данных и безопасности)
 components:
   schemas:
     # --- Модели для Auth ---
-    UserRegistrationDTO:
+    UserRegistrationRequest:
       type: object
       additionalProperties: false
+      required: [user]
       properties:
-        username:
-          type: string
-        password:
-          type: string
-        display_name:
-          type: string
-        biography:
-          type: string
+        user:
+          type: object
+          additionalProperties: false
+          required: [username, password, display_name]
+          properties:
+            username:
+              type: string
+              minLength: 3
+              maxLength: 32
+            password:
+              type: string
+              minLength: 8
+              format: password
+            display_name:
+              type: string
+              minLength: 3
+              maxLength: 50
+            biography:
+              type: string
+              maxLength: 180
     
     UserRegistered:
       type: object
       properties:
-        user_id:
-          type: string
-          format: uuid
-          example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef'
         username:
           type: string
           example: alice
+        token:
+          type: string
+          format: uuid
+          example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef'
     
     AuthToken:
       type: object
@@ -58,61 +70,11 @@ components:
       properties:
         user_id:
           type: string
-          format: uuid
-          example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef'
+          format: JWT
+          example: eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9
         username:
           type: string
           example: alice
-
-    # --- Модели для Chats ---
-    ChatInfo:
-      type: object
-      properties:
-        chat_id:
-          type: string
-          format: uuid
-          example: 'c1-chat-uuid-789'
-        name:
-          type: string
-          example: 'Chat with Bob'
-
-    # --- Модели для Messages ---
-    SendMessageRequest:
-      type: object
-      description: Тело запроса на отправку сообщения
-      properties:
-        recipient_id:
-          type: string
-          format: uuid
-          description: ID пользователя, которому отправляется сообщение
-          example: 'b1-bob-uuid-456'
-        text:
-          type: string
-          description: Текст сообщения
-          example: 'Привет, Боб!'
-      required:
-        - recipient_id
-        - text
-        
-    Message:
-      type: object
-      description: Объект полученного сообщения
-      properties:
-        message_id:
-          type: string
-          format: uuid
-          example: 'm1-message-uuid-111'
-        sender_id:
-          type: string
-          format: uuid
-          example: 'a1-alice-uuid-123'
-        text:
-          type: string
-          example: 'Привет!'
-        timestamp:
-          type: string
-          format: date-time
-          example: '2025-11-16T14:30:00Z'
 
     # --- Общая модель ошибки ---
     Error:
@@ -120,10 +82,20 @@ components:
       properties:
         code:
           type: string
-          example: 'INVALID_CREDENTIALS'
+          example: '400'
         message:
           type: string
           example: 'Неверное имя пользователя или пароль'
+        details:
+          type: object
+          properties:  
+            errors: 
+                type: object
+                description: Ошибки валидации по полям
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
 
   # --- Определение схемы безопасности ---
   securitySchemes:
@@ -145,14 +117,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserCredentials'
+              $ref: '#/components/schemas/UserRegistrationRequest'
       responses:
-        '201':
+        '200':
           description: Пользователь успешно зарегистрирован
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserRegistered'
+        '400':
+          description: Некорректные входные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
         '409':
           description: Пользователь с таким именем уже существует
           content:
@@ -160,155 +139,4 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
   
-  /users/login:
-    post:
-      tags:
-        - Auth
-      summary: Вход пользователя (получение токена)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserCredentials'
-      responses:
-        '200':
-          description: Успешный вход, токен выдан
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthToken'
-        '401':
-          description: Неверные креды
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  # --- Users ---
-  /users/me:
-    get:
-      tags:
-        - Users
-      summary: Получить информацию о себе (по токену)
-      security:
-        - BearerAuth: [] # Этот эндпоинт требует аутентификации
-      responses:
-        '200':
-          description: Информация о текущем пользователе
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserProfile'
-        '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /users/online:
-    get:
-      tags:
-        - Users
-      summary: Получить список пользователей онлайн
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Список пользователей
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserProfile'
-        '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
   
-  # --- Chats ---
-  /chats:
-    get:
-      tags:
-        - Chats
-      summary: Получить список моих чатов
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Список чатов
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ChatInfo'
-        '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  # --- Messages ---
-  /messages/send:
-    post:
-      tags:
-        - Messages
-      summary: Отправить сообщение пользователю
-      security:
-        - BearerAuth: []
-      requestBody:
-        description: Сообщение для отправки
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SendMessageRequest' # Я добавил эту модель
-      responses:
-        '202':
-          description: Сообщение принято к доставке (т.к. мы не храним, 201 'Created' не подходит)
-        '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Получатель не найден (или не онлайн)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /messages/recieve:
-    get:
-      tags:
-        - Messages
-      summary: Получить (ожидать) новые сообщения
-      description: |
-        Это может быть реализовано как Long-Polling. 
-        Сервер держит запрос открытым, пока не придет сообщение или не выйдет таймаут.
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Одно или несколько новых сообщений
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Message'
-        '204':
-          description: Нет новых сообщений (таймаут long-poll)
-        '401':
-          description: Не авторизован
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'

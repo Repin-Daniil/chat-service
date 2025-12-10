@@ -64,6 +64,13 @@ TEST(TUsername, InvalidUsername_InvalidCharacters) {
   EXPECT_THROW(TUsername("user#name"), std::invalid_argument);
 }
 
+TEST(TUsername, UsernameNotCaseSensitive) {
+  auto first = TUsername("UserName").Value();
+  auto second = TUsername("username").Value();
+
+  EXPECT_EQ(first, second);
+}
+
 // === Corner cases ===
 
 TEST(TUsername, EdgeCase_OnlyLetters) {

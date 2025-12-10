@@ -13,12 +13,10 @@ class Routes(str, Enum):
     def __str__(self) -> str:
         return self.value
 
-# todo
-
 
 class RequiredFields(tuple, Enum):
     LOGIN = 'username', 'password'
-    REGISTRATION = 'username', 'password', 'display_name'  # todo переделать
+    REGISTRATION = 'username', 'password', 'display_name'
 
 
 def model_dump(model, **kwargs):

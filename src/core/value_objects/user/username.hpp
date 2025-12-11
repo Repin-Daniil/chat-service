@@ -1,9 +1,9 @@
 #pragma once
 
 #include <fmt/format.h>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
-#include <algorithm>
 #include "core/exceptions.hpp"
 
 namespace NChat::NCore::NDomain {

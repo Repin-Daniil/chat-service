@@ -8,7 +8,7 @@ name: CI
     pull_request:
     push:
         branches:
-          - develop
+          - master
 
 env:
     UBSAN_OPTIONS: print_stacktrace=1

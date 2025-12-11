@@ -1,8 +1,8 @@
 PROJECT_NAME = chat_service
 NPROCS ?= $(shell nproc)
 CLANG_FORMAT ?= clang-format
-DOCKER_IMAGE ?= ghcr.io/userver-framework/ubuntu-24.04-userver:latest
-CMAKE_OPTS ?=
+DOCKER_IMAGE ?= ghcr.io/userver-framework/ubuntu-24.04-userver:v2.13
+CMAKE_OPTS ?= 
 # If we're under TTY, pass "-it" to "docker run"
 DOCKER_ARGS = $(shell /bin/test -t 0 && /bin/echo -it || echo)
 PRESETS ?= debug release debug-custom release-custom

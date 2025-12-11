@@ -1,21 +1,25 @@
-cmake_minimum_required(VERSION 3.12...3.31)
+cmake_minimum_required(VERSION 3.5)
 project(chat_service CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(DownloadUserver)
+set(CMAKE_CXX_STANDARD 23)
 
 find_package(
     userver
     COMPONENTS core #
-               postgresql
+    postgresql
     QUIET
 )
 if(NOT userver_FOUND)
     # Tries TRY_DIR first, falls back to downloading userver from GitHub using CPM.
-    download_userver(TRY_DIR third_party/userver)
+    download_userver(TRY_DIR third_party/userver GIT_TAG v2.13)
 endif()
 
 userver_setup_environment()
+
+# third party
+include(jwt)
 
 # Common sources
 file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.[hc]pp)
@@ -28,13 +32,22 @@ include_directories(src)
 target_link_libraries(
     ${PROJECT_NAME}_objs
     PUBLIC userver::core #
-           userver::postgresql
+    userver::postgresql
 )
 
 
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
+target_link_libraries(${PROJECT_NAME}_objs PUBLIC jwt-cpp)
+
+userver_add_sql_library(
+    ${PROJECT_NAME}_sql
+    NAMESPACE NChat
+    OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
+    SQL_FILES src/infrastructure/sql/*.sql
+)
+target_link_libraries(${PROJECT_NAME}_objs PUBLIC ${PROJECT_NAME}_sql)
 
 # Unit Tests
 add_executable(${PROJECT_NAME}_unittest ${UNIT_TEST_SOURCES})
@@ -42,12 +55,15 @@ target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs user
 add_google_tests(${PROJECT_NAME}_unittest)
 
 # Benchmarks
-add_executable(${PROJECT_NAME}_benchmark ${BENCHMARK_SOURCES})
-target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_objs userver::ubench)
-add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
+# add_executable(${PROJECT_NAME}_benchmark ${BENCHMARK_SOURCES})
+# target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_objs userver::ubench)
+# add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
 
 # Functional testing
-userver_testsuite_add_simple()
+userver_testsuite_add_simple(
+    REQUIREMENTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/requirements.txt
+    SQL_LIBRARY ${PROJECT_NAME}_sql
+)
 
 # Install
 include(GNUInstallDirs)

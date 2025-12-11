@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Chat API
+  description: MVP чата-хаба на userver
+  version: 1.0.0
+servers:
+  - url: /v1
+    description: Основной шлюз API
+
+tags:
+  - name: Auth
+    description: Аутентификация и регистрация
+  - name: Users
+    description: Управление пользователями
+  - name: Messages
+    description: Отправка и получение сообщений
+  - name: Chats
+    description: (Пока не используется)
+
+components:
+  schemas:
+    # --- Модели для Auth ---
+    UserRegistrationRequest:
+      type: object
+      additionalProperties: false
+      required: [user]
+      properties:
+        user:
+          type: object
+          additionalProperties: false
+          required: [username, password, display_name]
+          properties:
+            username:
+              type: string
+              minLength: 3
+              maxLength: 32
+            password:
+              type: string
+              minLength: 8
+              format: password
+            display_name:
+              type: string
+              minLength: 3
+              maxLength: 50
+            biography:
+              type: string
+              maxLength: 180
+    
+    UserRegistered:
+      type: object
+      properties:
+        username:
+          type: string
+          example: alice
+        token:
+          type: string
+          format: uuid
+          example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef'
+    
+    AuthToken:
+      type: object
+      properties:
+        session_token:
+          type: string
+          example: 'your-super-secret-token-qwe-rty'
+
+    # --- Модели для Users ---
+    UserProfile:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: JWT
+          example: eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9
+        username:
+          type: string
+          example: alice
+
+    # --- Общая модель ошибки ---
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: '400'
+        message:
+          type: string
+          example: 'Неверное имя пользователя или пароль'
+        details:
+          type: object
+          properties:  
+            errors: 
+                type: object
+                description: Ошибки валидации по полям
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+
+  # --- Определение схемы безопасности ---
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT # Или просто 'token', если это непрозрачный токен
+
+# 2. Определение путей (эндпоинтов)
+paths:
+  # --- Auth ---
+  /users/register:
+    post:
+      tags:
+        - Auth
+      summary: Регистрация нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistered'
+        '400':
+          description: Некорректные входные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+        '409':
+          description: Пользователь с таким именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  

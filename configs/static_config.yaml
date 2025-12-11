@@ -42,6 +42,7 @@ components_manager:
             fs-task-processor: fs-task-processor
 
         # New version
+        # Change v2.13 in dev-container, CMakeLists and Makefile
         # http-client-core:
         #     fs-task-processor: fs-task-processor
 

@@ -1,31 +1,12 @@
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-#include "infrastructure/security/auth_service_impl.hpp"  // for password hashing
-
 #include "registration.hpp"
+#include <gtest/gtest.h>
+#include "mocks.hpp"
+
+#include "infrastructure/security/auth_service_impl.hpp"  // for password hashing
 
 using namespace testing;
 using namespace NChat::NCore;
 using namespace NChat::NApp;
-
-// Моки для интеграционного теста
-class MockUserRepository : public IUserRepository {
- public:
-  MOCK_METHOD(void, InsertNewUser, (const TUser& user), (const, override));
-  MOCK_METHOD(std::optional<TUserId>, FindByUsername, (std::string_view username), (const, override));
-  //   MOCK_METHOD(std::optional<TUser>, GetUserById, (const TUserId& user_id),
-  //               (const, override));
-};
-
-class MockAuthService : public IAuthService {
- public:
-  MOCK_METHOD(NDomain::TPasswordHash, HashPassword, (std::string_view password), (override));
-  MOCK_METHOD(bool, CheckPassword,
-              (std::string_view input_password, std::string_view stored_password_hash, std::string_view password_salt),
-              (override));
-  MOCK_METHOD(std::string, CreateJwt, (NDomain::TUserId id), (override));
-  MOCK_METHOD(std::optional<NDomain::TUserId>, DecodeJwt, (std::string_view token), (override));
-};
 
 class RegistrationUseCaseIntegrationTest : public Test {
  protected:

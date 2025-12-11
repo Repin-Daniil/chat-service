@@ -39,6 +39,9 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
   return TUserId{result.AsSingleRow<std::string>()};
 }
 
+bool TPostgresUserRepository::CheckUserIdExists(const TUserId& id) const {
+  return false; //todo
+}
 // todo При загрузке пользователя, надо будет превращать из HEX соль и пароль
 
 }  // namespace NChat::NInfrastructure::NRepository

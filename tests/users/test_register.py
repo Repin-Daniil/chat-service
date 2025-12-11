@@ -81,7 +81,7 @@ async def test_register_missing_biography(service_client):
         json={'user': {'username': 'testuser',
                        'display_name': 'test user!', 'password': "VerYStrong#1234"}}
     )
-    #todo можно просто None в user передавать
+    # todo можно просто None в user передавать
     assert response.status == HTTPStatus.BAD_REQUEST
 
 

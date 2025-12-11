@@ -11,11 +11,12 @@ def validate_user_reg(user: User, response):
         },
     }
 
+
 def validate_profile(user: User, response):
     return response.json() == {
         'user': {
             'username': user.username,
-            'biography' user.biography,
+            'biography': user.biography,
             'display_name': user.display_name,
         },
     }

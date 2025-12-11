@@ -3,14 +3,14 @@ from http import HTTPStatus
 from endpoints import register_user
 from models import User
 from utils import Routes
-from validators import validate_user
+from validators import validate_user_reg
 
 
 async def test_register(service_client):
     user = User()
     response = await register_user(service_client, user)
     assert response.status == HTTPStatus.OK
-    assert validate_user(user, response)
+    assert validate_user_reg(user, response)
 
 
 async def test_register_same_username(service_client):
@@ -81,7 +81,7 @@ async def test_register_missing_biography(service_client):
         json={'user': {'username': 'testuser',
                        'display_name': 'test user!', 'password': "VerYStrong#1234"}}
     )
-
+    #todo можно просто None в user передавать
     assert response.status == HTTPStatus.BAD_REQUEST
 
 
@@ -107,7 +107,7 @@ async def test_register_multiple_users(service_client):
     for user in users:
         response = await register_user(service_client, user)
         assert response.status == HTTPStatus.OK
-        assert validate_user(user, response)
+        assert validate_user_reg(user, response)
 
 
 async def test_register_case_sensitive_username(service_client):

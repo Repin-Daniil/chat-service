@@ -11,11 +11,11 @@ NDto::TCheckTokenResult TCheckTokenUseCase::Execute(std::string token, bool is_r
       return {};
     }
 
-    return {.Error = NAuthErrors::EmptyAuth};
+    return {.UserId = {}, .Error = NAuthErrors::EmptyAuth};
   }
 
   if (!token.starts_with(TOKEN_KEYWORD)) {
-    return {.Error = NAuthErrors::InvalidFormat};
+    return {.UserId = {}, .Error = NAuthErrors::InvalidFormat};
   }
 
   std::string_view jwt{token.c_str() + TOKEN_KEYWORD.length()};
@@ -27,10 +27,10 @@ NDto::TCheckTokenResult TCheckTokenUseCase::Execute(std::string token, bool is_r
   }
 
   if (!UserRepo_.CheckUserIdExists(user_id.value())) {
-    return {.Error = NAuthErrors::InvalidUser};
+    return {.UserId = {}, .Error = NAuthErrors::InvalidUser};
   }
 
-  return {.UserId = *user_id.value()};
+  return {.UserId = *user_id.value(), .Error = {}};
 }
 
 }  // namespace NChat::NApp

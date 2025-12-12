@@ -13,25 +13,25 @@ TEST(TDisplayNameTest, ValidNames) {
 }
 
 TEST(TDisplayNameTest, TooShort) {
-  EXPECT_THROW(TDisplayName("A"), DisplayNameInvalidException);
-  EXPECT_THROW(TDisplayName("a"), DisplayNameInvalidException);
-  EXPECT_THROW(TDisplayName("  "), DisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("A"), TDisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("a"), TDisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("  "), TDisplayNameInvalidException);
 }
 
 TEST(TDisplayNameTest, TooLong) {
   std::string longName(MAX_DISPLAY_NAME_LENGTH + 1, 'a');
-  EXPECT_THROW(TDisplayName{longName}, DisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName{longName}, TDisplayNameInvalidException);
 }
 
 TEST(TDisplayNameTest, OnlyWhitespace) {
-  EXPECT_THROW(TDisplayName("   "), DisplayNameInvalidException);
-  EXPECT_THROW(TDisplayName("\t\t"), DisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("   "), TDisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("\t\t"), TDisplayNameInvalidException);
 }
 
 TEST(TDisplayNameTest, InvalidCharacters) {
-  EXPECT_THROW(TDisplayName("User@Name"), DisplayNameInvalidException);
-  EXPECT_THROW(TDisplayName("Name#123"), DisplayNameInvalidException);
-  EXPECT_THROW(TDisplayName("User$Name"), DisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("User@Name"), TDisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("Name#123"), TDisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("User$Name"), TDisplayNameInvalidException);
 }
 
 TEST(TDisplayNameTest, LeadingOrTrailingWhitespace) {
@@ -41,8 +41,8 @@ TEST(TDisplayNameTest, LeadingOrTrailingWhitespace) {
 }
 
 TEST(TDisplayNameTest, ConsecutiveSpaces) {
-  EXPECT_THROW(TDisplayName("User  Name"), DisplayNameInvalidException);
-  EXPECT_THROW(TDisplayName("A   B"), DisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("User  Name"), TDisplayNameInvalidException);
+  EXPECT_THROW(TDisplayName("A   B"), TDisplayNameInvalidException);
 }
 
 TEST(TDisplayNameTest, ValueAccess) {

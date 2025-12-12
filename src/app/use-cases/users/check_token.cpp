@@ -23,7 +23,7 @@ NDto::TCheckTokenResult TCheckTokenUseCase::Execute(std::string token, bool is_r
   auto user_id = AuthService_.DecodeJwt(jwt);
 
   if (!user_id.has_value()) {
-    return {.Error = NAuthErrors::VerifyError};
+    return {.UserId = {}, .Error = NAuthErrors::VerifyError};
   }
 
   if (!UserRepo_.CheckUserIdExists(user_id.value())) {

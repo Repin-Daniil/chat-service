@@ -1,3 +1,7 @@
+from helpers.utils import get_user_token
+from helpers.endpoints import register_user
+from helpers.models import User
+from http import HTTPStatus
 import os
 import sys
 import pytest
@@ -6,10 +10,6 @@ from testsuite.databases.pgsql import discover
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'helpers'))
 
-from http import HTTPStatus
-from models import User
-from endpoints import register_user
-from utils import get_user_token
 
 pytest_plugins = [
     'pytest_userver.plugins.core',

@@ -42,7 +42,13 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
 }
 
 bool TPostgresUserRepository::CheckUserIdExists(const TUserId& id) const {
-  return false;  // todo
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kFindUserById, *id);
+
+  return !result.IsEmpty();
+}
+
+std::optional<TUser> TPostgresUserRepository::GetProfileByUsername(std::string_view username) const {
+  return std::nullopt;  // todo
 }
 // todo При загрузке пользователя, надо будет превращать из HEX соль и пароль
 

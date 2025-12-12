@@ -9,7 +9,7 @@ fake.seed_instance(4321)
 class Routes(str, Enum):
     LOGIN = '/v1/users/login'
     REGISTRATION = '/v1/users/register'
-    GET_USER_BY_NAME = '/v1/users/username/{username}'
+    GET_USER_BY_NAME = '/v1/users/{username}'
 
     def __str__(self) -> str:
         return self.value

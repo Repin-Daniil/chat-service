@@ -7,8 +7,6 @@
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
 
-#include <algorithm>
-
 namespace NChat::NInfrastructure::NAuth {
 
 class TAuthCheckerBearer final : public userver::server::handlers::auth::AuthCheckerBase {

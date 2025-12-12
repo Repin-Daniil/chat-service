@@ -12,7 +12,7 @@
 
 namespace NChat::NCore::NDomain {
 
-class DisplayNameInvalidException : public TValidationException {
+class TDisplayNameInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
   std::string GetField() const noexcept override { return "display_name"; }
@@ -39,16 +39,16 @@ class TDisplayName {
     Value_ = NUtils::Trim(Value_);
 
     if (Value_.empty()) {
-      throw DisplayNameInvalidException("Display name cannot consist only of whitespace");
+      throw TDisplayNameInvalidException("Display name cannot consist only of whitespace");
     }
 
     if (Value_.size() < MIN_DISPLAY_NAME_LENGTH) {
-      throw DisplayNameInvalidException(
+      throw TDisplayNameInvalidException(
           fmt::format("Display name must be at least {} characters long", MIN_DISPLAY_NAME_LENGTH));
     }
 
     if (Value_.size() > MAX_DISPLAY_NAME_LENGTH) {
-      throw DisplayNameInvalidException(
+      throw TDisplayNameInvalidException(
           fmt::format("Display name must not exceed {} characters", MAX_DISPLAY_NAME_LENGTH));
     }
 
@@ -57,14 +57,14 @@ class TDisplayName {
     });
 
     if (!validChars) {
-      throw DisplayNameInvalidException(
+      throw TDisplayNameInvalidException(
           "Display name can only contain letters, digits, spaces, hyphens, "
           "underscores and dots");
     }
 
     for (std::size_t i = 0; i < Value_.size() - 1; ++i) {
       if (Value_[i] == ' ' && Value_[i + 1] == ' ') {
-        throw DisplayNameInvalidException("Display name cannot contain consecutive spaces");
+        throw TDisplayNameInvalidException("Display name cannot contain consecutive spaces");
       }
     }
   }

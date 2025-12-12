@@ -10,7 +10,7 @@
 
 namespace NChat::NCore::NDomain {
 
-class UsernameInvalidException : public TValidationException {
+class TUsernameInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
   std::string GetField() const noexcept override { return "username"; }
@@ -39,15 +39,15 @@ class TUsername {
     const auto len = Value_.length();
 
     if (len < kMinUsernameLength) {
-      throw UsernameInvalidException(fmt::format("Username must be at least {} characters long", kMinUsernameLength));
+      throw TUsernameInvalidException(fmt::format("Username must be at least {} characters long", kMinUsernameLength));
     }
 
     if (len > kMaxUsernameLength) {
-      throw UsernameInvalidException(fmt::format("Username must not exceed {} characters", kMaxUsernameLength));
+      throw TUsernameInvalidException(fmt::format("Username must not exceed {} characters", kMaxUsernameLength));
     }
 
     if (std::isdigit(static_cast<unsigned char>(Value_[0]))) {
-      throw UsernameInvalidException("Username cannot start with a digit");
+      throw TUsernameInvalidException("Username cannot start with a digit");
     }
 
     char prev = '\0';
@@ -55,13 +55,13 @@ class TUsername {
 
     for (char symbol : Value_) {
       if (!std::isalnum(static_cast<unsigned char>(symbol)) && !is_special(symbol)) {
-        throw UsernameInvalidException(
+        throw TUsernameInvalidException(
             "Username must contain ASCII letters, numbers, underscores and "
             "hyphens");
       }
 
       if (is_special(symbol) && is_special(prev)) {
-        throw UsernameInvalidException("Username cannot contain consecutive special characters");
+        throw TUsernameInvalidException("Username cannot contain consecutive special characters");
       }
 
       prev = symbol;

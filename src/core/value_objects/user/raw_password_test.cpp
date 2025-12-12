@@ -11,47 +11,47 @@ TEST(TRawPasswordTest, ValidPassword) {
 }
 
 TEST(TRawPasswordTest, TooShort) {
-  EXPECT_THROW(TRawPassword("Pass1"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword("Ab1"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword(""), PasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Pass1"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Ab1"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword(""), TPasswordInvalidException);
 }
 
 TEST(TRawPasswordTest, TooLong) {
   std::string longPassword(MAX_PASSWORD_LENGTH + 1, 'a');
   longPassword[0] = 'A';  // uppercase
   longPassword[1] = '1';  // digit
-  EXPECT_THROW(TRawPassword{longPassword}, PasswordInvalidException);
+  EXPECT_THROW(TRawPassword{longPassword}, TPasswordInvalidException);
 }
 
 TEST(TRawPasswordTest, NoDigit) {
-  EXPECT_THROW(TRawPassword("Password"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword("Abcdefgh"), PasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Password"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Abcdefgh"), TPasswordInvalidException);
 }
 
 TEST(TRawPasswordTest, NoLetter) {
-  EXPECT_THROW(TRawPassword("12345678"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword("1234567890"), PasswordInvalidException);
+  EXPECT_THROW(TRawPassword("12345678"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword("1234567890"), TPasswordInvalidException);
 }
 
 TEST(TRawPasswordTest, NoUppercase) {
-  EXPECT_THROW(TRawPassword("password123"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword("abcdef123"), PasswordInvalidException);
+  EXPECT_THROW(TRawPassword("password123"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword("abcdef123"), TPasswordInvalidException);
 }
 
 TEST(TRawPasswordTest, NoLowercase) {
-  EXPECT_THROW(TRawPassword("PASSWORD123"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword("ABCDEF123"), PasswordInvalidException);
+  EXPECT_THROW(TRawPassword("PASSWORD123"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword("ABCDEF123"), TPasswordInvalidException);
 }
 
 TEST(TRawPasswordTest, ContainsWhitespace) {
-  EXPECT_THROW(TRawPassword("Pass word123"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword("Pass\tword1A"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword("Passw0rd\n"), PasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Pass word123"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Pass\tword1A"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Passw0rd\n"), TPasswordInvalidException);
 }
 
 TEST(TRawPasswordTest, NonASCII) {
-  EXPECT_THROW(TRawPassword("Пароль123"), PasswordInvalidException);
-  EXPECT_THROW(TRawPassword("Passwörd1"), PasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Пароль123"), TPasswordInvalidException);
+  EXPECT_THROW(TRawPassword("Passwörd1"), TPasswordInvalidException);
 }
 
 TEST(TRawPasswordTest, ValueAccess) {

@@ -11,7 +11,7 @@
 
 namespace NChat::NCore::NDomain {
 
-class BiographyInvalidException : public TValidationException {
+class TBiographyInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
   std::string GetField() const noexcept override { return "biography"; }
@@ -40,11 +40,11 @@ class TBiography {
     Value_ = NUtils::Trim(Value_);
 
     if (Value_.size() > MAX_BIO_LENGTH) {
-      throw BiographyInvalidException(fmt::format("Biography must not exceed {} characters", MAX_BIO_LENGTH));
+      throw TBiographyInvalidException(fmt::format("Biography must not exceed {} characters", MAX_BIO_LENGTH));
     }
 
     if (!Value_.empty() && Value_.size() < MIN_BIO_LENGTH) {
-      throw BiographyInvalidException(
+      throw TBiographyInvalidException(
           fmt::format("Biography must be either empty or at least {} characters long", MIN_BIO_LENGTH));
     }
 
@@ -54,7 +54,7 @@ class TBiography {
     });
 
     if (!validChars) {
-      throw BiographyInvalidException("Biography contains invalid control characters");
+      throw TBiographyInvalidException("Biography contains invalid control characters");
     }
 
     int consecutiveNewlines = 0;
@@ -70,12 +70,12 @@ class TBiography {
     }
 
     if (maxConsecutiveNewlines > 3) {
-      throw BiographyInvalidException("Biography cannot contain more than 3 consecutive newlines");
+      throw TBiographyInvalidException("Biography cannot contain more than 3 consecutive newlines");
     }
 
     if (!Value_.empty()) {
       if (Value_.front() == '\n' || Value_.front() == '\r' || Value_.back() == '\n' || Value_.back() == '\r') {
-        throw BiographyInvalidException("Biography cannot start or end with newline characters");
+        throw TBiographyInvalidException("Biography cannot start or end with newline characters");
       }
     }
   }

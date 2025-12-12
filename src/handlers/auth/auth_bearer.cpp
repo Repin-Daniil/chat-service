@@ -1,13 +1,13 @@
 #include "auth_bearer.hpp"
-// #include "db/sql.hpp"
-#include <utils/jwt/jwt.hpp>
 
-#include <algorithm>
+#include <infrastructure/components/user_service_component.hpp>
+#include <utils/jwt/jwt.hpp>
 
 #include <userver/http/common_headers.hpp>
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
-#include "infrastructure/components/user_service_component.hpp"
+
+#include <algorithm>
 
 namespace NChat::NInfrastructure::NAuth {
 

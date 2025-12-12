@@ -1,11 +1,13 @@
 #pragma once
 
+#include <core/exceptions.hpp>
+#include <utils/validator.hpp>
+
 #include <fmt/format.h>
+
 #include <algorithm>
 #include <cctype>
-#include <core/exceptions.hpp>
 #include <string>
-#include "utils/validator.hpp"
 
 namespace NChat::NCore::NDomain {
 

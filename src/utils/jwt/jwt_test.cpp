@@ -1,6 +1,8 @@
 #include "jwt.hpp"
-#include <string>
+
 #include <userver/utest/utest.hpp>
+
+#include <string>
 
 TEST(JWTUtilsTest, GenerateAndDecodeSuccess) {
   std::string user_id = "user_12345";

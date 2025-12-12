@@ -1,8 +1,10 @@
 #include "registration.hpp"
-#include <gtest/gtest.h>
+
 #include "mocks.hpp"
 
-#include "infrastructure/security/auth_service_impl.hpp"  // for password hashing
+#include <infrastructure/security/auth_service_impl.hpp>  // for password hashing
+
+#include <gtest/gtest.h>
 
 using namespace testing;
 using namespace NChat::NCore;

@@ -1,12 +1,12 @@
 #pragma once
 
+#include <app/dto/check_token_dto.hpp>
 #include <app/dto/registration_dto.hpp>
 #include <app/exceptions.hpp>
+#include <app/use-cases/users/check_token.hpp>
+#include <app/use-cases/users/registration.hpp>
 #include <core/repositories/user_repo.hpp>
 #include <core/services/auth_service_interface.hpp>
-#include "app/dto/check_token_dto.hpp"
-#include "app/use-cases/users/check_token.hpp"
-#include "app/use-cases/users/registration.hpp"
 
 namespace NChat::NApp::NServices {
 

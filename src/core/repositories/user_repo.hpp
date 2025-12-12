@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/entities/user/user.hpp>
+
 #include <optional>
 
 namespace NChat::NCore {

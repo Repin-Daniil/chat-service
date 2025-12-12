@@ -1,9 +1,10 @@
 #pragma once
 
 #include <core/ids.hpp>
+#include <core/value_objects/user/hash_password.hpp>
+
 #include <optional>
 #include <string>
-#include "core/value_objects/user/hash_password.hpp"
 
 namespace NChat::NCore {
 

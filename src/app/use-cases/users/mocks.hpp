@@ -1,7 +1,7 @@
-#include <gmock/gmock.h>
-#include "core/repositories/user_repo.hpp"
-#include "core/services/auth_service_interface.hpp"
+#include <core/repositories/user_repo.hpp>
+#include <core/services/auth_service_interface.hpp>
 
+#include <gmock/gmock.h>
 
 using namespace testing;
 using namespace NChat::NCore;

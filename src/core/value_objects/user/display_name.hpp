@@ -1,12 +1,14 @@
 #pragma once
 
+#include <core/exceptions.hpp>
+#include <utils/validator.hpp>
+
 #include <fmt/format.h>
+#include <userver/logging/log.hpp>
+
 #include <algorithm>
 #include <cctype>
-#include <core/exceptions.hpp>
 #include <string>
-#include <userver/logging/log.hpp>
-#include "utils/validator.hpp"
 
 namespace NChat::NCore::NDomain {
 

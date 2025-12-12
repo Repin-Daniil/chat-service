@@ -1,8 +1,9 @@
 #pragma once
 
+#include <app/services/user_service.hpp>
+
 #include <userver/server/handlers/auth/auth_checker_factory.hpp>
 #include <userver/storages/postgres/postgres_fwd.hpp>
-#include "app/services/user_service.hpp"
 
 namespace NChat::NInfrastructure::NAuth {
 

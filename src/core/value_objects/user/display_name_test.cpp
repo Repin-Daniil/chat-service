@@ -1,4 +1,5 @@
 #include "display_name.hpp"
+
 #include <userver/utest/utest.hpp>
 
 using namespace NChat::NCore::NDomain;

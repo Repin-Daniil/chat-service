@@ -1,4 +1,8 @@
 #include "components.hpp"
+
+#include <handlers/users/user_register_handler.hpp>
+#include <infrastructure/components/user_service_component.hpp>
+
 #include <userver/clients/dns/component.hpp>
 #include <userver/clients/http/component.hpp>
 #include <userver/components/component.hpp>
@@ -8,8 +12,6 @@
 #include <userver/server/handlers/tests_control.hpp>
 #include <userver/storages/postgres/component.hpp>
 #include <userver/testsuite/testsuite_support.hpp>
-#include "handlers/users/user_register_handler.hpp"
-#include "infrastructure/components/user_service_component.hpp"
 
 namespace NChat::NInfrastructure {
 

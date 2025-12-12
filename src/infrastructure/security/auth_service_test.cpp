@@ -1,6 +1,8 @@
-#include <thread>
-#include <userver/utest/utest.hpp>
 #include "auth_service_impl.hpp"
+
+#include <userver/utest/utest.hpp>
+
+#include <thread>
 
 namespace NChat::NInfrastructure::Tests {
 

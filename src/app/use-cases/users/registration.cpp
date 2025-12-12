@@ -1,9 +1,11 @@
 #include "registration.hpp"
-#include <fmt/format.h>
+
+#include <core/value_objects/user/raw_password.hpp>
 #include <core/value_objects/user/username.hpp>
 #include <utils/jwt/jwt.hpp>
-#include "core/value_objects/user/raw_password.hpp"
-#include "utils/uuid/uuid_generator.hpp"
+#include <utils/uuid/uuid_generator.hpp>
+
+#include <fmt/format.h>
 
 namespace NChat::NApp {
 

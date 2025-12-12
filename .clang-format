@@ -1,5 +1,34 @@
 BasedOnStyle: google
 DerivePointerAlignment: false
-IncludeBlocks: Preserve
 ColumnLimit: 120
 InsertNewlineAtEOF: true
+
+SortIncludes: true
+IncludeBlocks: Regroup
+
+IncludeCategories:
+  # 1 — "local"
+  - Regex: '^".*"$'
+    Priority: 1
+
+  # 2 — project sources
+  - Regex: '^<(app|core|infrastructure|handlers|utils)/.*>$'
+    Priority: 2
+
+  # 3 — external libs (userver, fmt, etc.)
+  - Regex: '^<[^/]+/.*>$'
+    Priority: 3
+
+  # 4 — C headers (*.h in root)
+  - Regex: '^<[^>/]+\.h>$'
+    Priority: 4
+
+  # 5 — C++ std headers without .h
+  - Regex: '^<[A-Za-z0-9_]+>$'
+    Priority: 5
+
+
+
+
+
+  

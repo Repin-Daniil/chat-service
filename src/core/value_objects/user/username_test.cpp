@@ -1,7 +1,8 @@
 #include "username.hpp"
 
-#include <unordered_set>
 #include <userver/utest/utest.hpp>
+
+#include <unordered_set>
 
 using namespace NChat::NCore::NDomain;
 

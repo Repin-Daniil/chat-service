@@ -1,4 +1,5 @@
 #include "biography.hpp"
+
 #include <userver/utest/utest.hpp>
 
 using namespace NChat::NCore::NDomain;

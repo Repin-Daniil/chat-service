@@ -80,6 +80,14 @@ components_manager:
             method: POST
             task_processor: main-task-processor
 
+        # handler-get-by-username:
+        #     path: /v1/users/{username}                 
+        #     method: GET            
+        #     task_processor: main-task-processor 
+        #     auth:
+        #         types:
+        #           - bearer
+
         # PostgreSQL
         chat-postgres-database:
             dbconnection: $pg-connection

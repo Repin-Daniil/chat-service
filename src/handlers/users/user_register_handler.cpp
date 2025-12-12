@@ -1,12 +1,13 @@
 #include "user_register_handler.hpp"
-#include <userver/crypto/hash.hpp>
-#include <userver/crypto/random.hpp>
-#include <userver/formats/serialize/common_containers.hpp>
-#include <userver/storages/postgres/component.hpp>
 
 #include <app/dto/registration_dto.hpp>
 #include <handlers/handler_exceptions.hpp>
 #include <infrastructure/components/user_service_component.hpp>
+
+#include <userver/crypto/hash.hpp>
+#include <userver/crypto/random.hpp>
+#include <userver/formats/serialize/common_containers.hpp>
+#include <userver/storages/postgres/component.hpp>
 
 using NChat::NApp::NDto::TUserRegistrationData;
 using NChat::NApp::NDto::TUserRegistrationResult;

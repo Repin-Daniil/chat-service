@@ -1,9 +1,11 @@
 #pragma once
 
+#include <core/exceptions.hpp>
+
 #include <fmt/format.h>
+
 #include <algorithm>
 #include <cctype>
-#include <core/exceptions.hpp>
 #include <string>
 
 namespace NChat::NCore::NDomain {

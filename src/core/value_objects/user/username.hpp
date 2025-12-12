@@ -1,10 +1,12 @@
 #pragma once
 
+#include <core/exceptions.hpp>
+
 #include <fmt/format.h>
+
 #include <algorithm>
 #include <stdexcept>
 #include <string>
-#include "core/exceptions.hpp"
 
 namespace NChat::NCore::NDomain {
 

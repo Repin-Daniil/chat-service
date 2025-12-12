@@ -1,4 +1,5 @@
 #include "raw_password.hpp"
+
 #include <userver/utest/utest.hpp>
 
 using namespace NChat::NCore::NDomain;

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <core/exceptions.hpp>
+#include <core/ids.hpp>
+#include <core/value_objects/user/biography.hpp>
+#include <core/value_objects/user/display_name.hpp>
+#include <core/value_objects/user/hash_password.hpp>
+#include <core/value_objects/user/username.hpp>
+
 #include <string>
-#include "core/exceptions.hpp"
-#include "core/ids.hpp"
-#include "core/value_objects/user/biography.hpp"
-#include "core/value_objects/user/display_name.hpp"
-#include "core/value_objects/user/hash_password.hpp"
-#include "core/value_objects/user/username.hpp"
 
 namespace NChat::NCore::NDomain {
 

@@ -1,7 +1,9 @@
 #include "postgres_user_repository.hpp"
+
+#include <app/use-cases/users/registration.hpp>
+
+#include <NChat/sql_queries.hpp>
 #include <userver/utils/encoding/hex.hpp>
-#include "NChat/sql_queries.hpp"
-#include "app/use-cases/users/registration.hpp"
 
 namespace NChat::NInfrastructure::NRepository {
 
@@ -39,6 +41,9 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
   return TUserId{result.AsSingleRow<std::string>()};
 }
 
+bool TPostgresUserRepository::CheckUserIdExists(const TUserId& id) const {
+  return false;  // todo
+}
 // todo При загрузке пользователя, надо будет превращать из HEX соль и пароль
 
 }  // namespace NChat::NInfrastructure::NRepository

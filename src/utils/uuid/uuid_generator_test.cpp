@@ -1,8 +1,10 @@
 
-#include "utils/uuid/uuid_generator.hpp"
+#include <utils/uuid/uuid_generator.hpp>
+
+#include <userver/utest/utest.hpp>
+
 #include <regex>
 #include <unordered_set>
-#include <userver/utest/utest.hpp>
 
 using NUtils::NId::UuidGenerator;
 

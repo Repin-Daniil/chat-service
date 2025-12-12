@@ -1,9 +1,11 @@
 #include "user_service_component.hpp"
+
+#include <infrastructure/repositories/postgres_user_repository.hpp>
+#include <infrastructure/security/auth_service_impl.hpp>
+
 #include <userver/components/component.hpp>
 #include <userver/components/component_context.hpp>
 #include <userver/yaml_config/merge_schemas.hpp>
-#include "infrastructure/repositories/postgres_user_repository.hpp"
-#include "infrastructure/security/auth_service_impl.hpp"
 
 namespace NChat::NInfrastructure::NComponents {
 

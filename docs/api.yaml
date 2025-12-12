@@ -20,7 +20,7 @@ tags:
 components:
   schemas:
     # --- Модели для Auth ---
-    UserRegistrationRequest:
+    TUserRegistrationRequest:
       type: object
       additionalProperties: false
       required: [user]
@@ -46,7 +46,7 @@ components:
               type: string
               maxLength: 180
     
-    UserRegistered:
+    TUserRegistered:
       type: object
       properties:
         username:
@@ -54,30 +54,30 @@ components:
           example: alice
         token:
           type: string
-          format: uuid
-          example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef'
+          format: JWT
+          example: 'eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9'
     
-    AuthToken:
-      type: object
-      properties:
-        session_token:
-          type: string
-          example: 'your-super-secret-token-qwe-rty'
-
     # --- Модели для Users ---
-    UserProfile:
+    TUserProfile:
       type: object
       properties:
         user_id:
           type: string
-          format: JWT
-          example: eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9
+          format: uuid
+          example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef'
         username:
           type: string
           example: alice
+        display_name:
+          type: string
+          example: 'Daniil Repin'
+        biography:
+          type: string
+          example: "My biography"
+
 
     # --- Общая модель ошибки ---
-    Error:
+    TError:
       type: object
       properties:
         code:
@@ -97,46 +97,102 @@ components:
                   items:
                     type: string
 
-  # --- Определение схемы безопасности ---
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT # Или просто 'token', если это непрозрачный токен
+      bearerFormat: JWT
 
-# 2. Определение путей (эндпоинтов)
 paths:
-  # --- Auth ---
   /users/register:
     post:
       tags:
         - Auth
       summary: Регистрация нового пользователя
+      operationId: registerUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRegistrationRequest'
+              $ref: '#/components/schemas/TUserRegistrationRequest'
       responses:
         '200':
           description: Пользователь успешно зарегистрирован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserRegistered'
+                $ref: '#/components/schemas/TUserRegistered'
         '400':
           description: Некорректные входные данные
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  
+                $ref: '#/components/schemas/TError'
         '409':
           description: Пользователь с таким именем уже существует
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  
-  
+                $ref: '#/components/schemas/TError'
+
+  /users/username/{username}:
+    get:
+      tags:
+        - Users
+      summary: Получение профиля пользователя по username
+      operationId: getUserProfileByUsername
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Профиль получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TUserProfile'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TError'
+
+  /users/id/{user_id}:
+    get:
+      tags:
+        - Users
+      summary: Получение профиля пользователя по user_id
+      description: Получить публичный профиль пользователя по его уникальному идентификатору.
+      operationId: getUserProfileById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Профиль получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TUserProfile'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TError'
+
+
+

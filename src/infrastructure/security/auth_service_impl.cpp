@@ -1,9 +1,10 @@
 #include "auth_service_impl.hpp"
 
+#include <utils/jwt/jwt.hpp>
+
 #include <fmt/format.h>
 #include <userver/crypto/hash.hpp>
 #include <userver/crypto/random.hpp>
-#include "utils/jwt/jwt.hpp"
 
 namespace NChat::NInfrastructure {
 using NCore::NDomain::TPasswordHash;

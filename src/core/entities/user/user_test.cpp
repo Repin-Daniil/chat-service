@@ -1,8 +1,10 @@
 #include "user.hpp"
 
+#include <infrastructure/security/auth_service_impl.hpp>
+
 #include <gtest/gtest.h>
+
 #include <memory>
-#include "infrastructure/security/auth_service_impl.hpp"
 
 namespace NChat::NCore::NDomain {
 

@@ -21,7 +21,7 @@ class RequiredFields(tuple, Enum):
 
 
 def model_dump(model, **kwargs):
-    return {model.__class__.__name__.lower(): model.model_dump(**kwargs)}
+    return {model.__class__.__name__.lower(): model.model_dump(exclude_none=True, **kwargs)}
 
 
 def get_user_token(response):

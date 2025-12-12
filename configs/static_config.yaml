@@ -87,6 +87,7 @@ components_manager:
             auth:
                 types:
                   - bearer
+                required: true
 
         # PostgreSQL
         chat-postgres-database:

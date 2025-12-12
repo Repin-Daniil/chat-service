@@ -1,1 +1,0 @@
-SELECT username, display_name, biography FROM chat.users WHERE user_id = $1;

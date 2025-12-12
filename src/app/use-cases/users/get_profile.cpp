@@ -17,8 +17,7 @@ std::optional<NDto::TUserProfile> TGetProfileByNameUseCase::Execute(std::string 
   const auto result = UserRepo_.GetProfileByUsername(username.Value());
 
   if (result.has_value()) {
-    return {{.UserId = *result->GetId(),
-             .Username = result->GetUsername(),
+    return {{.Username = result->GetUsername(),
              .DisplayName = result->GetDisplayName(),
              .Biography = result->GetBiography()}};
   }

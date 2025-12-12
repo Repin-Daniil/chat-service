@@ -33,7 +33,7 @@ void TPostgresUserRepository::InsertNewUser(const TUser& user) const {
 
 std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view username) const {
   auto result =
-      PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kFindUserByUsername, username);
+      PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kFindUserByUsername, username);
   if (result.IsEmpty()) {
     return std::nullopt;
   }
@@ -42,29 +42,23 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
 }
 
 bool TPostgresUserRepository::CheckUserIdExists(const TUserId& id) const {
-  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kFindUserById, *id);
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kFindUserById, *id);
 
   return !result.IsEmpty();
 }
 
 std::optional<TUser> TPostgresUserRepository::GetProfileByUsername(std::string_view username) const {
-  return std::nullopt;  // todo
+  auto result =
+      PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetProfileByUsername, username);
+  if (result.IsEmpty()) {
+    return std::nullopt;
+  }
+
+  auto user_data = result.AsSingleRow<NCore::NDomain::TUserData>(userver::storages::postgres::kRowTag);
+
+  return NCore::NDomain::TUser::Restore(std::move(user_data));
 }
+
 // todo При загрузке пользователя, надо будет превращать из HEX соль и пароль
 
 }  // namespace NChat::NInfrastructure::NRepository
-
-// std::optional<domain::User> GetById(const std::string& id) {
-//       auto res = cluster_->Execute(..., sql::kSelectUser, id);
-//       if (res.IsEmpty()) return std::nullopt;
-
-//       auto row = res[0];
-//       // Используем Restore фабрику!
-//       return domain::User::Restore(
-//           row["id"].As<std::string>(),
-//           row["username"].As<std::string>(),
-//           row["bio"].As<std::string>(), // Тут строка превратится в
-//           Biography внутри Restore row["hash"].As<std::string>(),
-//           row["salt"].As<std::string>()
-//       );
-//   }

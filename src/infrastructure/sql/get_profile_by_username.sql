@@ -1,0 +1,1 @@
+SELECT user_id, username, display_name, password_hash, salt, biography FROM chat.users WHERE username = $1;

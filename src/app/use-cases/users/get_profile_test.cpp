@@ -28,24 +28,25 @@ class GetProfileByNameUseCaseIntegrationTest : public Test {
 // Пользователь найден
 TEST_F(GetProfileByNameUseCaseIntegrationTest, UserFound_ReturnsProfile) {
   // Arrange
-  const std::string username = "testuser";
-  const std::string display_name = "Test User";
-  const std::string biography = "Test bio";
-  const TUserId user_id("user123");
+  NDomain::TUserData data{.UserId = "user123",
+                          .Username = "testuser",
+                          .DisplayName = "Test User",
+                          .PasswordHash = "hash",
+                          .Salt = "salt",
+                          .Biography = "Test bio"};
 
-  auto mock_user = TUser::Restore(user_id, username, display_name, "hash", "salt", biography);
+  auto mock_user = TUser::Restore(data);
 
-  EXPECT_CALL(*user_repo_ptr_, GetProfileByUsername(username)).WillOnce(Return(std::optional<TUser>(mock_user)));
+  EXPECT_CALL(*user_repo_ptr_, GetProfileByUsername(data.Username)).WillOnce(Return(std::optional<TUser>(mock_user)));
 
   // Act
-  auto result = use_case_->Execute(username);
+  auto result = use_case_->Execute(data.Username);
 
   // Assert
   ASSERT_TRUE(result.has_value());
-  EXPECT_EQ(result->UserId, *user_id);
-  EXPECT_EQ(result->Username, username);
-  EXPECT_EQ(result->DisplayName, display_name);
-  EXPECT_EQ(result->Biography, biography);
+  EXPECT_EQ(result->Username, data.Username);
+  EXPECT_EQ(result->DisplayName, data.DisplayName);
+  EXPECT_EQ(result->Biography, data.Biography);
 }
 
 // Пользователь не найден

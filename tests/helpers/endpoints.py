@@ -10,8 +10,8 @@ async def register_user(service_client, user):
 
 async def get_user_by_name(service_client, username, token):
     return await service_client.get(
-        Routes.GET_USER_BY_NAME.format(username=username),
-        headers={'Authorization': token},
+        Routes.GET_USER_BY_NAME.format(username=(username or "")),
+        headers={'Authorization': token or ""},
     )
 
 

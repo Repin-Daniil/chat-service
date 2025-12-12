@@ -14,7 +14,6 @@ userver::formats::json::Value Serialize(const NChat::NApp::NDto::TUserProfile& r
                                         userver::formats::serialize::To<userver::formats::json::Value>) {
   userver::formats::json::ValueBuilder item;
 
-  item["user_id"] = result.UserId;
   item["username"] = result.Username;
   item["display_name"] = result.DisplayName;
   item["biography"] = result.Biography;

@@ -80,3 +80,15 @@ CREATE TABLE chat.chat_members (
 --
 --     PRIMARY KEY (chat_id, user_id)
 -- );
+
+
+-- ===========================
+--  FOR MAPPERS
+-- ===========================
+CREATE TYPE chat.user AS (
+    user_id TEXT,
+    username TEXT,
+    password_hash TEXT,
+    salt TEXT,
+    biography TEXT
+);

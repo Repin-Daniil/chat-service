@@ -42,7 +42,8 @@ TAuthCheckerBearer::TAuthCheckResult TAuthCheckerBearer::CheckAuth(
                             userver::server::handlers::HandlerErrorCode::kUnauthorized};
   }
 
-  request_context.SetData("user_id", result.UserId);
+  request_context.SetData("user_id", result.UserId);  // todo Возможно нужна миддлварь, которая будет сохранять в
+                                                      // контекст инфу, что за пользователь, его чаты, че нить такое
   return {};
 }
 

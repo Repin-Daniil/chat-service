@@ -1,4 +1,5 @@
 #include "components.hpp"
+
 #include "handlers/auth/auth_bearer.hpp"
 
 #include <handlers/users/get_by_username_handler.hpp>
@@ -26,8 +27,8 @@ void RegisterUserverComponents(userver::components::ComponentList& list) {
       .Append<userver::congestion_control::Component>();
 }
 
-void RegisterAuthCheckerFactory(){
-   userver::server::handlers::auth::RegisterAuthCheckerFactory<NChat::NInfrastructure::NAuth::TCheckerFactory>();
+void RegisterAuthCheckerFactory() {
+  userver::server::handlers::auth::RegisterAuthCheckerFactory<NChat::NInfrastructure::NAuth::TCheckerFactory>();
 }
 
 // Clients

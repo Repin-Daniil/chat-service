@@ -42,7 +42,7 @@ TEST_F(UserTest, CreateNewUser) {
 }
 
 TEST_F(UserTest, RestoreUser) {
-    NDomain::TUserData data{.UserId = "user123",
+  NDomain::TUserData data{.UserId = "user123",
                           .Username = "testuser",
                           .DisplayName = "Test User",
                           .PasswordHash = "hash",

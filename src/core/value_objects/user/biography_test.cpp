@@ -13,7 +13,7 @@ TEST(TBiographyTest, ValidBiographies) {
 
 TEST(TBiographyTest, TooLong) {
   std::string longBio(MAX_BIO_LENGTH + 1, 'a');
-  EXPECT_THROW(TBiography{longBio}, BiographyInvalidException);
+  EXPECT_THROW(TBiography{longBio}, TBiographyInvalidException);
 }
 
 TEST(TBiographyTest, EmptyIsValid) {
@@ -30,11 +30,11 @@ TEST(TBiographyTest, InvalidControlCharacters) {
   std::string bioWithNull = "Hello";
   bioWithNull += '\0';
   bioWithNull += " World";
-  EXPECT_THROW(TBiography{bioWithNull}, BiographyInvalidException);
+  EXPECT_THROW(TBiography{bioWithNull}, TBiographyInvalidException);
 }
 
 TEST(TBiographyTest, TooManyConsecutiveNewlines) {
-  EXPECT_THROW(TBiography("Line1\n\n\n\nLine2"), BiographyInvalidException);
+  EXPECT_THROW(TBiography("Line1\n\n\n\nLine2"), TBiographyInvalidException);
 }
 
 TEST(TBiographyTest, StartsOrEndsWithNewline) {

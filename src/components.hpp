@@ -2,6 +2,7 @@
 
 namespace NChat::NInfrastructure {
 void RegisterUserverComponents(userver::components::ComponentList&);
+void RegisterAuthCheckerFactory();
 
 // Clients
 void RegisterPostrgesComponent(userver::components::ComponentList&);

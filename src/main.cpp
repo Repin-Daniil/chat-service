@@ -6,6 +6,7 @@
 int main(int argc, char* argv[]) {
   auto component_list = userver::components::MinimalServerComponentList();
 
+  NChat::NInfrastructure::RegisterAuthCheckerFactory();
   NChat::NInfrastructure::RegisterUserverComponents(component_list);
   NChat::NInfrastructure::RegisterPostrgesComponent(component_list);
 

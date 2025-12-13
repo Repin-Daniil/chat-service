@@ -1,5 +1,8 @@
 #include "components.hpp"
 
+#include "handlers/auth/auth_bearer.hpp"
+
+#include <handlers/users/get_by_username_handler.hpp>
 #include <handlers/users/user_register_handler.hpp>
 #include <infrastructure/components/user_service_component.hpp>
 
@@ -24,13 +27,19 @@ void RegisterUserverComponents(userver::components::ComponentList& list) {
       .Append<userver::congestion_control::Component>();
 }
 
+void RegisterAuthCheckerFactory() {
+  userver::server::handlers::auth::RegisterAuthCheckerFactory<NChat::NInfrastructure::NAuth::TCheckerFactory>();
+}
+
 // Clients
 void RegisterPostrgesComponent(userver::components::ComponentList& list) {
   list.Append<userver::components::Postgres>("chat-postgres-database");
 }
 
 // Handlers
-void RegisterUserHandlers(userver::components::ComponentList& list) { list.Append<NHandlers::TRegisterUserHandler>(); }
+void RegisterUserHandlers(userver::components::ComponentList& list) {
+  list.Append<NHandlers::TRegisterUserHandler>().Append<NHandlers::TGetByUsernameHandler>();
+}
 
 // Components
 void RegisterUserServiceComponent(userver::components::ComponentList& list) {

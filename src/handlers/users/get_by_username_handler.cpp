@@ -1,52 +1,56 @@
-// #include "get_by_username_handler.hpp"
-// #include <userver/crypto/hash.hpp>
-// #include <userver/crypto/random.hpp>
-// #include <userver/formats/serialize/common_containers.hpp>
-// #include <userver/storages/postgres/component.hpp>
+#include "get_by_username_handler.hpp"
 
-// #include <app/dto/registration_dto.hpp>
-// #include <handlers/handler_exceptions.hpp>
-// #include <infrastructure/components/user_service_component.hpp>
+#include <app/dto/registration_dto.hpp>
+#include <handlers/handler_exceptions.hpp>
+#include <infrastructure/components/user_service_component.hpp>
 
-// using NChat::NApp::NDto::TUserRegistrationData;
-// using NChat::NApp::NDto::TUserRegistrationResult;
+#include <userver/crypto/hash.hpp>
+#include <userver/crypto/random.hpp>
+#include <userver/formats/serialize/common_containers.hpp>
+#include <userver/storages/postgres/component.hpp>
 
-// namespace userver::formats::serialize {
-// userver::formats::json::Value Serialize(const TUserRegistrationResult& result,
-//                                         userver::formats::serialize::To<userver::formats::json::Value>) {
-//   userver::formats::json::ValueBuilder item;
+namespace userver::formats::serialize {
+userver::formats::json::Value Serialize(const NChat::NApp::NDto::TUserProfile& result,
+                                        userver::formats::serialize::To<userver::formats::json::Value>) {
+  userver::formats::json::ValueBuilder item;
 
-//   item["username"] = result.Username;
-//   item["token"] = result.Token;
+  item["username"] = result.Username;
+  item["display_name"] = result.DisplayName;
+  item["biography"] = result.Biography;
 
-//   return item.ExtractValue();
-// }
-// }  // namespace userver::formats::serialize
+  return item.ExtractValue();
+}
+}  // namespace userver::formats::serialize
 
-// namespace NChat::NInfrastructure::NHandlers {
+namespace NChat::NInfrastructure::NHandlers {
 
-// TGetByUsernameHandler::TGetByUsernameHandler(const userver::components::ComponentConfig& config,
-//                                              const userver::components::ComponentContext& context)
-//     : HttpHandlerBase(config, context),
-//       UserService_(context.FindComponent<NComponents::TUserServiceComponent>().GetService()) {}
+TGetByUsernameHandler::TGetByUsernameHandler(const userver::components::ComponentConfig& config,
+                                             const userver::components::ComponentContext& context)
+    : HttpHandlerJsonBase(config, context),
+      UserService_(context.FindComponent<NComponents::TUserServiceComponent>().GetService()) {}
 
-// std::string TGetByUsernameHandler::HandleRequestThrow(const userver::server::http::HttpRequest& request,
-//                                                       userver::server::request::RequestContext&) const {
-//   const auto& username = request.GetPathArg("username");
+userver::formats::json::Value TGetByUsernameHandler::HandleRequestJsonThrow(
+    const userver::server::http::HttpRequest& request, const userver::formats::json::Value& /*request_json*/,
+    userver::server::request::RequestContext&) const {
+  const auto& username = request.GetPathArg("username");
+  std::optional<NApp::NDto::TUserProfile> result;
 
-//   if (username.empty()) {
-//     // throw
-//     // fixme или может само как-то может?
-//   }
+  try {
+    result = UserService_.GetProfileByUsername(username);
+  } catch (const NCore::NDomain::TUsernameInvalidException& ex) {
+    throw TValidationException(ex.GetField(), ex.what());
+  }
 
-//   try {
-//     const auto result = UserService_.Register(user_command);
+  if (!result.has_value()) {
+    auto& response = request.GetHttpResponse();
+    response.SetStatus(userver::server::http::HttpStatus::kNotFound);
+    return MakeError("username", fmt::format("User with username {} not found.", username));
+  }
 
-//     userver::formats::json::ValueBuilder builder;
-//     builder["user"] = result;
+  userver::formats::json::ValueBuilder builder;
+  builder["user"] = result;
 
-//     return userver::formats::json::ToString(builder.ExtractValue());
-//   }
-// }
+  return builder.ExtractValue();
+}
 
-// }  // namespace NChat::NInfrastructure::NHandlers
+}  // namespace NChat::NInfrastructure::NHandlers

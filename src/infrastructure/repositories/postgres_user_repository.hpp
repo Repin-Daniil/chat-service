@@ -5,18 +5,10 @@
 #include <userver/components/loggable_component_base.hpp>
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
+#include <userver/storages/postgres/io/io_fwd.hpp>
+#include <userver/storages/postgres/io/pg_types.hpp>
 
 namespace NChat::NInfrastructure::NRepository {
-
-// todo Кажется нужно тут отображать все поля?
-struct UserRecord {
-  std::string UserId;
-  std::string Username;
-  std::string DisplayName;
-  std::string Biography;
-  std::string PasswordHash;
-  std::string PasswordSalt;
-};
 
 class TPostgresUserRepository : public NCore::IUserRepository {
  public:
@@ -24,6 +16,7 @@ class TPostgresUserRepository : public NCore::IUserRepository {
 
   void InsertNewUser(const TUser& user) const override;
   std::optional<TUserId> FindByUsername(std::string_view username) const override;
+  std::optional<TUser> GetProfileByUsername(std::string_view username) const override;
   // std::optional<TUser> GetUserById(const TUserId& user_id) const override;
 
   // todo тут бы кэш к постгре прикрутить для CheckUserId
@@ -35,8 +28,11 @@ class TPostgresUserRepository : public NCore::IUserRepository {
 
 }  // namespace NChat::NInfrastructure::NRepository
 
-// fixme А это нужно? Непонятно пока
+namespace userver::storages::postgres::io {
+
 template <>
-struct userver::storages::postgres::io::CppToUserPg<NChat::NInfrastructure::NRepository::UserRecord> {
-  static constexpr DBTypeName postgres_name = "chat.user";
+struct CppToUserPg<NChat::NCore::NDomain::TUserData> {
+  static constexpr DBTypeName postgres_name{"chat.user"};
 };
+
+}  // namespace userver::storages::postgres::io

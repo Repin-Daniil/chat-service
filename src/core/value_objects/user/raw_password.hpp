@@ -10,7 +10,7 @@
 
 namespace NChat::NCore::NDomain {
 
-class PasswordInvalidException : public TValidationException {
+class TPasswordInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
   std::string GetField() const noexcept override { return "password"; }
@@ -37,11 +37,11 @@ class TRawPassword {
     std::string_view v = Value_;
 
     if (v.size() < MIN_PASSWORD_LENGTH) {
-      throw PasswordInvalidException(fmt::format("Password must be at least {} characters long", MIN_PASSWORD_LENGTH));
+      throw TPasswordInvalidException(fmt::format("Password must be at least {} characters long", MIN_PASSWORD_LENGTH));
     }
 
     if (v.size() > MAX_PASSWORD_LENGTH) {
-      throw PasswordInvalidException(fmt::format("Password must not exceed {} characters", MAX_PASSWORD_LENGTH));
+      throw TPasswordInvalidException(fmt::format("Password must not exceed {} characters", MAX_PASSWORD_LENGTH));
     }
 
     bool has_digit = false;
@@ -66,31 +66,31 @@ class TRawPassword {
     }
 
     if (!has_digit) {
-      throw PasswordInvalidException("Password must contain at least one digit");
+      throw TPasswordInvalidException("Password must contain at least one digit");
     }
 
     if (!has_letter) {
-      throw PasswordInvalidException("Password must contain at least one letter");
+      throw TPasswordInvalidException("Password must contain at least one letter");
     }
 
     if (!has_upper) {
-      throw PasswordInvalidException("Password must contain at least one uppercase letter");
+      throw TPasswordInvalidException("Password must contain at least one uppercase letter");
     }
 
     if (!has_lower) {
-      throw PasswordInvalidException("Password must contain at least one lowercase letter");
+      throw TPasswordInvalidException("Password must contain at least one lowercase letter");
     }
 
     if (has_space) {
-      throw PasswordInvalidException("Password must not contain whitespace characters");
+      throw TPasswordInvalidException("Password must not contain whitespace characters");
     }
 
     if (!has_special) {
-      throw PasswordInvalidException("Password must contain at least one special character");
+      throw TPasswordInvalidException("Password must contain at least one special character");
     }
 
     if (!all_ascii) {
-      throw PasswordInvalidException("Password must contain only ASCII characters");
+      throw TPasswordInvalidException("Password must contain only ASCII characters");
     }
   }
 

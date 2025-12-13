@@ -19,10 +19,9 @@ TUser TUser::CreateNew(TUserId user_id, const TUsername& username, const TDispla
   return TUser(user_id, username.Value(), name.Value(), password.GetHash(), password.GetSalt(), bio.Value());
 }
 
-TUser TUser::Restore(TUserId id, std::string username, std::string display_name, std::string password_hash,
-                     std::string password_salt, std::string biography) {
-  return TUser(id, std::move(username), std::move(display_name), std::move(password_hash), std::move(password_salt),
-               std::move(biography));
+TUser TUser::Restore(TUserData data) {
+  return TUser(TUserId{data.UserId}, std::move(data.Username), std::move(data.DisplayName),
+               std::move(data.PasswordHash), std::move(data.Salt), std::move(data.Biography));
 }
 
 void TUser::UpdateDisplayName(const TDisplayName& display_name) { DisplayName_ = display_name.Value(); }

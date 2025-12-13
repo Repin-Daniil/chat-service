@@ -42,20 +42,19 @@ TEST_F(UserTest, CreateNewUser) {
 }
 
 TEST_F(UserTest, RestoreUser) {
-  std::string username = "restored_user";
-  std::string display_name = "Restored User";
-  std::string password_hash = "hash123";
-  std::string password_salt = "salt123";
-  std::string biography = "Restored biography";
+  NDomain::TUserData data{.UserId = "user123",
+                          .Username = "testuser",
+                          .DisplayName = "Test User",
+                          .PasswordHash = "hash",
+                          .Salt = "salt",
+                          .Biography = "Test bio"};
 
-  auto user = TUser::Restore(user_id_, username, display_name, password_hash, password_salt, biography);
+  auto user = TUser::Restore(data);
 
-  EXPECT_EQ(user.GetId(), user_id_);
-  EXPECT_EQ(user.GetUsername(), username);
-  EXPECT_EQ(user.GetDisplayName(), display_name);
-  EXPECT_EQ(user.GetPasswordHash(), password_hash);
-  EXPECT_EQ(user.GetPasswordSalt(), password_salt);
-  EXPECT_EQ(user.GetBiography(), biography);
+  EXPECT_EQ(user.GetId(), TUserId{data.UserId});
+  EXPECT_EQ(user.GetUsername(), data.Username);
+  EXPECT_EQ(user.GetDisplayName(), data.DisplayName);
+  EXPECT_EQ(user.GetBiography(), data.Biography);
 }
 
 TEST_F(UserTest, UpdateDisplayName) {

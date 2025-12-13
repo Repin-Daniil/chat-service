@@ -16,13 +16,21 @@ class TUserAlreadyExistsException : public TDomainException {
   using TDomainException::TDomainException;
 };
 
+struct TUserData final {
+  std::string UserId;
+  std::string Username;
+  std::string DisplayName;
+  std::string PasswordHash;
+  std::string Salt;
+  std::string Biography;
+};
+
 class TUser {
  public:
   static TUser CreateNew(TUserId user_id, const TUsername& username, const TDisplayName& name,
                          const TPasswordHash& password, const TBiography& bio);
 
-  static TUser Restore(TUserId id, std::string username, std::string display_name, std::string password_hash,
-                       std::string password_salt, std::string biography);
+  static TUser Restore(TUserData user_data);
 
   // Getters
   const TUserId& GetId() const { return Id_; }

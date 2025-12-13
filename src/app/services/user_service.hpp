@@ -1,9 +1,7 @@
 #pragma once
 
-#include <app/dto/check_token_dto.hpp>
-#include <app/dto/registration_dto.hpp>
-#include <app/exceptions.hpp>
 #include <app/use-cases/users/check_token.hpp>
+#include <app/use-cases/users/get_profile.hpp>
 #include <app/use-cases/users/registration.hpp>
 #include <core/repositories/user_repo.hpp>
 #include <core/services/auth_service_interface.hpp>
@@ -16,14 +14,15 @@ class TUserService {
 
   NDto::TUserRegistrationResult Register(NDto::TUserRegistrationData request);
   NDto::TCheckTokenResult CheckToken(std::string token, const bool is_required);
+  std::optional<NDto::TUserProfile> GetProfileByUsername(std::string username);
 
   // TLoginResult Login();
   // GetInfoById();
-  // GetInfoByUsername();
 
  private:
   TRegistrationUseCase RegistrationUseCase_;
   TCheckTokenUseCase CheckTokenUseCase_;
+  TGetProfileByNameUseCase ProfileByNameUseCase_;
 };
 
 }  // namespace NChat::NApp::NServices

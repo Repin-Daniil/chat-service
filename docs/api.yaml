@@ -18,8 +18,45 @@ tags:
     description: (Пока не используется)
 
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
-    # --- Модели для Auth ---
+    # Error
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "400"
+        message:
+          type: string
+          example: "Неверное имя пользователя или пароль"
+        details:
+          type: object
+          properties:
+            errors:
+              type: object
+              description: Ошибки валидации по полям
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+    # Token
+    AuthToken:
+      type: object
+      required:
+        - access-token
+      properties:
+        access-token:
+          type: string
+          format: jwt
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+
+    # Users
     UserRegistrationRequest:
       type: object
       additionalProperties: false
@@ -69,16 +106,6 @@ components:
         token:
           $ref: "#/components/schemas/AuthToken"
 
-    AuthToken:
-      type: object
-      required:
-        - access-token
-      properties:
-        access-token:
-          type: string
-          format: jwt
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
-    # --- Модели для Users ---
     UserProfile:
       type: object
       properties:
@@ -91,33 +118,6 @@ components:
         biography:
           type: string
           example: "My biography"
-
-    # --- Общая модель ошибки ---
-    Error:
-      type: object
-      properties:
-        code:
-          type: string
-          example: "400"
-        message:
-          type: string
-          example: "Неверное имя пользователя или пароль"
-        details:
-          type: object
-          properties:
-            errors:
-              type: object
-              description: Ошибки валидации по полям
-              additionalProperties:
-                type: array
-                items:
-                  type: string
-
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
 
 paths:
   /users/register:

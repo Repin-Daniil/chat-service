@@ -45,20 +45,20 @@ components:
             biography:
               type: string
               maxLength: 180
-    
+
     TUserLoginRequest:
       type: object
       additionalProperties: false
       required: [username, password]
       properties:
-          username:
-            type: string
-            minLength: 3
-            maxLength: 32
-          password:
-            type: string
-            minLength: 8
-            format: password
+        username:
+          type: string
+          minLength: 3
+          maxLength: 32
+        password:
+          type: string
+          minLength: 8
+          format: password
 
     TUserRegistered:
       type: object
@@ -67,8 +67,8 @@ components:
           type: string
           example: alice
         token:
-          $ref: '#/components/schemas/TAuthToken'
-          
+          $ref: "#/components/schemas/TAuthToken"
+
     TAuthToken:
       type: object
       required:
@@ -87,11 +87,10 @@ components:
           example: alice
         display_name:
           type: string
-          example: 'Daniil Repin'
+          example: "Daniil Repin"
         biography:
           type: string
           example: "My biography"
-
 
     # --- Общая модель ошибки ---
     TError:
@@ -99,20 +98,20 @@ components:
       properties:
         code:
           type: string
-          example: '400'
+          example: "400"
         message:
           type: string
-          example: 'Неверное имя пользователя или пароль'
+          example: "Неверное имя пользователя или пароль"
         details:
           type: object
-          properties:  
-            errors: 
-                type: object
-                description: Ошибки валидации по полям
-                additionalProperties:
-                  type: array
-                  items:
-                    type: string
+          properties:
+            errors:
+              type: object
+              description: Ошибки валидации по полям
+              additionalProperties:
+                type: array
+                items:
+                  type: string
 
   securitySchemes:
     BearerAuth:
@@ -132,26 +131,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TUserRegistrationRequest'
+              $ref: "#/components/schemas/TUserRegistrationRequest"
       responses:
-        '200':
+        "200":
           description: Пользователь успешно зарегистрирован
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TUserRegistered'
-        '400':
+                $ref: "#/components/schemas/TUserRegistered"
+        "400":
           description: Некорректные входные данные
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TError'
-        '409':
+                $ref: "#/components/schemas/TError"
+        "409":
           description: Пользователь с таким именем уже существует
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TError'
+                $ref: "#/components/schemas/TError"
 
   /users/login:
     post:
@@ -164,23 +163,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TUserLoginRequest'
+              $ref: "#/components/schemas/TUserLoginRequest"
       responses:
-        '200':
+        "200":
           description: Успешный вход, токен выдан
           content:
             application/json:
               schema:
                 type: string
                 format: JWT
-                example: 'eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9'
+                example: "eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9"
 
-        '401':
+        "401":
           description: Неверные входные параметры
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TError'
+                $ref: "#/components/schemas/TError"
 
   /users/username/{username}:
     get:
@@ -197,18 +196,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Профиль получен
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TUserProfile'
-        '404':
+                $ref: "#/components/schemas/TUserProfile"
+        "404":
           description: Пользователь не найден
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TError'
+                $ref: "#/components/schemas/TError"
 
   /users/id/{user_id}:
     get:
@@ -227,18 +226,15 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Профиль получен
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TUserProfile'
-        '404':
+                $ref: "#/components/schemas/TUserProfile"
+        "404":
           description: Пользователь не найден
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TError'
-
-
-
+                $ref: "#/components/schemas/TError"

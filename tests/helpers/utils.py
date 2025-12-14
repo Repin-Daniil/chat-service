@@ -2,7 +2,7 @@ from enum import Enum
 
 from faker import Faker
 
-fake = Faker()
+fake = Faker()  # todo Faker("ru_RU")
 fake.seed_instance(4321)
 
 

@@ -1,6 +1,5 @@
 #pragma once
 
-// todo #include <userver/utils/boost_uuid7.hpp>
 #include <utils/strong_typedef.hpp>
 
 #include <string>

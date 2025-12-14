@@ -17,7 +17,6 @@ class TPostgresUserRepository : public NCore::IUserRepository {
   void InsertNewUser(const TUser& user) const override;
   std::optional<TUserId> FindByUsername(std::string_view username) const override;
   std::optional<TUser> GetProfileByUsername(std::string_view username) const override;
-  // std::optional<TUser> GetUserById(const TUserId& user_id) const override;
 
   // todo тут бы кэш к постгре прикрутить для CheckUserId
   bool CheckUserIdExists(const TUserId& id) const override;

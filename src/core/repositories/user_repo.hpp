@@ -18,9 +18,6 @@ class IUserRepository {
 
   virtual bool CheckUserIdExists(const TUserId& id) const = 0;
 
-  // virtual std::optional<TUser> GetUserById(const TUserId& user_id) const = 0;
-  // todo Update
-
   virtual ~IUserRepository() = default;
 };
 }  // namespace NChat::NCore

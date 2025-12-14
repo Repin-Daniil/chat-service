@@ -59,6 +59,4 @@ std::optional<TUser> TPostgresUserRepository::GetProfileByUsername(std::string_v
   return NCore::NDomain::TUser::Restore(std::move(user_data));
 }
 
-// todo При загрузке пользователя, надо будет превращать из HEX соль и пароль
-
 }  // namespace NChat::NInfrastructure::NRepository

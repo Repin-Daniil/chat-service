@@ -1,14 +1,18 @@
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
-from pydantic import Field
-
-from helpers.utils import fake
+from pydantic import BaseModel, Field
+from helpers.utils import *
 
 
 class User(BaseModel):
-    username: str = Field(default_factory=fake.user_name)
-    password: str = Field(default_factory=fake.password)
-    display_name: Optional[str] = Field(default_factory=fake.name)
-    biography: Optional[str] = Field(default_factory=fake.paragraph)
+    username: str = Field(default_factory=username_generator)
+    password: str = Field(default_factory=password_generator)
+    display_name: Optional[str] = Field(default_factory=display_name_generator)
+    biography: Optional[str] = Field(default_factory=biography_generator)
+    token: Optional[str] = Field(default=None, exclude=True)
+
+
+class Message(BaseModel):
+    recipient: str = Field(default="")
+    text: str = Field(default_factory=fake.paragraph)

@@ -20,3 +20,15 @@ async def login_user(service_client, user):
         Routes.LOGIN,
         json=model_dump(user, include=RequiredFields.LOGIN.value),
     )
+
+
+async def send_message(service_client, message, token):
+    return await service_client.post(
+        Routes.SEND_MESSAGE,
+        json=model_dump(message)
+    )
+
+
+async def poll_messages(service_client, token):
+    # todo
+    pass

@@ -219,6 +219,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Не авторизован
         "404":
           description: Пользователь не найден
           content:
@@ -275,11 +277,13 @@ paths:
       responses:
         "202":
           description: Сообщение принято к доставке
-        "401":
-          description: Не авторизован
+        "400":
+          description: Неверный запрос
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "401":
+          description: Не авторизован
         "404":
           description: Получатель не найден

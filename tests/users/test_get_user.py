@@ -11,18 +11,17 @@ from validators import validate_profile
 
 async def test_get_user(service_client, registered_user):
     """Проверяет успешное получение профиля пользователя."""
-    user, token = registered_user
-
-    response = await get_user_by_name(service_client, user.username, token)
+    response = await get_user_by_name(service_client, registered_user.username, registered_user.token)
 
     assert response.status == HTTPStatus.OK
-    assert validate_profile(user, response)
+    assert validate_profile(registered_user, response)
 
 
+@pytest.mark.parametrize('multiple_users', [3], indirect=True)
 async def test_get_multiple_users(service_client, multiple_users):
     """Проверяет получение профилей нескольких пользователей."""
-    for user, token in multiple_users:
-        response = await get_user_by_name(service_client, user.username, token)
+    for user in multiple_users:
+        response = await get_user_by_name(service_client, user.username, user.token)
 
         assert response.status == HTTPStatus.OK
         assert validate_profile(user, response)
@@ -34,9 +33,7 @@ async def test_get_multiple_users(service_client, multiple_users):
 ])
 async def test_get_user_unauthorized(service_client, registered_user, token):
     """Проверяет отказ в доступе при невалидном токене."""
-    user, _ = registered_user
-
-    response = await get_user_by_name(service_client, user.username, token)
+    response = await get_user_by_name(service_client, registered_user.username, token)
 
     assert response.status == HTTPStatus.UNAUTHORIZED
 
@@ -47,19 +44,16 @@ async def test_get_user_unauthorized(service_client, registered_user, token):
 ])
 async def test_get_user_wrong_token_format(service_client, registered_user, token_prefix, jwt_token):
     """Проверяет отказ в доступе при неправильном формате токена."""
-    user, _ = registered_user
-
     invalid_token = f'{token_prefix} {jwt_token}'
-    response = await get_user_by_name(service_client, user.username, invalid_token)
+    response = await get_user_by_name(service_client, registered_user.username, invalid_token)
 
     assert response.status == HTTPStatus.UNAUTHORIZED
 
 
 async def test_get_user_empty_username(service_client, registered_user):
     """Проверяет ошибку при пустом имени пользователя."""
-    _, token = registered_user
 
-    response = await get_user_by_name(service_client, None, token)
+    response = await get_user_by_name(service_client, None, registered_user.token)
 
     assert response.status == HTTPStatus.BAD_REQUEST
     assert 'errors' in response.json().get('details', {})

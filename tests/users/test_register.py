@@ -20,7 +20,7 @@ async def test_register(service_client):
 
 async def test_register_same_username(service_client, registered_user):
     """Проверяет, что нельзя зарегистрировать пользователя с существующим username."""
-    user, _ = registered_user
+    user = registered_user
 
     duplicate_user = User(username=user.username)
     response = await register_user(service_client, duplicate_user)
@@ -31,9 +31,7 @@ async def test_register_same_username(service_client, registered_user):
 
 async def test_register_same_password(service_client, registered_user):
     """Проверяет, что можно зарегистрировать разных пользователей с одинаковым паролем."""
-    user, _ = registered_user
-
-    another_user = User(password=user.password)
+    another_user = User(password=registered_user.password)
     response = await register_user(service_client, another_user)
 
     assert response.status == HTTPStatus.OK

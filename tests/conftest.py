@@ -1,6 +1,6 @@
 from helpers.utils import get_user_token
 from helpers.endpoints import register_user
-from helpers.models import User
+from helpers.models import User, Message
 from http import HTTPStatus
 import os
 import sys
@@ -24,25 +24,33 @@ async def registered_user(service_client):
     response = await register_user(service_client, user)
     assert response.status == HTTPStatus.OK, "Регистрация пользователя не удалась"
 
-    token = get_user_token(response)
-    return user, token
+    user.token = get_user_token(response)
+    return user
 
 
 @pytest.fixture
-async def multiple_users(service_client):
+async def multiple_users(service_client, request):
     """Создаёт и регистрирует несколько пользователей."""
-    user_amount = 5
+    users_amount = getattr(request, "param", 2)
+
     users_data = []
 
-    for _ in range(user_amount):
+    for _ in range(users_amount):
         user = User()
         response = await register_user(service_client, user)
         assert response.status == HTTPStatus.OK
 
-        token = get_user_token(response)
-        users_data.append((user, token))
+        user.token = get_user_token(response)
+        users_data.append(user)
 
     return users_data
+
+
+@pytest.fixture
+async def communication(multiple_users):
+    sender, recipient = multiple_users
+    message = Message(recipient=recipient.username)
+    return sender, recipient, message
 
 
 @pytest.fixture(scope='session')

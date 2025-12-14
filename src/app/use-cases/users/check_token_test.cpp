@@ -34,7 +34,7 @@ class CheckTokenUseCaseIntegrationTest : public Test {
 TEST_F(CheckTokenUseCaseIntegrationTest, EmptyTokenNotRequired_ReturnsEmptyResult) {
   auto result = use_case_->Execute("", false);
 
-  EXPECT_FALSE(result.UserId.has_value());
+  EXPECT_FALSE(result.User.has_value());
   EXPECT_FALSE(result.Error.has_value());
 }
 
@@ -42,7 +42,7 @@ TEST_F(CheckTokenUseCaseIntegrationTest, EmptyTokenNotRequired_ReturnsEmptyResul
 TEST_F(CheckTokenUseCaseIntegrationTest, EmptyTokenRequired_ReturnsEmptyAuthError) {
   auto result = use_case_->Execute("", true);
 
-  EXPECT_FALSE(result.UserId.has_value());
+  EXPECT_FALSE(result.User.has_value());
   ASSERT_TRUE(result.Error.has_value());
   EXPECT_EQ(result.Error.value(), NAuthErrors::EmptyAuth);
 }
@@ -51,7 +51,7 @@ TEST_F(CheckTokenUseCaseIntegrationTest, EmptyTokenRequired_ReturnsEmptyAuthErro
 TEST_F(CheckTokenUseCaseIntegrationTest, TokenWithWrongPrefix_ReturnsInvalidFormatError) {
   auto result = use_case_->Execute("Token abc123", true);
 
-  EXPECT_FALSE(result.UserId.has_value());
+  EXPECT_FALSE(result.User.has_value());
   ASSERT_TRUE(result.Error.has_value());
   EXPECT_EQ(result.Error.value(), NAuthErrors::InvalidFormat);
 }
@@ -60,7 +60,7 @@ TEST_F(CheckTokenUseCaseIntegrationTest, TokenWithWrongPrefix_ReturnsInvalidForm
 TEST_F(CheckTokenUseCaseIntegrationTest, TokenWithSpaces_ReturnsInvalidFormatError) {
   auto result = use_case_->Execute("  Bearer abc123", true);
 
-  EXPECT_FALSE(result.UserId.has_value());
+  EXPECT_FALSE(result.User.has_value());
   ASSERT_TRUE(result.Error.has_value());
   EXPECT_EQ(result.Error.value(), NAuthErrors::InvalidFormat);
 }
@@ -71,7 +71,7 @@ TEST_F(CheckTokenUseCaseIntegrationTest, BearerWithoutToken_ReturnsVerifyError) 
 
   auto result = use_case_->Execute("Bearer ", true);
 
-  EXPECT_FALSE(result.UserId.has_value());
+  EXPECT_FALSE(result.User.has_value());
   ASSERT_TRUE(result.Error.has_value());
   EXPECT_EQ(result.Error.value(), NAuthErrors::VerifyError);
 }
@@ -82,7 +82,7 @@ TEST_F(CheckTokenUseCaseIntegrationTest, InvalidJwt_ReturnsVerifyError) {
 
   auto result = use_case_->Execute("Bearer invalid.jwt.token", true);
 
-  EXPECT_FALSE(result.UserId.has_value());
+  EXPECT_FALSE(result.User.has_value());
   ASSERT_TRUE(result.Error.has_value());
   EXPECT_EQ(result.Error.value(), NAuthErrors::VerifyError);
 }
@@ -92,11 +92,11 @@ TEST_F(CheckTokenUseCaseIntegrationTest, ValidJwtButUserNotExists_ReturnsInvalid
   NDomain::TUserId user_id{"123"};
 
   EXPECT_CALL(*auth_service_ptr_, DecodeJwt("valid.jwt.token")).WillOnce(Return(user_id));
-  EXPECT_CALL(*user_repo_ptr_, CheckUserIdExists(user_id)).WillOnce(Return(false));
+  EXPECT_CALL(*user_repo_ptr_, GetProfileById(user_id)).WillOnce(Return(std::nullopt));
 
   auto result = use_case_->Execute("Bearer valid.jwt.token", true);
 
-  EXPECT_FALSE(result.UserId.has_value());
+  EXPECT_FALSE(result.User.has_value());
   ASSERT_TRUE(result.Error.has_value());
   EXPECT_EQ(result.Error.value(), NAuthErrors::InvalidUser);
 }
@@ -104,13 +104,16 @@ TEST_F(CheckTokenUseCaseIntegrationTest, ValidJwtButUserNotExists_ReturnsInvalid
 // Хороший сценарий
 TEST_F(CheckTokenUseCaseIntegrationTest, ValidTokenAndUserExists_ReturnsUserId) {
   NDomain::TUserId user_id{"123"};
+  NDomain::TUserTinyProfile user{user_id, "Username", "User Name"};
 
   EXPECT_CALL(*auth_service_ptr_, DecodeJwt("valid.jwt.token")).WillOnce(Return(user_id));
-  EXPECT_CALL(*user_repo_ptr_, CheckUserIdExists(user_id)).WillOnce(Return(true));
+  EXPECT_CALL(*user_repo_ptr_, GetProfileById(user_id)).WillOnce(Return(user));
 
   auto result = use_case_->Execute("Bearer valid.jwt.token", true);
 
   EXPECT_FALSE(result.Error.has_value());
-  ASSERT_TRUE(result.UserId.has_value());
-  EXPECT_EQ(result.UserId.value(), "123");
+  ASSERT_TRUE(result.User.has_value());
+  EXPECT_EQ(result.User.value().UserId, *user.Id);
+  EXPECT_EQ(result.User.value().Username, user.Username);
+  EXPECT_EQ(result.User.value().DisplayName, user.DisplayName);
 }

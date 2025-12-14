@@ -10,7 +10,7 @@ class TGetProfileByNameUseCase final {
  public:
   TGetProfileByNameUseCase(NCore::IUserRepository& user_repo);
 
-  std::optional<NDto::TUserProfile> Execute(std::string username_request) const;
+  std::optional<NDto::TUserProfileResult> Execute(std::string username_request) const;
 
  private:
   NCore::IUserRepository& UserRepo_;

@@ -11,11 +11,11 @@ NDto::TCheckTokenResult TCheckTokenUseCase::Execute(std::string token, bool is_r
       return {};
     }
 
-    return {.UserId = {}, .Error = NAuthErrors::EmptyAuth};
+    return {.User = {}, .Error = NAuthErrors::EmptyAuth};
   }
 
   if (!token.starts_with(TOKEN_KEYWORD)) {
-    return {.UserId = {}, .Error = NAuthErrors::InvalidFormat};
+    return {.User = {}, .Error = NAuthErrors::InvalidFormat};
   }
 
   std::string_view jwt{token.c_str() + TOKEN_KEYWORD.length()};
@@ -23,14 +23,16 @@ NDto::TCheckTokenResult TCheckTokenUseCase::Execute(std::string token, bool is_r
   auto user_id = AuthService_.DecodeJwt(jwt);
 
   if (!user_id.has_value()) {
-    return {.UserId = {}, .Error = NAuthErrors::VerifyError};
+    return {.User = {}, .Error = NAuthErrors::VerifyError};
   }
 
-  if (!UserRepo_.CheckUserIdExists(user_id.value())) {
-    return {.UserId = {}, .Error = NAuthErrors::InvalidUser};
+  auto result = UserRepo_.GetProfileById(user_id.value());
+
+  if (!result.has_value()) {
+    return {.User = {}, .Error = NAuthErrors::InvalidUser};
   }
 
-  return {.UserId = *user_id.value(), .Error = {}};
+  return {.User = {{*result->Id, result->Username, result->DisplayName}}, .Error = {}};
 }
 
 }  // namespace NChat::NApp

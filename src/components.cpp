@@ -1,10 +1,10 @@
 #include "components.hpp"
 
-#include "handlers/auth/auth_bearer.hpp"
-
+#include <handlers/messages/send_message_handler.hpp>
 #include <handlers/users/get_by_username_handler.hpp>
 #include <handlers/users/user_register_handler.hpp>
 #include <infrastructure/components/user_service_component.hpp>
+#include <infrastructure/middleware/auth_bearer.hpp>
 
 #include <userver/clients/dns/component.hpp>
 #include <userver/clients/http/component.hpp>
@@ -39,6 +39,10 @@ void RegisterPostrgesComponent(userver::components::ComponentList& list) {
 // Handlers
 void RegisterUserHandlers(userver::components::ComponentList& list) {
   list.Append<NHandlers::TRegisterUserHandler>().Append<NHandlers::TGetByUsernameHandler>();
+}
+
+void RegisterMessagesHandlers(userver::components::ComponentList& list) {
+  list.Append<NHandlers::TSendMessageHandler>();
 }
 
 // Components

@@ -14,7 +14,7 @@ class TUserService {
 
   NDto::TUserRegistrationResult Register(NDto::TUserRegistrationData request);
   NDto::TCheckTokenResult CheckToken(std::string token, const bool is_required);
-  std::optional<NDto::TUserProfile> GetProfileByUsername(std::string username);
+  std::optional<NDto::TUserProfileResult> GetProfileByUsername(std::string username);
 
   // TLoginResult Login();
   // GetInfoById();

@@ -15,7 +15,7 @@ NDto::TCheckTokenResult TUserService::CheckToken(std::string token, const bool i
   return CheckTokenUseCase_.Execute(token, is_required);
 }
 
-std::optional<NDto::TUserProfile> TUserService::GetProfileByUsername(std::string username) {
+std::optional<NDto::TUserProfileResult> TUserService::GetProfileByUsername(std::string username) {
   return ProfileByNameUseCase_.Execute(username);
 }
 

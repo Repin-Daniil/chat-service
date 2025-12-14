@@ -11,10 +11,10 @@ namespace NChat::NApp {
 
 TGetProfileByNameUseCase::TGetProfileByNameUseCase(NCore::IUserRepository& user_repo) : UserRepo_(user_repo) {}
 
-std::optional<NDto::TUserProfile> TGetProfileByNameUseCase::Execute(std::string username_request) const {
+std::optional<NDto::TUserProfileResult> TGetProfileByNameUseCase::Execute(std::string username_request) const {
   NCore::NDomain::TUsername username{username_request};
 
-  const auto result = UserRepo_.GetProfileByUsername(username.Value());
+  const auto result = UserRepo_.GetUserByUsername(username.Value());
 
   if (result.has_value()) {
     return {{.Username = result->GetUsername(),

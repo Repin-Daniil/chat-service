@@ -37,7 +37,7 @@ TEST_F(GetProfileByNameUseCaseIntegrationTest, UserFound_ReturnsProfile) {
 
   auto mock_user = TUser::Restore(data);
 
-  EXPECT_CALL(*user_repo_ptr_, GetProfileByUsername(data.Username)).WillOnce(Return(std::optional<TUser>(mock_user)));
+  EXPECT_CALL(*user_repo_ptr_, GetUserByUsername(data.Username)).WillOnce(Return(std::optional<TUser>(mock_user)));
 
   // Act
   auto result = use_case_->Execute(data.Username);
@@ -54,7 +54,7 @@ TEST_F(GetProfileByNameUseCaseIntegrationTest, UserNotFound_ReturnsEmpty) {
   // Arrange
   const std::string username = "nonexistent";
 
-  EXPECT_CALL(*user_repo_ptr_, GetProfileByUsername(username)).WillOnce(Return(std::nullopt));
+  EXPECT_CALL(*user_repo_ptr_, GetUserByUsername(username)).WillOnce(Return(std::nullopt));
 
   // Act
   auto result = use_case_->Execute(username);

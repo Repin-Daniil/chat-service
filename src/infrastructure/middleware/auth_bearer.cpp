@@ -40,9 +40,17 @@ TAuthCheckerBearer::TAuthCheckResult TAuthCheckerBearer::CheckAuth(
                             userver::server::handlers::HandlerErrorCode::kUnauthorized};
   }
 
-  request_context.SetData("user_id", result.UserId);  // todo Возможно нужна миддлварь, которая будет сохранять в
-                                                      // контекст инфу, что за пользователь, его чаты, че нить такое
-  return {};
+  if (result.User.has_value()) {
+    auto user = result.User.value();
+    request_context.SetData("user_id", user.UserId);
+    request_context.SetData("username", user.Username);
+    request_context.SetData("display_name", user.DisplayName);
+
+    return {};
+  }
+
+  return TAuthCheckResult{.status = TAuthCheckResult::Status::kInternalCheckFailure,
+                          .code = userver::server::handlers::HandlerErrorCode::kServerSideError};
 }
 
 TCheckerFactory::TCheckerFactory(const userver::components::ComponentContext& context)

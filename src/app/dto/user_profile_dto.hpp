@@ -4,7 +4,7 @@
 
 namespace NChat::NApp::NDto {
 
-struct TUserProfile {
+struct TUserProfileResult {
   std::string Username;
   std::string DisplayName;
   std::string Biography;

@@ -16,10 +16,10 @@ class TPostgresUserRepository : public NCore::IUserRepository {
 
   void InsertNewUser(const TUser& user) const override;
   std::optional<TUserId> FindByUsername(std::string_view username) const override;
-  std::optional<TUser> GetProfileByUsername(std::string_view username) const override;
+  std::optional<TUser> GetUserByUsername(std::string_view username) const override;
 
   // todo тут бы кэш к постгре прикрутить для CheckUserId
-  bool CheckUserIdExists(const TUserId& id) const override;
+  std::optional<TUserTinyProfile> GetProfileById(const TUserId& id) const override;
 
  private:
   userver::storages::postgres::ClusterPtr PgCluster_;

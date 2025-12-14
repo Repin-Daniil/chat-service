@@ -9,6 +9,7 @@ void RegisterPostrgesComponent(userver::components::ComponentList&);
 
 // Handlers
 void RegisterUserHandlers(userver::components::ComponentList&);
+void RegisterMessagesHandlers(userver::components::ComponentList&);
 
 // Components
 void RegisterUserServiceComponent(userver::components::ComponentList&);

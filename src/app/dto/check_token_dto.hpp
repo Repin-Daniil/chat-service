@@ -4,8 +4,14 @@
 
 namespace NChat::NApp::NDto {
 
+struct TUserDetails {
+  std::string UserId;
+  std::string Username;
+  std::string DisplayName;
+};
+
 struct TCheckTokenResult {
-  std::optional<std::string> UserId;
+  std::optional<TUserDetails> User;
   std::optional<std::string> Error;
 };
 

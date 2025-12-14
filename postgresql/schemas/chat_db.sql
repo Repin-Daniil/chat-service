@@ -88,6 +88,7 @@ CREATE TABLE chat.chat_members (
 CREATE TYPE chat.user AS (
     user_id TEXT,
     username TEXT,
+    display_name TEXT,
     password_hash TEXT,
     salt TEXT,
     biography TEXT

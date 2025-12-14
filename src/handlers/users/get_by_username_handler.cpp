@@ -1,7 +1,7 @@
 #include "get_by_username_handler.hpp"
 
 #include <app/dto/registration_dto.hpp>
-#include <handlers/handler_exceptions.hpp>
+#include <infrastructure/exceptions/handler_exceptions.hpp>
 #include <infrastructure/components/user_service_component.hpp>
 
 #include <userver/crypto/hash.hpp>
@@ -10,7 +10,7 @@
 #include <userver/storages/postgres/component.hpp>
 
 namespace userver::formats::serialize {
-userver::formats::json::Value Serialize(const NChat::NApp::NDto::TUserProfile& result,
+userver::formats::json::Value Serialize(const NChat::NApp::NDto::TUserProfileResult& result,
                                         userver::formats::serialize::To<userver::formats::json::Value>) {
   userver::formats::json::ValueBuilder item;
 
@@ -33,7 +33,7 @@ userver::formats::json::Value TGetByUsernameHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& /*request_json*/,
     userver::server::request::RequestContext&) const {
   const auto& username = request.GetPathArg("username");
-  std::optional<NApp::NDto::TUserProfile> result;
+  std::optional<NApp::NDto::TUserProfileResult> result;
 
   try {
     result = UserService_.GetProfileByUsername(username);

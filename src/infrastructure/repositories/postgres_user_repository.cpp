@@ -10,6 +10,7 @@ namespace NChat::NInfrastructure::NRepository {
 namespace {
 using NCore::NDomain::TUser;
 using NCore::NDomain::TUserId;
+using NCore::NDomain::TUserTinyProfile;
 }  // namespace
 
 TPostgresUserRepository::TPostgresUserRepository(userver::storages::postgres::ClusterPtr pg_cluster)
@@ -41,15 +42,23 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
   return TUserId{result.AsSingleRow<std::string>()};
 }
 
-bool TPostgresUserRepository::CheckUserIdExists(const TUserId& id) const {
-  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kFindUserById, *id);
+std::optional<TUserTinyProfile> TPostgresUserRepository::GetProfileById(const TUserId& id) const {
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetProfileById, *id);
 
-  return !result.IsEmpty();
+  if (result.IsEmpty()) {
+    return std::nullopt;
+  }
+
+  auto profile = result[0];
+
+  return {{.Id = id,
+           .Username = profile["username"].As<std::string>(),
+           .DisplayName = profile["display_name"].As<std::string>()}};
 }
 
-std::optional<TUser> TPostgresUserRepository::GetProfileByUsername(std::string_view username) const {
+std::optional<TUser> TPostgresUserRepository::GetUserByUsername(std::string_view username) const {
   auto result =
-      PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetProfileByUsername, username);
+      PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetUserByUsername, username);
   if (result.IsEmpty()) {
     return std::nullopt;
   }

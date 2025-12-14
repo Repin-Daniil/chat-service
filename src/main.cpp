@@ -13,6 +13,7 @@ int main(int argc, char* argv[]) {
   NChat::NInfrastructure::RegisterUserServiceComponent(component_list);
 
   NChat::NInfrastructure::RegisterUserHandlers(component_list);
+  NChat::NInfrastructure::RegisterMessagesHandlers(component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }

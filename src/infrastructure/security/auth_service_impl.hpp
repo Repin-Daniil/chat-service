@@ -8,7 +8,7 @@ class TAuthServiceImpl : public NCore::IAuthService {
  public:
   using TUserId = NCore::NDomain::TUserId;
 
-  TAuthServiceImpl(std::size_t salt_length = 32);
+  TAuthServiceImpl(int expiry_duration_hours = 1, std::size_t salt_length = 32);
 
   NCore::NDomain::TPasswordHash HashPassword(std::string_view password) override;
   bool CheckPassword(std::string_view password, std::string_view password_hash, std::string_view salt) override;
@@ -17,6 +17,7 @@ class TAuthServiceImpl : public NCore::IAuthService {
   std::optional<TUserId> DecodeJwt(std::string_view token) override;
 
  private:
+  int ExpiryDuration_ = 0;
   std::size_t SaltLength_ = 0;
 };
 }  // namespace NChat::NInfrastructure

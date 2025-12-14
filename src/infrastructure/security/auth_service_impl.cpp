@@ -10,7 +10,8 @@ namespace NChat::NInfrastructure {
 using NCore::NDomain::TPasswordHash;
 using NCore::NDomain::TUserId;
 
-TAuthServiceImpl::TAuthServiceImpl(std::size_t salt_length) : SaltLength_(salt_length) {}
+TAuthServiceImpl::TAuthServiceImpl(int expiry_duration_hours, std::size_t salt_length)
+    : ExpiryDuration_(expiry_duration_hours), SaltLength_(salt_length) {}
 
 TPasswordHash TAuthServiceImpl::HashPassword(std::string_view password) {
   auto salt = userver::crypto::GenerateRandomBlock(SaltLength_);
@@ -28,7 +29,7 @@ bool TAuthServiceImpl::CheckPassword(std::string_view input_password, std::strin
   return computed_hash == stored_password_hash;
 }
 
-std::string TAuthServiceImpl::CreateJwt(TUserId id) { return NUtils::NTokens::GenerateJWT(*id); }
+std::string TAuthServiceImpl::CreateJwt(TUserId id) { return NUtils::NTokens::GenerateJWT(*id, ExpiryDuration_); }
 
 std::optional<TUserId> TAuthServiceImpl::DecodeJwt(std::string_view token) {
   if (auto user_id = NUtils::NTokens::DecodeJWT(token)) {

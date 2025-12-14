@@ -46,6 +46,20 @@ components:
               type: string
               maxLength: 180
     
+    TUserLoginRequest:
+      type: object
+      additionalProperties: false
+      required: [username, password]
+      properties:
+          username:
+            type: string
+            minLength: 3
+            maxLength: 32
+          password:
+            type: string
+            minLength: 8
+            format: password
+
     TUserRegistered:
       type: object
       properties:
@@ -53,10 +67,17 @@ components:
           type: string
           example: alice
         token:
+          $ref: '#/components/schemas/TAuthToken'
+          
+    TAuthToken:
+      type: object
+      required:
+        - access-token
+      properties:
+        accessToken:
           type: string
-          format: JWT
-          example: 'eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9'
-    
+          format: jwt
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
     # --- Модели для Users ---
     TUserProfile:
       type: object
@@ -127,6 +148,35 @@ paths:
                 $ref: '#/components/schemas/TError'
         '409':
           description: Пользователь с таким именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TError'
+
+  /users/login:
+    post:
+      tags:
+        - Auth
+      summary: Вход пользователя (получение токена)
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TUserLoginRequest'
+      responses:
+        '200':
+          description: Успешный вход, токен выдан
+          content:
+            application/json:
+              schema:
+                type: string
+                format: JWT
+                example: 'eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9'
+
+        '401':
+          description: Неверные входные параметры
           content:
             application/json:
               schema:

@@ -65,9 +65,11 @@ components_manager:
         # Components
         user-service-component:
             load-enabled: true
-            storage-type: postgres
+            token-expiry-hours: $token_expiry_hours
+            storage-type: $database
             postgres-component: chat-postgres-database
             ydb-component: chat-ydb-database
+
 
         # Handlers 
         # handler-auth-login:

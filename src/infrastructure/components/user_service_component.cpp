@@ -24,7 +24,7 @@ TUserServiceComponent::TUserServiceComponent(const userver::components::Componen
     throw std::runtime_error("Unknown storage-type: " + storage_type + ". Allowed: postgres, ydb");
   }
 
-  AuthService_ = std::make_unique<TAuthServiceImpl>();
+  AuthService_ = std::make_unique<TAuthServiceImpl>(config["token-expiry-hours"].As<int>());
   UserService_ = std::make_unique<NApp::NServices::TUserService>(*UserRepo_, *AuthService_);
 }
 
@@ -35,6 +35,9 @@ type: object
 description: Component for user service logic
 additionalProperties: false
 properties:
+    token-expiry-hours:
+      type: integer
+      description: Token expiry duration in hours
     storage-type:
         type: string
         description: Type of the underlying database storage

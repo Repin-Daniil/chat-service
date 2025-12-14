@@ -13,7 +13,6 @@
 namespace {
 const std::string SECRET_KEY = "very_secret_key";
 const std::string ISSUER = "realtime-chat";
-const auto EXPIRY_DURATION = std::chrono::hours(1);
 }  // namespace
 
 namespace NUtils::NTokens {
@@ -23,9 +22,9 @@ std::string GenerateRandomJti() {
   return std::to_string(rng());
 }
 
-std::string GenerateJWT(std::string_view id) {
+std::string GenerateJWT(std::string_view id, int expiry_duration_hours) {
   auto now = std::chrono::system_clock::now();
-  auto expires_at = now + EXPIRY_DURATION;
+  auto expires_at = now + std::chrono::hours(expiry_duration_hours);
 
   std::string token = jwt::create()
                           .set_issuer(ISSUER)

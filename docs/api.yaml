@@ -173,13 +173,14 @@ paths:
                 type: string
                 format: JWT
                 example: "eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9"
-
-        "401":
+        "400":
           description: Неверные входные параметры
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "401":
+          description: Не авторизован
 
   /users/username/{username}:
     get:

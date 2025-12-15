@@ -72,6 +72,8 @@ components_manager:
 
 
         # Handlers 
+
+        # Users
         # handler-auth-login:
         #     path: /v1/auth/login
         #     method: POST
@@ -90,7 +92,17 @@ components_manager:
                 types:
                   - bearer
                 required: true
-
+        
+        # Messages
+        handler-send-message:
+            path: /v1/messages/send
+            method: POST
+            task_processor: main-task-processor
+            auth:
+                types:
+                  - bearer
+                required: true
+                
         # PostgreSQL
         chat-postgres-database:
             dbconnection: $pg-connection

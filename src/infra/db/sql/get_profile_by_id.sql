@@ -1,0 +1,1 @@
+SELECT username, display_name FROM chat.users WHERE user_id = $1;

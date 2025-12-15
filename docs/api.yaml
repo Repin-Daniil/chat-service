@@ -118,8 +118,25 @@ components:
         biography:
           type: string
           example: "My biography"
+    
+    # Messages
+    SendMessageRequest:
+      type: object
+      description: Сообщение для отправки
+      properties:
+        recipient-username:
+          type: string
+          description: Username пользователя, которому отправляется сообщение
+        text:
+          type: string
+          description: Текст сообщения
+          example: "Hello, World!"
+      required:
+        - recipient_id
+        - text
 
 paths:
+  # Users
   /users/register:
     post:
       tags:
@@ -203,6 +220,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Не авторизован
         "404":
           description: Пользователь не найден
           content:
@@ -239,3 +258,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+
+  # Messages
+  /messages/send:
+    post:
+      tags:
+        - Messages
+      summary: Отправить сообщение пользователю
+      operationId: sendMessage
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: Сообщение для отправки
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageRequest"
+      responses:
+        "202":
+          description: Сообщение принято к доставке
+        "400":
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Не авторизован
+        "404":
+          description: Получатель не найден

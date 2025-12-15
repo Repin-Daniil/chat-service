@@ -12,7 +12,7 @@ IncludeCategories:
     Priority: 1
 
   # 2 — project sources
-  - Regex: '^<(app|core|infrastructure|handlers|utils)/.*>$'
+  - Regex: '^<(app|core|infra|api|utils)/.*>$'
     Priority: 2
 
   # 3 — external libs (userver, fmt, etc.)

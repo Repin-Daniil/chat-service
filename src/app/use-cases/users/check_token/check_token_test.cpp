@@ -1,7 +1,6 @@
 #include "check_token.hpp"
 
 #include <app/use-cases/users/mocks.hpp>
-
 #include <infrastructure/security/auth_service_impl.hpp>  // for jwt
 
 #include <gtest/gtest.h>

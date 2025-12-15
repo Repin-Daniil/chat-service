@@ -9,9 +9,7 @@ TSendMessageHandler::TSendMessageHandler(const userver::components::ComponentCon
 userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest&, const userver::formats::json::Value& request_json,
     userver::server::request::RequestContext&) const {
-        
-
-    return {};
+  return {};
 }
 
 }  // namespace NChat::NInfrastructure::NHandlers

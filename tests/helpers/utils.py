@@ -40,14 +40,18 @@ def generate_string(min_length: int, max_length: int, generator: callable, fill_
         value = value.ljust(min_length, fill_char)
     return value
 
+
 def username_generator():
     return generate_string(3, 32, fake.user_name)
+
 
 def password_generator():
     return generate_string(8, 32, lambda: fake.password(length=12), fill_char="A")
 
+
 def display_name_generator():
     return generate_string(3, 50, fake.name)
+
 
 def biography_generator():
     return generate_string(0, 180, fake.paragraph)

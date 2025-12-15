@@ -1,13 +1,13 @@
 #include "user_register_handler.hpp"
 
 #include <app/dto/users/registration_dto.hpp>
-#include <infrastructure/exceptions/handler_exceptions.hpp>
 #include <infrastructure/components/user_service_component.hpp>
+#include <infrastructure/exceptions/handler_exceptions.hpp>
 
+#include <userver/components/component.hpp>
 #include <userver/crypto/hash.hpp>
 #include <userver/crypto/random.hpp>
 #include <userver/formats/serialize/common_containers.hpp>
-#include <userver/components/component.hpp>
 
 using NChat::NApp::NDto::TUserRegistrationData;
 using NChat::NApp::NDto::TUserRegistrationResult;

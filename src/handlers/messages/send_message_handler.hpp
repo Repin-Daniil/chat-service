@@ -15,8 +15,7 @@ class TSendMessageHandler : public userver::server::handlers::HttpHandlerJsonBas
       userver::server::request::RequestContext& context) const override;
 
  private:
- //TODO Какой-нибудь MessageService, Routing, Mailbox? 
+  // TODO Какой-нибудь MessageService, Routing, Mailbox?
 };
 
 }  // namespace NChat::NInfrastructure::NHandlers
-

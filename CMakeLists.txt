@@ -45,7 +45,7 @@ userver_add_sql_library(
     ${PROJECT_NAME}_sql
     NAMESPACE NChat
     OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
-    SQL_FILES src/infrastructure/sql/*.sql
+    SQL_FILES src/infra/db/sql/*.sql
 )
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC ${PROJECT_NAME}_sql)
 

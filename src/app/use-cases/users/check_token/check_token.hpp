@@ -1,8 +1,8 @@
 #pragma once
 
-#include "app/dto/users/check_token_dto.hpp"
-#include "core/repositories/user_repo.hpp"
-#include "core/services/auth_service_interface.hpp"
+#include <app/dto/users/check_token_dto.hpp>
+#include <core/users/auth_service_interface.hpp>
+#include <core/users/user_repo.hpp>
 
 namespace NChat::NApp {
 

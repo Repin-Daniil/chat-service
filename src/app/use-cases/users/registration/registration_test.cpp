@@ -1,7 +1,7 @@
 #include "registration.hpp"
 
 #include <app/use-cases/users/mocks.hpp>
-#include <infrastructure/security/auth_service_impl.hpp>  // for password hashing
+#include <infra/auth/auth_service_impl.hpp>  // for password hashing
 
 #include <gtest/gtest.h>
 
@@ -30,7 +30,7 @@ class RegistrationUseCaseIntegrationTest : public Test {
 };
 
 NDomain::TPasswordHash HashPasswordUtil(std::string_view password) {
-  return NChat::NInfrastructure::TAuthServiceImpl().HashPassword(password);
+  return NChat::NInfra::TAuthServiceImpl().HashPassword(password);
 }
 
 // Успешная регистрация нового пользователя

@@ -3,8 +3,8 @@
 #include <app/use-cases/users/check_token/check_token.hpp>
 #include <app/use-cases/users/get_profile/get_profile.hpp>
 #include <app/use-cases/users/registration/registration.hpp>
-#include <core/repositories/user_repo.hpp>
-#include <core/services/auth_service_interface.hpp>
+#include <core/users/auth_service_interface.hpp>
+#include <core/users/user_repo.hpp>
 
 namespace NChat::NApp::NServices {
 

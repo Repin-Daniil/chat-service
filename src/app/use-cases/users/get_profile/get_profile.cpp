@@ -1,7 +1,7 @@
 #include "get_profile.hpp"
 
-#include <core/value_objects/user/raw_password.hpp>
-#include <core/value_objects/user/username.hpp>
+#include <core/users/value/raw_password.hpp>
+#include <core/users/value/username.hpp>
 #include <utils/jwt/jwt.hpp>
 #include <utils/uuid/uuid_generator.hpp>
 

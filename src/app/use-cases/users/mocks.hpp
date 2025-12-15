@@ -1,5 +1,5 @@
-#include <core/repositories/user_repo.hpp>
-#include <core/services/auth_service_interface.hpp>
+#include <core/users/auth_service_interface.hpp>
+#include <core/users/user_repo.hpp>
 
 #include <gmock/gmock.h>
 

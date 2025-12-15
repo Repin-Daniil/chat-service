@@ -21,7 +21,7 @@ async def test_send_yourself(service_client, registered_user):
 
 
 async def test_wrong_recipient(service_client, registered_user):
-    message = Message(recipient=generate_username())
+    message = Message(recipient=username_generator())
     response = await send_message(service_client, message, registered_user.token)
 
     assert response.status == HTTPStatus.NOT_FOUND

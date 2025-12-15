@@ -1,6 +1,6 @@
 #pragma once
 
-#include <app/dto/registration_dto.hpp>
+#include <app/dto/users/registration_dto.hpp>
 #include <app/exceptions.hpp>
 #include <core/repositories/user_repo.hpp>
 #include <core/services/auth_service_interface.hpp>

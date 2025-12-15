@@ -1,6 +1,6 @@
 #pragma once
 
-#include "app/dto/check_token_dto.hpp"
+#include "app/dto/users/check_token_dto.hpp"
 #include "core/repositories/user_repo.hpp"
 #include "core/services/auth_service_interface.hpp"
 

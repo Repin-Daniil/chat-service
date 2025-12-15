@@ -1,6 +1,6 @@
 #include "get_profile.hpp"
 
-#include "mocks.hpp"
+#include <app/use-cases/users/mocks.hpp>
 
 #include <gtest/gtest.h>
 

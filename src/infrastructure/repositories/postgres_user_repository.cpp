@@ -1,6 +1,6 @@
 #include "postgres_user_repository.hpp"
 
-#include <app/use-cases/users/registration.hpp>
+#include <app/use-cases/users/registration/registration.hpp>
 
 #include <NChat/sql_queries.hpp>
 #include <userver/utils/encoding/hex.hpp>

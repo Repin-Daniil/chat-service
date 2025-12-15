@@ -25,7 +25,8 @@ async def login_user(service_client, user):
 async def send_message(service_client, message, token):
     return await service_client.post(
         Routes.SEND_MESSAGE,
-        json=model_dump(message)
+        json=model_dump(message),
+        headers={'Authorization': token or ""},
     )
 
 

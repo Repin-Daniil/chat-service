@@ -1,6 +1,6 @@
 #pragma once
 
-#include <app/services/user_service.hpp>
+#include <app/services/user/user_service.hpp>
 
 #include <userver/components/component.hpp>
 #include <userver/server/handlers/http_handler_json_base.hpp>

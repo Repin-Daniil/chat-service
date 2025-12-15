@@ -1,6 +1,6 @@
 #pragma once
 
-#include <app/services/user_service.hpp>
+#include <app/services/user/user_service.hpp>
 
 #include <userver/components/loggable_component_base.hpp>
 #include <userver/storages/postgres/component.hpp>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <app/services/user_service.hpp>
+#include <app/services/user/user_service.hpp>
 
 #include <userver/server/handlers/auth/auth_checker_factory.hpp>
 #include <userver/storages/postgres/postgres_fwd.hpp>

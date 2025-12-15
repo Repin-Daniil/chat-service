@@ -1,6 +1,6 @@
 #include "user_register_handler.hpp"
 
-#include <app/dto/registration_dto.hpp>
+#include <app/dto/users/registration_dto.hpp>
 #include <infrastructure/exceptions/handler_exceptions.hpp>
 #include <infrastructure/components/user_service_component.hpp>
 

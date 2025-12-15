@@ -1,11 +1,8 @@
 #include "get_by_username_handler.hpp"
 
-#include <app/dto/registration_dto.hpp>
 #include <infrastructure/exceptions/handler_exceptions.hpp>
 #include <infrastructure/components/user_service_component.hpp>
 
-#include <userver/crypto/hash.hpp>
-#include <userver/crypto/random.hpp>
 #include <userver/formats/serialize/common_containers.hpp>
 #include <userver/storages/postgres/component.hpp>
 

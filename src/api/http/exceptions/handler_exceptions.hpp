@@ -22,6 +22,7 @@ class TConflictException
   explicit TConflictException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
 };
 
+
 class TServerException : public userver::server::handlers::ExceptionWithCode<
                              userver::server::handlers::HandlerErrorCode::kServerSideError> {
  public:

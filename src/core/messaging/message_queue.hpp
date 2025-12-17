@@ -2,15 +2,22 @@
 
 #include <core/messaging/message.hpp>
 
+#include <chrono>
+
 namespace NChat::NCore {
 
 class IMessageQueue {
  public:
-  bool Push(NDomain::TMessage);
-  NDomain::TMessage Pop();  // deadline передавать?
-    // Size()?
-};
+  virtual bool Push(NDomain::TMessage&&) = 0;
 
-// todo Бенчмарки на разные очереди
+  virtual std::vector<NDomain::TMessage> PopBatch(std::size_t max_batch_size, std::chrono::milliseconds timeout) = 0;
+
+  virtual std::size_t GetSizeApproximate() const = 0;
+
+  virtual void SetMaxSize(std::size_t max_size) = 0;
+  virtual std::size_t GetMaxSize() const = 0;
+
+  virtual ~IMessageQueue() = default;
+};
 
 }  // namespace NChat::NCore

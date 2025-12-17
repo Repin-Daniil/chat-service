@@ -8,8 +8,8 @@ namespace NChat::NCore::NDomain {
 
 struct TChatMember {
   TUserId Id;
-  TUsername Username;
-  TDisplayName DisplayName;
+  std::string Username;
+  std::string DisplayName;
 };
 
 }  // namespace NChat::NCore::NDomain

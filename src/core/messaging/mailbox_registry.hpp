@@ -15,6 +15,8 @@ class IMailboxRegistry {
   virtual TMailboxPtr CreateOrGetMailbox(NDomain::TUserId) = 0;
   virtual void RemoveMailbox(NDomain::TUserId) = 0;
   virtual void CollectGarbage() = 0;
+
+  virtual ~IMailboxRegistry() = default;
 };
 
 }  // namespace NChat::NCore

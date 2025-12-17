@@ -10,7 +10,8 @@ class TStrongTypedef {
  public:
   using ValueType = Value;
   using TagType = Tag;
-
+  
+  TStrongTypedef() = default;
   explicit TStrongTypedef(Value&& v) : value_(std::move(v)) {}
   explicit TStrongTypedef(const Value& v) : value_(v) {}
 

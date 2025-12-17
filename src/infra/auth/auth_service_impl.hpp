@@ -20,4 +20,8 @@ class TAuthServiceImpl : public NCore::IAuthService {
   int ExpiryDuration_ = 0;
   std::size_t SaltLength_ = 0;
 };
+
+//fixme надо пофиксить, чтобы JWT был не user_id, а пара user_id и connection_id
+// Иначе тут может два консьюмера быть у одной очереди
+
 }  // namespace NChat::NInfra

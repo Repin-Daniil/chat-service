@@ -21,24 +21,34 @@ namespace {
 // ============================================================================
 
 TMessage CreateTestMessage(std::size_t text_size = 100) {
-  static const std::string kPool = []() {
-      std::string s;
-      s.reserve(100000); // С запасом
-      std::mt19937 gen(std::random_device{}());
-      std::uniform_int_distribution<> dis(0, 25);
-      for (int i = 0; i < 100000; ++i) {
-          s += static_cast<char>('a' + dis(gen));
-      }
-      return s;
-  }();
+    static const std::vector<std::string> kPools = []() {
+        std::vector<std::string> pools;
+        std::mt19937 gen(std::random_device{}());
+        std::uniform_int_distribution<> dis(0, 25);
 
-  std::string text = kPool.substr(0, text_size);
+        for (int p = 0; p < 4; ++p) { // 4 разных пула
+            std::string s;
+            s.reserve(100000);
+            for (int i = 0; i < 100000; ++i) {
+                s += static_cast<char>('a' + dis(gen));
+            }
+            pools.push_back(std::move(s));
+        }
+        return pools;
+    }();
 
-  return TMessage{
-      .Sender = {TUserId("user1"), "sender", "Sender"},
-      .Recipient = {TUserId("user2"), "recipient", "Recipient"},
-      .Text = std::move(text),
-  };
+    static thread_local std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<std::size_t> pool_dis(0, kPools.size() - 1);
+    std::uniform_int_distribution<std::size_t> offset_dis(0, 100000 - text_size);
+
+    const auto& pool = kPools[pool_dis(gen)];
+    std::string text = pool.substr(offset_dis(gen), text_size);
+
+    return TMessage{
+        .Sender = {TUserId("user1"), "sender", "Sender"},
+        .Recipient = {TUserId("user2"), "recipient", "Recipient"},
+        .Text = std::move(text),
+    };
 }
 
 // ============================================================================

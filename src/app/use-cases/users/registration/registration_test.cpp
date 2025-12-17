@@ -189,3 +189,25 @@ TEST_F(RegistrationUseCaseIntegrationTest, CorrectUserDataPassed) {
 
   use_case_->Execute(request);
 }
+
+// Ошибка репозитория
+TEST_F(RegistrationUseCaseIntegrationTest, RepositoryError) {
+  NDto::TUserRegistrationData request{
+      .Username = "testuser",
+      .Password = "Password@123",
+      .Biography = "My bio",
+      .DisplayName = "Test Display",
+  };
+
+  EXPECT_CALL(*user_repo_ptr_, FindByUsername("testuser")).WillOnce(Return(std::nullopt));
+
+  NDomain::TPasswordHash hash = HashPasswordUtil(request.Password);
+  EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password)).WillOnce(Return(hash));
+
+  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(testing::_))
+      .WillOnce(Throw(std::runtime_error("Database connection failed")));
+
+  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).Times(0);
+
+  EXPECT_THROW(use_case_->Execute(request), TRegistrationTemporaryUnavailable);
+}

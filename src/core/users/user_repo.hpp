@@ -16,8 +16,8 @@ class IUserRepository {
   virtual void InsertNewUser(const TUser& user) const = 0;
 
   virtual std::optional<TUserId> FindByUsername(std::string_view username) const = 0;
-  virtual std::optional<TUser> GetUserByUsername(std::string_view username) const = 0;
   virtual std::optional<TUserTinyProfile> GetProfileById(const TUserId& id) const = 0;
+  virtual std::unique_ptr<TUser> GetUserByUsername(std::string_view username) const = 0;
 
   virtual ~IUserRepository() = default;
 };

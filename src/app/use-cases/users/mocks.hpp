@@ -11,8 +11,8 @@ class MockUserRepository : public IUserRepository {
  public:
   MOCK_METHOD(void, InsertNewUser, (const TUser& user), (const, override));
   MOCK_METHOD(std::optional<TUserId>, FindByUsername, (std::string_view username), (const, override));
-  MOCK_METHOD(std::optional<TUser>, GetUserByUsername, (std::string_view username), (const, override));
   MOCK_METHOD(std::optional<TUserTinyProfile>, GetProfileById, (const TUserId& user_id), (const, override));
+  MOCK_METHOD(std::unique_ptr<TUser>, GetUserByUsername, (std::string_view username), (const, override));
 };
 
 class MockAuthService : public IAuthService {

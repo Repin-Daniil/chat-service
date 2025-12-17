@@ -9,20 +9,26 @@
 
 namespace NChat::NApp {
 
+using NCore::NDomain::TUser;
+
 TGetProfileByNameUseCase::TGetProfileByNameUseCase(NCore::IUserRepository& user_repo) : UserRepo_(user_repo) {}
 
-std::optional<NDto::TUserProfileResult> TGetProfileByNameUseCase::Execute(std::string username_request) const {
+std::optional<NDto::TUserProfileResult> TGetProfileByNameUseCase::Execute(const std::string& username_request) const {
   NCore::NDomain::TUsername username{username_request};
 
-  const auto result = UserRepo_.GetUserByUsername(username.Value());
-
-  if (result.has_value()) {
-    return {{.Username = result->GetUsername(),
-             .DisplayName = result->GetDisplayName(),
-             .Biography = result->GetBiography()}};
+  std::unique_ptr<TUser> user;
+  try {
+    user = UserRepo_.GetUserByUsername(username.Value());
+  } catch (const std::exception& e) {
+    throw TGetProfileTemporaryUnavailable(fmt::format("Failed to get user by username: {}", e.what()));
   }
 
-  return {};
+  if (user) {
+    return {
+        {.Username = user->GetUsername(), .DisplayName = user->GetDisplayName(), .Biography = user->GetBiography()}};
+  }
+
+  return std::nullopt;
 }
 
 }  // namespace NChat::NApp

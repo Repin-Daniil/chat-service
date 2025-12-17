@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
-
 namespace NChat::NCore::NDomain {
 
 class UserTest : public ::testing::Test {
@@ -29,7 +27,7 @@ class UserTest : public ::testing::Test {
 };
 
 TEST_F(UserTest, CreateNewUser) {
-  auto user = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
+  auto user = TUser(user_id_, username_, display_name_, password_, biography_);
 
   EXPECT_EQ(user.GetId(), user_id_);
   EXPECT_EQ(user.GetUsername(), username_.Value());
@@ -47,7 +45,7 @@ TEST_F(UserTest, RestoreUser) {
                           .Salt = "salt",
                           .Biography = "Test bio"};
 
-  auto user = TUser::Restore(data);
+  auto user = TUser(data);
 
   EXPECT_EQ(user.GetId(), TUserId{data.UserId});
   EXPECT_EQ(user.GetUsername(), data.Username);
@@ -56,7 +54,7 @@ TEST_F(UserTest, RestoreUser) {
 }
 
 TEST_F(UserTest, UpdateDisplayName) {
-  auto user = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
+  auto user = TUser(user_id_, username_, display_name_, password_, biography_);
 
   TDisplayName new_display_name("Jane Doe");
   user.UpdateDisplayName(new_display_name);
@@ -66,7 +64,7 @@ TEST_F(UserTest, UpdateDisplayName) {
 }
 
 TEST_F(UserTest, UpdateBiography) {
-  auto user = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
+  auto user = TUser(user_id_, username_, display_name_, password_, biography_);
 
   TBiography new_bio("Senior Software Developer");
   user.UpdateBiography(new_bio);
@@ -77,7 +75,7 @@ TEST_F(UserTest, UpdateBiography) {
 }
 
 TEST_F(UserTest, UpdateUsername) {
-  auto user = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
+  auto user = TUser(user_id_, username_, display_name_, password_, biography_);
 
   TUsername new_username("jane_doe");
   user.UpdateUsername(new_username);
@@ -88,7 +86,7 @@ TEST_F(UserTest, UpdateUsername) {
 }
 
 TEST_F(UserTest, UpdatePassword) {
-  auto user = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
+  auto user = TUser(user_id_, username_, display_name_, password_, biography_);
 
   std::string old_hash = user.GetPasswordHash();
   std::string old_salt = user.GetPasswordSalt();
@@ -103,24 +101,24 @@ TEST_F(UserTest, UpdatePassword) {
 }
 
 TEST_F(UserTest, EqualityOperator) {
-  auto user1 = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
-  auto user2 = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
-  auto user3 = TUser::CreateNew(TUserId("user-456"), username_, display_name_, password_, biography_);
+  auto user1 = TUser(user_id_, username_, display_name_, password_, biography_);
+  auto user2 = TUser(user_id_, username_, display_name_, password_, biography_);
+  auto user3 = TUser(TUserId("user-456"), username_, display_name_, password_, biography_);
 
   EXPECT_EQ(user1, user2);  // Same ID
   EXPECT_NE(user1, user3);  // Different ID
 }
 
 TEST_F(UserTest, InequalityOperator) {
-  auto user1 = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
-  auto user2 = TUser::CreateNew(TUserId("user-456"), username_, display_name_, password_, biography_);
+  auto user1 = TUser(user_id_, username_, display_name_, password_, biography_);
+  auto user2 = TUser(TUserId("user-456"), username_, display_name_, password_, biography_);
 
   EXPECT_TRUE(user1 != user2);
   EXPECT_FALSE(user1 != user1);
 }
 
 TEST_F(UserTest, GettersReturnCorrectValues) {
-  auto user = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
+  auto user = TUser(user_id_, username_, display_name_, password_, biography_);
 
   // Verify all getters return non-empty values
   EXPECT_FALSE(user.GetUsername().empty());
@@ -131,7 +129,7 @@ TEST_F(UserTest, GettersReturnCorrectValues) {
 }
 
 TEST_F(UserTest, IdIsImmutable) {
-  auto user = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
+  auto user = TUser(user_id_, username_, display_name_, password_, biography_);
 
   TUserId original_id = user.GetId();
 
@@ -144,7 +142,7 @@ TEST_F(UserTest, IdIsImmutable) {
 }
 
 TEST_F(UserTest, MultipleUpdates) {
-  auto user = TUser::CreateNew(user_id_, username_, display_name_, password_, biography_);
+  auto user = TUser(user_id_, username_, display_name_, password_, biography_);
 
   // Perform multiple updates
   TDisplayName new_name("Updated Name");

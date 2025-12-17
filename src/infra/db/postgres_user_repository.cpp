@@ -56,16 +56,18 @@ std::optional<TUserTinyProfile> TPostgresUserRepository::GetProfileById(const TU
            .DisplayName = profile["display_name"].As<std::string>()}};
 }
 
-std::optional<TUser> TPostgresUserRepository::GetUserByUsername(std::string_view username) const {
+std::unique_ptr<TUser> TPostgresUserRepository::GetUserByUsername(std::string_view username) const {
   auto result =
       PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetUserByUsername, username);
   if (result.IsEmpty()) {
-    return std::nullopt;
+    return nullptr;
   }
 
   auto user_data = result.AsSingleRow<NCore::NDomain::TUserData>(userver::storages::postgres::kRowTag);
+  user_data.PasswordHash =  userver::utils::encoding::FromHex(user_data.PasswordHash);
+  user_data.Salt =  userver::utils::encoding::FromHex(user_data.Salt);
 
-  return NCore::NDomain::TUser::Restore(std::move(user_data));
+  return std::make_unique<NCore::NDomain::TUser>(std::move(user_data));
 }
 
 }  // namespace NChat::NInfra::NRepository

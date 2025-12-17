@@ -20,3 +20,9 @@ def validate_profile(user: User, response):
             'biography': user.biography,
         },
     }
+
+
+def validate_user_login(user: User, response):
+    return response.json() == {
+        'token': matching.RegexString(r'^[\w-]+\.[\w-]+\.[\w-]+$'),
+    }

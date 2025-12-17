@@ -14,6 +14,22 @@ class TValidationException
   explicit TValidationException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
 };
 
+class TUnauthorizedException
+    : public userver::server::handlers::ExceptionWithCode<userver::server::handlers::HandlerErrorCode::kUnauthorized> {
+ public:
+  TUnauthorizedException(std::string_view field, std::string_view msg) : BaseType(MakeError(field, msg)) {}
+
+  explicit TUnauthorizedException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
+};
+
+class TNotFoundException
+    : public userver::server::handlers::ExceptionWithCode<userver::server::handlers::HandlerErrorCode::kResourceNotFound> {
+ public:
+  TNotFoundException(std::string_view field, std::string_view msg) : BaseType(MakeError(field, msg)) {}
+
+  explicit TNotFoundException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
+};
+
 class TConflictException
     : public userver::server::handlers::ExceptionWithCode<userver::server::handlers::HandlerErrorCode::kConflictState> {
  public:

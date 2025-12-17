@@ -19,7 +19,7 @@ TUserServiceComponent::TUserServiceComponent(const userver::components::Componen
 
     auto& pg_component = context.FindComponent<userver::components::Postgres>(pg_component_name);
 
-    UserRepo_ = std::make_unique<NRepository::TPostgresUserRepository>(pg_component.GetCluster());
+    UserRepo_ = std::make_unique<NRepository::TPostgresUserRepository>(pg_component.GetCluster(), context.FindComponent<TProfileCache>());
   } else {
     throw std::runtime_error("Unknown storage-type: " + storage_type + ". Allowed: postgres, ydb");
   }

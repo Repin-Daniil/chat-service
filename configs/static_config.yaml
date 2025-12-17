@@ -113,4 +113,7 @@ components_manager:
             sync-start: true
             connlimit_mode: manual
 
+        profile-pg-cache:
+            pgcomponent: chat-postgres-database
+            update-interval: 10s
         

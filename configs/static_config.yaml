@@ -115,5 +115,6 @@ components_manager:
 
         profile-pg-cache:
             pgcomponent: chat-postgres-database
+            chunk-size: 0 # due to libpq patch problem
             update-interval: 10s
         

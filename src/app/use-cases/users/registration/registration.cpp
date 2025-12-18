@@ -10,6 +10,7 @@
 namespace NChat::NApp {
 
 namespace {
+
 using NCore::NDomain::TBiography;
 using NCore::NDomain::TDisplayName;
 using NCore::NDomain::TPasswordHash;
@@ -26,16 +27,18 @@ std::optional<NCore::NDomain::TUserId> InsertUser(const NCore::IUserRepository& 
 
   while (attempts < kMaxAttempts) {
     auto id = NCore::NDomain::TUserId{generator.Generate()};
-    auto user = NCore::NDomain::TUser::CreateNew(id, username, name, password_hash, biography);
+    auto user = NCore::NDomain::TUser(id, username, name, password_hash, biography);
 
     try {
       repo.InsertNewUser(user);
       return id;
     } catch (const TUserIdAlreadyExists&) {
       ++attempts;
+    } catch (const std::exception& e) {
+      throw TRegistrationTemporaryUnavailable("Registration temporary unavailable. Failed to insert new user");
     }
   }
-  return std::nullopt;
+  throw TRegistrationTemporaryUnavailable("Registration temporary unavailable. Failed to generate unique id");
 }
 
 }  // namespace
@@ -45,7 +48,7 @@ std::optional<NCore::NDomain::TUserId> InsertUser(const NCore::IUserRepository& 
 TRegistrationUseCase::TRegistrationUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service)
     : UserRepo_(user_repo), AuthService_(auth_service) {}
 
-NDto::TUserRegistrationResult TRegistrationUseCase::Execute(NDto::TUserRegistrationData request) const {
+NDto::TUserRegistrationResult TRegistrationUseCase::Execute(const NDto::TUserRegistrationRequest& request) const {
   TRawPassword raw_password{request.Password};
   TBiography biography{request.Biography};
   TDisplayName display_name{request.DisplayName};
@@ -58,10 +61,6 @@ NDto::TUserRegistrationResult TRegistrationUseCase::Execute(NDto::TUserRegistrat
   auto password_hash = AuthService_.HashPassword(request.Password);
 
   auto user_id = InsertUser(UserRepo_, username, display_name, password_hash, biography);
-
-  if (!user_id.has_value()) {
-    throw TRegistrationTemporaryUnavailable("Registration temporary unavailable. Failed to generate unique id");
-  }
 
   auto token = AuthService_.CreateJwt(user_id.value());
 

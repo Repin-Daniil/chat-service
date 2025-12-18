@@ -39,9 +39,7 @@ userver::formats::json::Value TGetByUsernameHandler::HandleRequestJsonThrow(
   }
 
   if (!result.has_value()) {
-    auto& response = request.GetHttpResponse();
-    response.SetStatus(userver::server::http::HttpStatus::kNotFound);
-    return MakeError("username", fmt::format("User with username {} not found.", username));
+    throw TNotFoundException(fmt::format("User with username {} not found.", username));
   }
 
   userver::formats::json::ValueBuilder builder;

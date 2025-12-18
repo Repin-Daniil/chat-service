@@ -1,6 +1,7 @@
 #pragma once
 
 #include <app/dto/users/check_token_dto.hpp>
+#include <app/exceptions.hpp>
 #include <core/users/auth_service_interface.hpp>
 #include <core/users/user_repo.hpp>
 
@@ -15,13 +16,17 @@ inline constexpr const char* InvalidUser = "Invalid user auth";
 
 }  // namespace NAuthErrors
 
+class TCheckTokenTemporaryUnavailable : public TApplicationException {
+  using TApplicationException::TApplicationException;
+};
+
 const std::string_view TOKEN_KEYWORD = "Bearer ";
 
 class TCheckTokenUseCase final {
  public:
   TCheckTokenUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service);
 
-  NDto::TCheckTokenResult Execute(std::string token, bool is_required) const;
+  NDto::TCheckTokenResult Execute(const std::string& token, bool is_required) const;
 
  private:
   NCore::IUserRepository& UserRepo_;

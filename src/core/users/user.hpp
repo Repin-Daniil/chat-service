@@ -27,10 +27,11 @@ struct TUserData final {
 
 class TUser {
  public:
-  static TUser CreateNew(TUserId user_id, const TUsername& username, const TDisplayName& name,
-                         const TPasswordHash& password, const TBiography& bio);
+  TUser(TUserId user_id, const TUsername& username, const TDisplayName& name, const TPasswordHash& password,
+        const TBiography& bio);
+  TUser(TUserData user_data);
 
-  static TUser Restore(TUserData user_data);
+  TUser(const TUser& user) = delete;
 
   // Getters
   const TUserId& GetId() const { return Id_; }

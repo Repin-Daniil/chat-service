@@ -3,6 +3,7 @@
 
 namespace NChat::NInfra::NHandlers {
 
+userver::formats::json::Value MakeError(std::string_view error);
 userver::formats::json::Value MakeError(std::string_view field_name, std::string_view message);
 userver::formats::json::Value MakeServerError(std::optional<std::string_view> message = std::nullopt);
 
@@ -25,7 +26,7 @@ class TUnauthorizedException
 class TNotFoundException
     : public userver::server::handlers::ExceptionWithCode<userver::server::handlers::HandlerErrorCode::kResourceNotFound> {
  public:
-  TNotFoundException(std::string_view field, std::string_view msg) : BaseType(MakeError(field, msg)) {}
+  TNotFoundException(std::string_view error) : BaseType(MakeError(error)) {}
 
   explicit TNotFoundException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
 };

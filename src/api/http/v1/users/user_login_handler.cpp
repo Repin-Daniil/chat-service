@@ -7,14 +7,14 @@
 #include <userver/components/component.hpp>
 #include <userver/formats/serialize/common_containers.hpp>
 
-using NChat::NApp::NDto::TUserLoginData;
+using NChat::NApp::NDto::TUserLoginRequest;
 using NChat::NApp::NDto::TUserLoginResult;
 
 namespace userver::formats::parse {
-TUserLoginData Parse(const formats::json::Value& json, formats::parse::To<TUserLoginData>) {
+TUserLoginRequest Parse(const formats::json::Value& json, formats::parse::To<TUserLoginRequest>) {
   using NChat::NInfra::NHandlers::TValidationException;
 
-  TUserLoginData dto{
+  TUserLoginRequest dto{
       .Username = json["username"].As<std::string>(""),
       .Password = json["password"].As<std::string>(""),
   };
@@ -53,7 +53,7 @@ TLoginUserHandler::TLoginUserHandler(const userver::components::ComponentConfig&
 userver::formats::json::Value TLoginUserHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest&, const userver::formats::json::Value& request_json,
     userver::server::request::RequestContext&) const {
-  const auto user_login_data = request_json["user"].As<TUserLoginData>();
+  const auto user_login_data = request_json["user"].As<TUserLoginRequest>();
 
   try {
     const auto result = UserService_.Login(user_login_data);
@@ -67,7 +67,7 @@ userver::formats::json::Value TLoginUserHandler::HandleRequestJsonThrow(
 
     return builder.ExtractValue();
   } catch (const NCore::TValidationException& ex) {
-    throw TValidationException(ex.GetField(), ex.what());
+    throw TUnauthorizedException("credentials", "Invalid credentials");
   } catch (const NApp::TLoginTemporaryUnavailable& ex) {
     LOG_ERROR() << "Login unavailable: " << ex.what();
     throw TServerException("Login temporary unavailable");

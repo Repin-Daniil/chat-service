@@ -35,7 +35,7 @@ NDomain::TPasswordHash HashPasswordUtil(std::string_view password) {
 
 // Успешная регистрация нового пользователя
 TEST_F(RegistrationUseCaseIntegrationTest, SuccessfulRegistration) {
-  NDto::TUserRegistrationData request{
+  NDto::TUserRegistrationRequest request{
       .Username = "testuser",
       .Password = "secure#Password123",
       .Biography = "Test biography",
@@ -64,7 +64,7 @@ TEST_F(RegistrationUseCaseIntegrationTest, SuccessfulRegistration) {
 
 // Попытка регистрации с уже существующим username
 TEST_F(RegistrationUseCaseIntegrationTest, UserAlreadyExists) {
-  NDto::TUserRegistrationData request{
+  NDto::TUserRegistrationRequest request{
       .Username = "existinguser",
       .Password = "passworD-123",
       .Biography = "Biography",
@@ -85,7 +85,7 @@ TEST_F(RegistrationUseCaseIntegrationTest, UserAlreadyExists) {
 
 // UUID коллизия с успешным retry
 TEST_F(RegistrationUseCaseIntegrationTest, UuidCollisionWithSuccessfulRetry) {
-  NDto::TUserRegistrationData request{
+  NDto::TUserRegistrationRequest request{
       .Username = "newuser", .Password = "passworDD$123", .Biography = "Biography", .DisplayName = "New User"};
 
   EXPECT_CALL(*user_repo_ptr_, FindByUsername("newuser")).WillOnce(Return(std::nullopt));
@@ -111,7 +111,7 @@ TEST_F(RegistrationUseCaseIntegrationTest, UuidCollisionWithSuccessfulRetry) {
 
 // Исчерпание попыток при UUID коллизии
 TEST_F(RegistrationUseCaseIntegrationTest, UuidCollisionMaxAttemptsExceeded) {
-  NDto::TUserRegistrationData request{
+  NDto::TUserRegistrationRequest request{
       .Username = "unluckyuser",
       .Password = "PsWrDD@123",
       .Biography = "Biography",
@@ -133,7 +133,7 @@ TEST_F(RegistrationUseCaseIntegrationTest, UuidCollisionMaxAttemptsExceeded) {
 
 // Полный поток: хэширование -> сохранение -> генерация JWT
 TEST_F(RegistrationUseCaseIntegrationTest, CompleteIntegrationFlow) {
-  NDto::TUserRegistrationData request{
+  NDto::TUserRegistrationRequest request{
       .Username = "john_doe",
       .Password = "MySecureP#ssw0rd",
       .Biography = "Software engineer",
@@ -166,7 +166,7 @@ TEST_F(RegistrationUseCaseIntegrationTest, CompleteIntegrationFlow) {
 
 // Проверка передачи правильных параметров в InsertNewUser
 TEST_F(RegistrationUseCaseIntegrationTest, CorrectUserDataPassed) {
-  NDto::TUserRegistrationData request{
+  NDto::TUserRegistrationRequest request{
       .Username = "testuser",
       .Password = "Password@123",
       .Biography = "My bio",
@@ -192,7 +192,7 @@ TEST_F(RegistrationUseCaseIntegrationTest, CorrectUserDataPassed) {
 
 // Ошибка репозитория
 TEST_F(RegistrationUseCaseIntegrationTest, RepositoryError) {
-  NDto::TUserRegistrationData request{
+  NDto::TUserRegistrationRequest request{
       .Username = "testuser",
       .Password = "Password@123",
       .Biography = "My bio",

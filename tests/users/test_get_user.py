@@ -66,3 +66,11 @@ async def test_get_user_empty_username(service_client, registered_user):
 
     assert response.status == HTTPStatus.BAD_REQUEST
     assert 'errors' in response.json().get('details', {})
+
+
+async def test_get_user(service_client, registered_user):
+    """Проверяет ошибку при неизвестном пользователе."""
+    response = await get_user_by_name(service_client, 'unknown_user', registered_user.token)
+
+    assert response.status == HTTPStatus.NOT_FOUND
+    assert 'errors' in response.json().get('details', {})

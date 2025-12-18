@@ -5,7 +5,7 @@
 
 namespace NChat::NApp::NDto {
 
-struct TUserLoginData {
+struct TUserLoginRequest {
   std::string Username;
   std::string Password;
 };

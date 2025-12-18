@@ -8,7 +8,7 @@ TUserService::TUserService(NCore::IUserRepository& user_repo, NCore::IAuthServic
       ProfileByNameUseCase_(user_repo),
       LoginUseCase_(user_repo, auth_service) {}
 
-NDto::TUserRegistrationResult TUserService::Register(const NDto::TUserRegistrationData& request) {
+NDto::TUserRegistrationResult TUserService::Register(const NDto::TUserRegistrationRequest& request) {
   return RegistrationUseCase_.Execute(request);
 }
 
@@ -20,7 +20,7 @@ std::optional<NDto::TUserProfileResult> TUserService::GetProfileByUsername(const
   return ProfileByNameUseCase_.Execute(username);
 }
 
-NDto::TUserLoginResult TUserService::Login(const NDto::TUserLoginData& request) {
+NDto::TUserLoginResult TUserService::Login(const NDto::TUserLoginRequest& request) {
   return LoginUseCase_.Execute(request);
 }
 

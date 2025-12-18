@@ -16,7 +16,7 @@ using NCore::NDomain::TUsername;
 TLoginUseCase::TLoginUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service)
     : UserRepo_(user_repo), AuthService_(auth_service) {}
 
-NDto::TUserLoginResult TLoginUseCase::Execute(const NDto::TUserLoginData& request) const {
+NDto::TUserLoginResult TLoginUseCase::Execute(const NDto::TUserLoginRequest& request) const {
   TUsername username{request.Username};
   TRawPassword raw_password{request.Password};
 
@@ -38,7 +38,6 @@ NDto::TUserLoginResult TLoginUseCase::Execute(const NDto::TUserLoginData& reques
   }
 
   auto token = AuthService_.CreateJwt(user->GetId());
-  LOG_CRITICAL() << fmt::format("TOKEN: {}", token);
 
   return {.Token = token, .Error = std::nullopt};
 }

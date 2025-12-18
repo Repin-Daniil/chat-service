@@ -15,7 +15,7 @@ class TLoginUseCase final {
  public:
   TLoginUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service);
 
-  NDto::TUserLoginResult Execute(const NDto::TUserLoginData& request) const;
+  NDto::TUserLoginResult Execute(const NDto::TUserLoginRequest& request) const;
 
  private:
   NCore::IUserRepository& UserRepo_;

@@ -13,12 +13,11 @@ class TUserService {
  public:
   TUserService(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service);
 
-  NDto::TUserRegistrationResult Register(const NDto::TUserRegistrationData& request);
+  NDto::TUserRegistrationResult Register(const NDto::TUserRegistrationRequest& request);
   NDto::TCheckTokenResult CheckToken(const std::string& token, const bool is_required);
   std::optional<NDto::TUserProfileResult> GetProfileByUsername(const std::string& username);
 
-  NDto::TUserLoginResult Login(const NDto::TUserLoginData& request);
-  // GetInfoById();
+  NDto::TUserLoginResult Login(const NDto::TUserLoginRequest& request);
 
  private:
   TRegistrationUseCase RegistrationUseCase_;

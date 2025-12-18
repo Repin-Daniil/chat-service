@@ -83,3 +83,25 @@ async def test_login_invalid_json(service_client):
     response = await service_client.post(Routes.LOGIN, data='invalid json')
 
     assert response.status == HTTPStatus.BAD_REQUEST
+
+
+async def test_login_invalid_login(service_client, registered_user):
+    """Проверяет, что логин с невалидным логином отклоняется."""
+    user = User(username='123', password=registered_user.username)
+    response = await login_user(service_client, user)
+
+    assert response.status == HTTPStatus.UNAUTHORIZED
+    assert 'errors' in response.json()['details']
+    assert 'credentials' in response.json()['details']['errors']
+    assert response.json()['details']['errors']['credentials'] == ['Invalid credentials']
+
+
+async def test_login_invalid_password(service_client, registered_user):
+    """Проверяет, что логин с невалидным паролем отклоняется."""
+    user = User(username=registered_user.username, password='invalidpassword')
+    response = await login_user(service_client, user)
+
+    assert response.status == HTTPStatus.UNAUTHORIZED
+    assert 'errors' in response.json()['details']
+    assert 'credentials' in response.json()['details']['errors']
+    assert response.json()['details']['errors']['credentials'] == ['Invalid credentials']

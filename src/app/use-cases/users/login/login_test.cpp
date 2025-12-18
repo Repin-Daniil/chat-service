@@ -41,7 +41,7 @@ class LoginUseCaseIntegrationTest : public Test {
 
 // Успешный логин
 TEST_F(LoginUseCaseIntegrationTest, SuccessfulLogin) {
-  NDto::TUserLoginData request{
+  NDto::TUserLoginRequest request{
       .Username = "testuser",
       .Password = "secure#Password123",
   };
@@ -64,7 +64,7 @@ TEST_F(LoginUseCaseIntegrationTest, SuccessfulLogin) {
 
 // Пользователь не существует
 TEST_F(LoginUseCaseIntegrationTest, UserDoesNotExist) {
-  NDto::TUserLoginData request{
+  NDto::TUserLoginRequest request{
       .Username = "nonexistent",
       .Password = "secure#Password123",
   };
@@ -82,7 +82,7 @@ TEST_F(LoginUseCaseIntegrationTest, UserDoesNotExist) {
 
 // Неверный пароль
 TEST_F(LoginUseCaseIntegrationTest, WrongPassword) {
-  NDto::TUserLoginData request{
+  NDto::TUserLoginRequest request{
       .Username = "testuser",
       .Password = "wrongPassword$123",
   };
@@ -104,7 +104,7 @@ TEST_F(LoginUseCaseIntegrationTest, WrongPassword) {
 
 // Ошибка репозитория
 TEST_F(LoginUseCaseIntegrationTest, RepositoryError) {
-  NDto::TUserLoginData request{
+  NDto::TUserLoginRequest request{
       .Username = "testuser",
       .Password = "secure#Password123",
   };

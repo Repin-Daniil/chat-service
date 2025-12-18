@@ -39,7 +39,7 @@ userver::formats::json::Value TGetByUsernameHandler::HandleRequestJsonThrow(
   }
 
   if (!result.has_value()) {
-    throw TNotFoundException("username", fmt::format("User with username {} not found.", username));
+    throw TNotFoundException(fmt::format("User with username {} not found.", username));
   }
 
   userver::formats::json::ValueBuilder builder;

@@ -48,7 +48,7 @@ std::optional<NCore::NDomain::TUserId> InsertUser(const NCore::IUserRepository& 
 TRegistrationUseCase::TRegistrationUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service)
     : UserRepo_(user_repo), AuthService_(auth_service) {}
 
-NDto::TUserRegistrationResult TRegistrationUseCase::Execute(const NDto::TUserRegistrationData& request) const {
+NDto::TUserRegistrationResult TRegistrationUseCase::Execute(const NDto::TUserRegistrationRequest& request) const {
   TRawPassword raw_password{request.Password};
   TBiography biography{request.Biography};
   TDisplayName display_name{request.DisplayName};

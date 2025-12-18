@@ -1,7 +1,6 @@
 #include "postgres_user_repository.hpp"
 
 #include <app/use-cases/users/registration/registration.hpp>
-
 #include <NChat/sql_queries.hpp>
 #include <userver/utils/encoding/hex.hpp>
 
@@ -13,8 +12,8 @@ using NCore::NDomain::TUserId;
 using NCore::NDomain::TUserTinyProfile;
 }  // namespace
 
-TPostgresUserRepository::TPostgresUserRepository(userver::storages::postgres::ClusterPtr pg_cluster)
-    : PgCluster_(pg_cluster) {}
+TPostgresUserRepository::TPostgresUserRepository(userver::storages::postgres::ClusterPtr pg_cluster, const TProfileCache& profile_cache)
+    : PgCluster_(pg_cluster), ProfileCache_(profile_cache) {}
 
 void TPostgresUserRepository::InsertNewUser(const TUser& user) const {
   try {
@@ -43,6 +42,16 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
 }
 
 std::optional<TUserTinyProfile> TPostgresUserRepository::GetProfileById(const TUserId& id) const {
+  const auto snapshot = ProfileCache_.Get();
+
+  auto it = snapshot->find(*id);
+  if (it != snapshot->end()) {
+    const auto [_, username, display_name] = it->second;
+    return {{.Id = id,
+           .Username = username,
+           .DisplayName = display_name}};
+  }
+
   auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetProfileById, *id);
 
   if (result.IsEmpty()) {

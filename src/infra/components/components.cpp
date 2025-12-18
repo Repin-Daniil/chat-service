@@ -6,6 +6,7 @@
 #include <api/http/v1/users/user_login_handler.hpp>
 #include <api/http/v1/users/user_register_handler.hpp>
 #include <infra/components/user_service_component.hpp>
+#include <infra/db/postgres_profile_cache.hpp>
 
 #include <userver/clients/dns/component.hpp>
 #include <userver/clients/http/component.hpp>
@@ -35,6 +36,11 @@ void RegisterAuthCheckerFactory() {
 // Clients
 void RegisterPostrgesComponent(userver::components::ComponentList& list) {
   list.Append<userver::components::Postgres>("chat-postgres-database");
+}
+
+// Caches
+void RegisterCacheComponent(userver::components::ComponentList& list) {
+    list.Append<TProfileCache>();
 }
 
 // Handlers

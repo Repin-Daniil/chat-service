@@ -1,16 +1,28 @@
 #pragma once
 
 #include <core/common/ids.hpp>
-#include <core/messaging/chat_member.hpp>
+
+#include <chrono>
+#include <memory>
 
 namespace NChat::NCore::NDomain {
 
-struct TMessage {
-  TChatMember Sender;
-  TChatMember Recipient;
+struct TMessagePaylod {
+  TUserId Sender;
   std::string Text;
+};
 
-  // std::chrono::_ Timestamp; for message drop
+struct TDeliveryContext {
+  std::chrono::steady_clock::time_point Get;
+  std::chrono::steady_clock::time_point Enqueued;
+  std::chrono::steady_clock::time_point Dequeued;
+  std::chrono::steady_clock::time_point Delivered;
+};
+
+struct TMessage {
+  std::shared_ptr<const TMessagePaylod> Payload;
+  TUserId RecipientId;
+  TDeliveryContext Context;
   // TMessageId Id;
 };
 

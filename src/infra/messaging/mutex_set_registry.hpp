@@ -8,7 +8,7 @@ namespace NChat::NInfra {
 class TMutexSetRegistry : public NCore::IMailboxRegistry {
  public:
  private:
-  userver::concurrent::MutexSet<NCore::TMailboxPtr> MutexSet_; 
-  //todo В конфиге нужно держать количество бакетов
+  userver::concurrent::MutexSet<NCore::TMailboxPtr> MutexSet_;
+  // todo В конфиге нужно держать количество бакетов
 };
 }  // namespace NChat::NInfra

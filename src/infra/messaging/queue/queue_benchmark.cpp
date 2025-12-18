@@ -21,34 +21,32 @@ namespace {
 // ============================================================================
 
 TMessage CreateTestMessage(std::size_t text_size = 100) {
-    static const std::vector<std::string> kPools = []() {
-        std::vector<std::string> pools;
-        std::mt19937 gen(std::random_device{}());
-        std::uniform_int_distribution<> dis(0, 25);
+  static const std::vector<std::string> kPools = []() {
+    std::vector<std::string> pools;
+    std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<> dis(0, 25);
 
-        for (int p = 0; p < 4; ++p) { // 4 разных пула
-            std::string s;
-            s.reserve(100000);
-            for (int i = 0; i < 100000; ++i) {
-                s += static_cast<char>('a' + dis(gen));
-            }
-            pools.push_back(std::move(s));
-        }
-        return pools;
-    }();
+    for (int p = 0; p < 4; ++p) {  // 4 разных пула
+      std::string s;
+      s.reserve(100000);
+      for (int i = 0; i < 100000; ++i) {
+        s += static_cast<char>('a' + dis(gen));
+      }
+      pools.push_back(std::move(s));
+    }
+    return pools;
+  }();
 
-    static thread_local std::mt19937 gen(std::random_device{}());
-    std::uniform_int_distribution<std::size_t> pool_dis(0, kPools.size() - 1);
-    std::uniform_int_distribution<std::size_t> offset_dis(0, 100000 - text_size);
+  static thread_local std::mt19937 gen(std::random_device{}());
+  std::uniform_int_distribution<std::size_t> pool_dis(0, kPools.size() - 1);
+  std::uniform_int_distribution<std::size_t> offset_dis(0, 100000 - text_size);
 
-    const auto& pool = kPools[pool_dis(gen)];
-    std::string text = pool.substr(offset_dis(gen), text_size);
+  const auto& pool = kPools[pool_dis(gen)];
+  std::string text = pool.substr(offset_dis(gen), text_size);
 
-    return TMessage{
-        .Sender = {TUserId("user1"), "sender", "Sender"},
-        .Recipient = {TUserId("user2"), "recipient", "Recipient"},
-        .Text = std::move(text),
-    };
+  return TMessage{.Payload = std::make_shared<TMessagePaylod>(TUserId("user1"), std::move(text)),
+                  .RecipientId = TUserId("user2"),
+                  .Context = {}};
 }
 
 // ============================================================================
@@ -83,10 +81,8 @@ const char* QueueTypeName(EQueueType type) {
 // МАКРОС ДЛЯ РЕГИСТРАЦИИ БЕНЧМАРКОВ ДЛЯ ВСЕХ ТИПОВ ОЧЕРЕДЕЙ
 // ============================================================================
 
-#define BENCHMARK_ALL_QUEUES(BenchFunc, ...)                            \
-  BENCHMARK_CAPTURE(BenchFunc, Vyukov, EQueueType::Vyukov) \
-  
-  
+#define BENCHMARK_ALL_QUEUES(BenchFunc, ...) BENCHMARK_CAPTURE(BenchFunc, Vyukov, EQueueType::Vyukov)
+
 // ============================================================================
 // 1. БАЗОВЫЕ ОПЕРАЦИИ - ЛАТЕНТНОСТЬ
 // ============================================================================

@@ -10,6 +10,7 @@ class IMessageQueue {
  public:
   virtual bool Push(NDomain::TMessage&&) = 0;
 
+  // Don't consume concurrently!
   virtual std::vector<NDomain::TMessage> PopBatch(std::size_t max_batch_size, std::chrono::milliseconds timeout) = 0;
 
   virtual std::size_t GetSizeApproximate() const = 0;

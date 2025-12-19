@@ -88,7 +88,7 @@ const char* QueueTypeName(EQueueType type) {
 // ============================================================================
 
 // Измеряем latency одного Push
-static void BM_SinglePush(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_SinglePush(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t msg_size = state.range(0);
     auto queue = CreateQueue(queue_type, 10000);
@@ -103,13 +103,13 @@ static void BM_SinglePush(benchmark::State& state, EQueueType queue_type) {
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_SinglePush)
+BENCHMARK_ALL_QUEUES(BM_Queue_SinglePush)
     ->Arg(10)      // Маленькие сообщения
     ->Arg(1000)    // Средние
     ->Arg(10000);  // Большие
 
 // Измеряем latency PopBatch с разными размерами батчей
-static void BM_PopBatch(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_PopBatch(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t batch_size = state.range(0);
     const std::size_t queue_size = batch_size * 10;
@@ -136,14 +136,14 @@ static void BM_PopBatch(benchmark::State& state, EQueueType queue_type) {
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_PopBatch)->Arg(1)->Arg(10)->Arg(100)->Arg(1000);
+BENCHMARK_ALL_QUEUES(BM_Queue_PopBatch)->Arg(1)->Arg(10)->Arg(100)->Arg(1000);
 
 // ============================================================================
 // 2. THROUGHPUT - ПРОПУСКНАЯ СПОСОБНОСТЬ (SPSC)
 // ============================================================================
 
 // Single Producer -> Single Consumer
-static void BM_SPSC_Throughput(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_SPSC_Throughput(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t msg_count = state.range(0);
     const std::size_t batch_size = state.range(1);
@@ -174,7 +174,7 @@ static void BM_SPSC_Throughput(benchmark::State& state, EQueueType queue_type) {
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_SPSC_Throughput)
+BENCHMARK_ALL_QUEUES(BM_Queue_SPSC_Throughput)
     ->Args({1000, 1})  // Без батчинга
     ->Args({1000, 10})
     ->Args({1000, 100})
@@ -185,7 +185,7 @@ BENCHMARK_ALL_QUEUES(BM_SPSC_Throughput)
 // ============================================================================
 
 // Multi Producer -> Single Consumer
-static void BM_MPSC_Throughput(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_MPSC_Throughput(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t num_producers = state.range(0);
     const std::size_t msg_per_producer = state.range(1);
@@ -226,7 +226,7 @@ static void BM_MPSC_Throughput(benchmark::State& state, EQueueType queue_type) {
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_MPSC_Throughput)
+BENCHMARK_ALL_QUEUES(BM_Queue_MPSC_Throughput)
     ->Args({2, 1000, 100})
     ->Args({4, 1000, 100})
     ->Args({8, 1000, 100})
@@ -234,7 +234,7 @@ BENCHMARK_ALL_QUEUES(BM_MPSC_Throughput)
     ->Args({32, 1000, 100});
 
 // MPSC с разными размерами сообщений
-static void BM_MPSC_MessageSizes(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_MPSC_MessageSizes(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t num_producers = state.range(0);
     const std::size_t msg_size = state.range(1);
@@ -274,7 +274,7 @@ static void BM_MPSC_MessageSizes(benchmark::State& state, EQueueType queue_type)
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_MPSC_MessageSizes)
+BENCHMARK_ALL_QUEUES(BM_Queue_MPSC_MessageSizes)
     ->Args({4, 10})       // 4 producer, маленькие сообщения
     ->Args({4, 1024})     // 4 producer, 1KB
     ->Args({4, 10240})    // 4 producer, 10KB
@@ -287,7 +287,7 @@ BENCHMARK_ALL_QUEUES(BM_MPSC_MessageSizes)
 // ============================================================================
 
 // Производительность при разной загрузке очереди
-static void BM_QueueUtilization(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_QueueUtilization(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t queue_size = 10000;
     const std::size_t initial_fill = state.range(0);  // Процент заполнения
@@ -317,14 +317,14 @@ static void BM_QueueUtilization(benchmark::State& state, EQueueType queue_type) 
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_QueueUtilization)
+BENCHMARK_ALL_QUEUES(BM_Queue_QueueUtilization)
     ->Arg(10)   // Почти пустая
     ->Arg(50)   // Наполовину заполнена
     ->Arg(90)   // Почти полная
     ->Arg(99);  // Критически полная
 
 // Влияние contention при большом числе producers
-static void BM_MPSC_HighContention(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_MPSC_HighContention(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t num_producers = state.range(0);
     const std::size_t operations_per_producer = 10000;
@@ -368,7 +368,7 @@ static void BM_MPSC_HighContention(benchmark::State& state, EQueueType queue_typ
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_MPSC_HighContention)
+BENCHMARK_ALL_QUEUES(BM_Queue_MPSC_HighContention)
     ->Arg(2)
     ->Arg(4)
     ->Arg(8)
@@ -382,7 +382,7 @@ BENCHMARK_ALL_QUEUES(BM_MPSC_HighContention)
 // ============================================================================
 
 // Сравнение: множественные PopBatch(1) vs один PopBatch(N)
-static void BM_BatchingEfficiency(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_BatchingEfficiency(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t batch_size = state.range(0);
     const bool use_batch = state.range(1);
@@ -421,7 +421,7 @@ static void BM_BatchingEfficiency(benchmark::State& state, EQueueType queue_type
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_BatchingEfficiency)
+BENCHMARK_ALL_QUEUES(BM_Queue_BatchingEfficiency)
     ->Args({10, 0})     // 10 x PopBatch(1)
     ->Args({10, 1})     // 1 x PopBatch(10)
     ->Args({100, 0})    // 100 x PopBatch(1)
@@ -434,7 +434,7 @@ BENCHMARK_ALL_QUEUES(BM_BatchingEfficiency)
 // ============================================================================
 
 // Производительность при постоянном переполнении
-static void BM_ConstantOverflow(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_ConstantOverflow(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     auto queue = CreateQueue(queue_type, 10);  // Маленькая очередь
 
@@ -453,10 +453,10 @@ static void BM_ConstantOverflow(benchmark::State& state, EQueueType queue_type) 
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_ConstantOverflow);
+BENCHMARK_ALL_QUEUES(BM_Queue_ConstantOverflow);
 
 // Производительность при флуктуирующей нагрузке
-static void BM_BurstyLoad(benchmark::State& state, EQueueType queue_type) {
+static void BM_Queue_BurstyLoad(benchmark::State& state, EQueueType queue_type) {
   userver::engine::RunStandalone([&]() {
     const std::size_t burst_size = state.range(0);
     auto queue = CreateQueue(queue_type, burst_size * 10);
@@ -480,6 +480,6 @@ static void BM_BurstyLoad(benchmark::State& state, EQueueType queue_type) {
   });
 }
 
-BENCHMARK_ALL_QUEUES(BM_BurstyLoad)->Arg(10)->Arg(100)->Arg(1000)->Arg(10000);
+BENCHMARK_ALL_QUEUES(BM_Queue_BurstyLoad)->Arg(10)->Arg(100)->Arg(1000)->Arg(10000);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN();

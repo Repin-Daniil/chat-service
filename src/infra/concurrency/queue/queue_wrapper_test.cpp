@@ -8,6 +8,7 @@
 
 namespace NChat::NInfra {
 
+
 namespace {
 
 TMessage CreateTestMessage(const std::string& text, const std::string& sender_id = "user1",

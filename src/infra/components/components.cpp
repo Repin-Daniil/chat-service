@@ -14,6 +14,7 @@
 #include <userver/components/component_list.hpp>
 #include <userver/congestion_control/component.hpp>
 #include <userver/server/handlers/ping.hpp>
+#include <userver/server/handlers/server_monitor.hpp>
 #include <userver/server/handlers/tests_control.hpp>
 #include <userver/storages/postgres/component.hpp>
 #include <userver/testsuite/testsuite_support.hpp>
@@ -25,6 +26,7 @@ void RegisterUserverComponents(userver::components::ComponentList& list) {
       .Append<userver::components::TestsuiteSupport>()
       .Append<userver::components::HttpClient>()
       .Append<userver::clients::dns::Component>()
+      .Append<userver::server::handlers::ServerMonitor>()
       .Append<userver::server::handlers::TestsControl>()
       .Append<userver::congestion_control::Component>();
 }

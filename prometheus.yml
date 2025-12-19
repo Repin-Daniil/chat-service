@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'chat_server'
+    metrics_path: '/service/monitor'
+
+    params:
+      format: ['prometheus']
+      
+    static_configs:
+      - targets:
+          - 'chat-server:8081'

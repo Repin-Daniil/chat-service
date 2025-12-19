@@ -78,3 +78,11 @@ $(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(
 		    HOME=$$HOME \
 			USERVER_ENABLE_STACK_USAGE_MONITOR=0 \
 		    $$PWD/run_as_user.sh $(shell /bin/id -u) $(shell /bin/id -g) make $*
+
+.PHONY: deps
+deps:   
+	@if [ ! -f ./build-release/chat_service ]; then \
+	echo "Binary not found, run 'make build' first" && exit 1; \
+	else \
+	mkdir -p ./deps && ldd ./build-release/chat_service | tr -s '[:space:]' '\n' | grep '^/' | xargs -I{} cp -v -- "{}" ./deps;\
+	fi

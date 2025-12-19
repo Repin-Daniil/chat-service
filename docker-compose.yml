@@ -1,0 +1,33 @@
+version: "2.3"
+
+services:
+  postgres:
+    container_name: service-postgres
+    image: postgres:12
+    environment: &db_env
+      POSTGRES_DB: chat_service
+      POSTGRES_USER: chat-user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432"
+    volumes:
+      - ./postgresql/schemas:/docker-entrypoint-initdb.d
+      - ./.pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  chat-server:
+      container_name: chat-server
+      build: . 
+      ports:
+        - "8080:8080"
+      volumes:
+        - ./configs/config_vars_docker.yaml:/app/configs/config_vars.yaml
+      depends_on:
+        - postgres
+      networks:
+        - backend
+
+networks:
+  backend:
+    driver: bridge

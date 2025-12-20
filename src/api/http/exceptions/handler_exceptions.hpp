@@ -23,8 +23,16 @@ class TUnauthorizedException
   explicit TUnauthorizedException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
 };
 
-class TNotFoundException
-    : public userver::server::handlers::ExceptionWithCode<userver::server::handlers::HandlerErrorCode::kResourceNotFound> {
+class TForbiddenException
+    : public userver::server::handlers::ExceptionWithCode<userver::server::handlers::HandlerErrorCode::kForbidden> {
+ public:
+  TForbiddenException(std::string_view error) : BaseType(MakeError(error)) {}
+
+  explicit TForbiddenException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
+};
+
+class TNotFoundException : public userver::server::handlers::ExceptionWithCode<
+                               userver::server::handlers::HandlerErrorCode::kResourceNotFound> {
  public:
   TNotFoundException(std::string_view error) : BaseType(MakeError(error)) {}
 

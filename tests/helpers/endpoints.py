@@ -14,6 +14,12 @@ async def get_user_by_name(service_client, username, token):
         headers={'Authorization': token or ""},
     )
 
+async def delete_user_by_name(service_client, username, token):
+    return await service_client.delete(
+        Routes.GET_USER_BY_NAME.format(username=(username or "")),
+        headers={'Authorization': token or ""},
+    )
+
 
 async def login_user(service_client, user):
     return await service_client.post(

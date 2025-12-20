@@ -24,7 +24,7 @@ userver::formats::json::Value TDeleteByUsernameHandler::HandleRequestJsonThrow(
   try {
     UserService_.DeleteUser(dto);
   } catch (const NCore::NDomain::TUsernameInvalidException& ex) {
-    throw TValidationException(ex.GetField(), ex.what());
+    throw TNotFoundException(fmt::format("User with username {} not found.", username));
   } catch (const NApp::TDeleteUserForbidden& ex) {
     throw TForbiddenException(ex.what());
   } catch (const NApp::TDeleteUserTemporaryUnavailable& ex) {

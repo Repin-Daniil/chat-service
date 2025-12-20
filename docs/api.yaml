@@ -250,12 +250,6 @@ paths:
       responses:
         "200":
           description: Пользователь удален
-        "400":
-          description: Некорректные входные данные
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
         "401":
           description: Не авторизован
           content:
@@ -264,6 +258,12 @@ paths:
                 $ref: "#/components/schemas/Error"
         "403":
           description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Пользователь не найден
           content:
             application/json:
               schema:

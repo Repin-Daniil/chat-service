@@ -48,7 +48,7 @@ async def test_delete_user_empty_username(service_client, registered_user):
     """Проверяет ошибку при пустом имени пользователя."""
     response = await delete_user_by_name(service_client, None, registered_user.token)
 
-    assert response.status == HTTPStatus.BAD_REQUEST
+    assert response.status == HTTPStatus.NOT_FOUND
     assert 'errors' in response.json().get('details', {})
 
 

@@ -16,7 +16,7 @@ class TUserMailbox {
   using TimePoint = std::chrono::steady_clock::time_point;
   using QueuePtr = std::unique_ptr<IMessageQueue>;
 
-  TUserMailbox(NDomain::TUserId consumer_id, QueuePtr queue);
+  TUserMailbox(NDomain::TUserId consumer_id, QueuePtr queue, TimePoint now);
 
   bool SendMessage(NDomain::TMessage&& message, int max_try_amount = 3);
   TMessages PollMessages(TimePoint now, std::size_t max_size, std::chrono::seconds timeout);
@@ -28,7 +28,8 @@ class TUserMailbox {
  private:
   NDomain::TUserId ConsumerId_;
   QueuePtr MessageBus_;
-  std::atomic<TimePoint> LastConsumerActivity_;
+
+  std::atomic<TimePoint> LastConsumerActivity_{};
   std::atomic<bool> MissedMessages_{false};  // True if consumer must resync dropped messages
 };
 

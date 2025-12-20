@@ -1,5 +1,4 @@
 #include <benchmark/benchmark.h>
-
 #include <userver/logging/log.hpp>
 #include <userver/utils/impl/static_registration.hpp>
 
@@ -12,16 +11,16 @@ static void MaybeReenterWithoutASLR(Args&&...) {}
 }  // namespace benchmark
 
 int main(int argc, char** argv) {
-    ::benchmark::MaybeReenterWithoutASLR(argc, argv);
+  ::benchmark::MaybeReenterWithoutASLR(argc, argv);
 
-    USERVER_NAMESPACE::utils::impl::FinishStaticRegistration();
+  USERVER_NAMESPACE::utils::impl::FinishStaticRegistration();
 
-    const USERVER_NAMESPACE::logging::DefaultLoggerLevelScope level_scope{USERVER_NAMESPACE::logging::Level::kError};
+  const USERVER_NAMESPACE::logging::DefaultLoggerLevelScope level_scope{USERVER_NAMESPACE::logging::Level::kError};
 
-    ::benchmark::Initialize(&argc, argv);
-    if (::benchmark::ReportUnrecognizedArguments(argc, argv)) {
-        return 1;
-    }
-    ::benchmark::RunSpecifiedBenchmarks();
-    ::benchmark::Shutdown();
+  ::benchmark::Initialize(&argc, argv);
+  if (::benchmark::ReportUnrecognizedArguments(argc, argv)) {
+    return 1;
+  }
+  ::benchmark::RunSpecifiedBenchmarks();
+  ::benchmark::Shutdown();
 }

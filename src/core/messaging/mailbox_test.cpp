@@ -2,6 +2,7 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <userver/utils/datetime_light.hpp>
 
 #include <chrono>
 
@@ -44,7 +45,8 @@ class MailboxTest : public ::testing::Test {
  protected:
   void SetUp() override {
     queue_raw_ = new NiceMock<MockMessageQueue>();
-    mailbox_ = std::make_unique<TUserMailbox>(user_id_, std::unique_ptr<IMessageQueue>(queue_raw_));
+    mailbox_ = std::make_unique<TUserMailbox>(user_id_, std::unique_ptr<IMessageQueue>(queue_raw_),
+                                              std::chrono::steady_clock::now());
   }
 
   MockMessageQueue* queue_raw_;
@@ -57,7 +59,7 @@ TEST_F(MailboxTest, ValidConstruction) {
   auto user_id = NDomain::TUserId{"user123"};
 
   EXPECT_NO_THROW({
-    TUserMailbox mailbox(user_id, std::move(queue));
+    TUserMailbox mailbox(user_id, std::move(queue), std::chrono::steady_clock::now());
     EXPECT_EQ(*mailbox.GetConsumerId(), "user123");
   });
 }
@@ -65,14 +67,15 @@ TEST_F(MailboxTest, ValidConstruction) {
 TEST_F(MailboxTest, InvalidCounstructionNullQueue) {
   auto user_id = NDomain::TUserId{"user123"};
 
-  EXPECT_THROW({ TUserMailbox mailbox(user_id, nullptr); }, std::invalid_argument);
+  EXPECT_THROW({ TUserMailbox mailbox(user_id, nullptr, std::chrono::steady_clock::now()); }, std::invalid_argument);
 }
 
 TEST_F(MailboxTest, InvalidConstructionEmptyUserId) {
   auto queue = std::make_unique<NiceMock<MockMessageQueue>>();
   auto empty_id = NDomain::TUserId{""};
 
-  EXPECT_THROW({ TUserMailbox mailbox(empty_id, std::move(queue)); }, std::invalid_argument);
+  EXPECT_THROW(
+      { TUserMailbox mailbox(empty_id, std::move(queue), std::chrono::steady_clock::now()); }, std::invalid_argument);
 }
 
 // Тесты SendMessage

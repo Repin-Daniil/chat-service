@@ -1,6 +1,7 @@
 #include "auth_bearer.hpp"
 
 #include <infra/components/user_service_component.hpp>
+
 #include <utils/jwt/jwt.hpp>
 
 #include <userver/http/common_headers.hpp>

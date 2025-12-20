@@ -19,7 +19,7 @@ class TShardedMap {
   using ValuePtr = std::shared_ptr<Value>;
 
   TShardedMap(std::size_t shards_amount) : Shards_(shards_amount) {
-    if(shards_amount == 0 || (shards_amount & (shards_amount - 1)) != 0) {
+    if (shards_amount == 0 || (shards_amount & (shards_amount - 1)) != 0) {
       throw std::invalid_argument("Shards amount must be a degree of 2");
     }
   }
@@ -34,7 +34,26 @@ class TShardedMap {
     const auto& shard = GetShard(key);
     std::shared_lock lock(shard.Mutex);
 
-    return shard.Map.contains(key) ? shard.Map.at(key) : nullptr;
+    auto it = shard.Map.find(key);
+    return it != shard.Map.end() ? it->second : nullptr;
+  }
+
+  std::pair<ValuePtr, bool> GetOrCreate(const Key& key, auto&& factory) {
+    auto& shard = GetShard(key);
+
+    {
+      std::shared_lock lock(shard.Mutex);
+      auto it = shard.Map.find(key);
+      if (it != shard.Map.end()) {
+        return {it->second, false};
+      }
+    }
+
+    auto value = factory();
+
+    std::unique_lock lock(shard.Mutex);
+    auto [it, inserted] = shard.Map.try_emplace(key, std::move(value));
+    return {it->second, inserted};
   }
 
   void Remove(const Key& key) {
@@ -83,16 +102,17 @@ class TShardedMap {
       }
     }
 
+    uint64_t removed_amount = 0;
+
     if (!keys_to_remove.empty()) {
       std::unique_lock write_lock(shard.Mutex);
 
       for (const auto& key : keys_to_remove) {
-        // map::erase is safe even if the key is already deleted
-        shard.Map.erase(key);
+        removed_amount += shard.Map.erase(key);
       }
     }
 
-    return keys_to_remove.size();
+    return removed_amount;
   }
 
  private:

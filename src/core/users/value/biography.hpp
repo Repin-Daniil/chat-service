@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/common/exceptions.hpp>
+
 #include <utils/validator.hpp>
 
 #include <fmt/format.h>

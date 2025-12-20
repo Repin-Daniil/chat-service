@@ -13,10 +13,10 @@ struct TMessagePaylod {
 };
 
 struct TDeliveryContext {
-  std::chrono::steady_clock::time_point Get;
-  std::chrono::steady_clock::time_point Enqueued;
-  std::chrono::steady_clock::time_point Dequeued;
-  std::chrono::steady_clock::time_point Delivered;
+  std::chrono::steady_clock::time_point Get{};
+  std::chrono::steady_clock::time_point Enqueued{};
+  std::chrono::steady_clock::time_point Dequeued{};
+  std::chrono::steady_clock::time_point Delivered{};
 };
 
 struct TMessage {

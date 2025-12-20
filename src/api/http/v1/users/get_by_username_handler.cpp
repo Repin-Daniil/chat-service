@@ -1,7 +1,8 @@
 #include "get_by_username_handler.hpp"
 
-#include <api/http/exceptions/handler_exceptions.hpp>
 #include <infra/components/user_service_component.hpp>
+
+#include <api/http/exceptions/handler_exceptions.hpp>
 
 #include <userver/formats/serialize/common_containers.hpp>
 #include <userver/storages/postgres/component.hpp>

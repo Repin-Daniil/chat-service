@@ -288,3 +288,5 @@ paths:
           description: Не авторизован
         "404":
           description: Получатель не найден
+        "409":
+          description: Пользователь офлайн

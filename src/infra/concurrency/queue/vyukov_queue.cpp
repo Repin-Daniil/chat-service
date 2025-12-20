@@ -1,4 +1,4 @@
-#include "vyukov_queue_impl.hpp"
+#include "vyukov_queue.hpp"
 
 #include <userver/utils/datetime_light.hpp>
 

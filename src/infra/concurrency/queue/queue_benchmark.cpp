@@ -1,4 +1,4 @@
-#include "vyukov_queue_impl.hpp"
+#include "vyukov_queue.hpp"
 
 #include <benchmark/benchmark.h>
 #include <userver/engine/async.hpp>

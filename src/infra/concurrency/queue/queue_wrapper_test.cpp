@@ -1,4 +1,4 @@
-#include "vyukov_queue_impl.hpp"
+#include "vyukov_queue.hpp"
 
 #include <userver/engine/sleep.hpp>
 #include <userver/utest/utest.hpp>
@@ -7,7 +7,6 @@
 #include <atomic>
 
 namespace NChat::NInfra {
-
 
 namespace {
 

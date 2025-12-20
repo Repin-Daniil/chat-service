@@ -1,10 +1,11 @@
 #include "components.hpp"
 
+#include <infra/components/user_service_component.hpp>
+
 #include <api/http/middlewares/auth_bearer.hpp>
 #include <api/http/v1/messages/send_message_handler.hpp>
 #include <api/http/v1/users/get_by_username_handler.hpp>
 #include <api/http/v1/users/user_register_handler.hpp>
-#include <infra/components/user_service_component.hpp>
 
 #include <userver/clients/dns/component.hpp>
 #include <userver/clients/http/component.hpp>

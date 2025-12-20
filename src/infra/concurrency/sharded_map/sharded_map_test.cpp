@@ -215,6 +215,86 @@ UTEST(ShardedMap, CleanupWithDelay) {
 }
 
 // ============================================================================
+// GetOrCreate Tests
+// ============================================================================
+
+UTEST(ShardedMap, GetOrCreateNew) {
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TUserId user_id{"231"};
+
+  auto factory = []() { return std::make_shared<TDummyQueue>(false, 100); };
+
+  auto [value, inserted] = map.GetOrCreate(user_id, factory);
+  ASSERT_TRUE(inserted);
+  ASSERT_TRUE(value);
+  ASSERT_EQ(value->Size, 100);
+
+  // Verify it's in the map
+  auto retrieved = map.Get(user_id);
+  ASSERT_TRUE(retrieved);
+  ASSERT_EQ(retrieved->Size, 100);
+}
+
+UTEST(ShardedMap, GetOrCreateExisting) {
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TUserId user_id{"231"};
+
+  // Put initial value
+  map.Put(user_id, std::make_shared<TDummyQueue>(false, 100));
+
+  std::atomic<int> factory_called{0};
+  auto factory = [&factory_called]() {
+    factory_called++;
+    return std::make_shared<TDummyQueue>(false, 200);
+  };
+
+  auto [value, inserted] = map.GetOrCreate(user_id, factory);
+  ASSERT_FALSE(inserted);
+  ASSERT_TRUE(value);
+  ASSERT_EQ(value->Size, 100);          // Original value
+  ASSERT_EQ(0, factory_called.load());  // Factory should not be called for shared_lock path
+}
+
+UTEST(ShardedMap, GetOrCreateFactoryCalledOnce) {
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TUserId user_id{"231"};
+
+  std::atomic<int> factory_called{0};
+  auto factory = [&factory_called]() {
+    factory_called++;
+    return std::make_shared<TDummyQueue>(false, 123);
+  };
+
+  auto [value, inserted] = map.GetOrCreate(user_id, factory);
+  ASSERT_TRUE(inserted);
+  ASSERT_EQ(1, factory_called.load());
+  ASSERT_EQ(value->Size, 123);
+}
+
+UTEST(ShardedMap, GetOrCreateMultipleKeys) {
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+
+  for (int i = 0; i < 100; ++i) {
+    TUserId user_id{std::to_string(i)};
+    auto factory = [i]() { return std::make_shared<TDummyQueue>(false, i); };
+
+    auto [value, inserted] = map.GetOrCreate(user_id, factory);
+    ASSERT_TRUE(inserted);
+    ASSERT_EQ(value->Size, static_cast<std::size_t>(i));
+  }
+
+  // Verify all exist and GetOrCreate returns existing
+  for (int i = 0; i < 100; ++i) {
+    TUserId user_id{std::to_string(i)};
+    auto factory = []() { return std::make_shared<TDummyQueue>(false, 999); };
+
+    auto [value, inserted] = map.GetOrCreate(user_id, factory);
+    ASSERT_FALSE(inserted);
+    ASSERT_EQ(value->Size, static_cast<std::size_t>(i));
+  }
+}
+
+// ============================================================================
 // Concurrency Tests
 // ============================================================================
 
@@ -460,4 +540,120 @@ UTEST_MT(ShardedMap, StressTest, 16) {
   }
 
   ASSERT_EQ(concurrent_jobs * 1000, static_cast<std::size_t>(operation_count.load()));
+}
+
+UTEST_MT(ShardedMap, GetOrCreateConcurrent, 8) {
+  const auto concurrent_jobs = GetThreadCount();
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+
+  std::atomic<int> total_created{0};
+  std::atomic<int> total_found{0};
+  std::vector<userver::engine::Task> tasks;
+  tasks.reserve(concurrent_jobs);
+
+  // All threads try to create the same keys
+  for (std::size_t thread_no = 0; thread_no < concurrent_jobs; ++thread_no) {
+    tasks.push_back(userver::engine::AsyncNoSpan([&, thread_no]() {
+      for (int i = 0; i < 100; ++i) {
+        TUserId user_id{std::to_string(i)};
+        auto factory = [i, thread_no]() { return std::make_shared<TDummyQueue>(false, i * 1000 + thread_no); };
+
+        auto [value, inserted] = map.GetOrCreate(user_id, factory);
+        if (inserted) {
+          total_created++;
+        } else {
+          total_found++;
+        }
+        ASSERT_TRUE(value);
+      }
+    }));
+  }
+
+  for (auto& task : tasks) {
+    task.Wait();
+  }
+
+  // Exactly 100 items should be created (one per unique key)
+  ASSERT_EQ(100, total_created.load());
+  ASSERT_EQ(concurrent_jobs * 100 - 100, total_found.load());
+
+  // Verify all keys exist
+  for (int i = 0; i < 100; ++i) {
+    ASSERT_TRUE(map.Get(TUserId{std::to_string(i)}));
+  }
+}
+
+UTEST_MT(ShardedMap, GetOrCreateRaceCondition, 16) {
+  const auto concurrent_jobs = GetThreadCount();
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+
+  // Single key, many threads trying to create it
+  TUserId user_id{"race_key"};
+  std::atomic<int> created_count{0};
+  std::atomic<int> factory_called{0};
+
+  std::vector<userver::engine::Task> tasks;
+  tasks.reserve(concurrent_jobs);
+
+  for (std::size_t thread_no = 0; thread_no < concurrent_jobs; ++thread_no) {
+    tasks.push_back(userver::engine::AsyncNoSpan([&, thread_no]() {
+      auto factory = [&factory_called, thread_no]() {
+        factory_called++;
+        return std::make_shared<TDummyQueue>(false, thread_no);
+      };
+
+      auto [value, inserted] = map.GetOrCreate(user_id, factory);
+      if (inserted) {
+        created_count++;
+      }
+      ASSERT_TRUE(value);
+    }));
+  }
+
+  for (auto& task : tasks) {
+    task.Wait();
+  }
+
+  // Only one thread should have successfully inserted
+  ASSERT_EQ(1, created_count.load());
+  // Factory might be called multiple times due to race, but value should be consistent
+  ASSERT_GE(factory_called.load(), 1);
+}
+
+UTEST_MT(ShardedMap, GetOrCreateWithGetAndPut, 8) {
+  const auto concurrent_jobs = GetThreadCount();
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+
+  std::vector<userver::engine::Task> tasks;
+  tasks.reserve(concurrent_jobs);
+
+  for (std::size_t thread_no = 0; thread_no < concurrent_jobs; ++thread_no) {
+    tasks.push_back(userver::engine::AsyncNoSpan([&, thread_no]() {
+      std::mt19937 rng(thread_no);
+      std::uniform_int_distribution<int> key_dist(0, 99);
+      std::uniform_int_distribution<int> op_dist(0, 99);
+
+      for (int iter = 0; iter < 500; ++iter) {
+        int key = key_dist(rng);
+        int op = op_dist(rng);
+        TUserId user_id{std::to_string(key)};
+
+        if (op < 50) {  // 50% GetOrCreate
+          auto factory = [key]() { return std::make_shared<TDummyQueue>(false, key); };
+          auto [value, inserted] = map.GetOrCreate(user_id, factory);
+          ASSERT_TRUE(value);
+        } else if (op < 80) {  // 30% Get
+          map.Get(user_id);
+        } else if (op < 95) {  // 15% Put
+          map.Put(user_id, std::make_shared<TDummyQueue>(false, key));
+        } else {  // 5% Remove
+          map.Remove(user_id);
+        }
+      }
+    }));
+  }
+
+  for (auto& task : tasks) {
+    task.Wait();
+  }
 }

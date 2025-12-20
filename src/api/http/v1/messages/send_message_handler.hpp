@@ -16,7 +16,7 @@ class TSendMessageHandler : public userver::server::handlers::HttpHandlerJsonBas
       userver::server::request::RequestContext& context) const override;
 
  private:
-  // NApp::NServices::TMessagingService& MessageService_;
+  NApp::NServices::TMessagingService& MessageService_;
 };
 
 }  // namespace NChat::NInfra::NHandlers

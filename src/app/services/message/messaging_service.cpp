@@ -7,8 +7,8 @@ TMessagingService::TMessagingService(NCore::IMailboxRegistry& registry, NCore::I
                                      NCore::IUserRepository& repository)
     : SendMessageUseCase_(registry, limiter, repository) {}
 
-bool TMessagingService::SendMessage(NDto::TSendMessageRequest request) {
-  return SendMessageUseCase_.Execute(std::move(request));
+void TMessagingService::SendMessage(NDto::TSendMessageRequest request) {
+  SendMessageUseCase_.Execute(std::move(request));
 }
 
 }  // namespace NChat::NApp::NServices

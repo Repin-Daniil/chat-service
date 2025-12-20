@@ -63,14 +63,23 @@ components_manager:
             url_trailing_slash: strict-match
 
         # Components
-        user-service-component:
-            load-enabled: true
-            token-expiry-hours: $token_expiry_hours
+        user-repository-component:
             storage-type: $database
             postgres-component: chat-postgres-database
             ydb-component: chat-ydb-database
 
+        user-service-component:
+            load-enabled: true
+            token-expiry-hours: $token_expiry_hours
 
+        messaging-service-component:
+            load-enabled: true
+            shards-amount: $registry-shards-amount
+            queue-type: $mailbox-queue-type
+            registry-type: $mailbox-registry-type
+            limiter-type: $limiter-registry-type
+
+            #todo в .docker тоже переменные занести
         # Handlers 
 
         # Users

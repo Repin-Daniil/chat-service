@@ -23,6 +23,7 @@ class TShardedRegistry : public NCore::IMailboxRegistry {
   void TraverseRegistry() override;
   // todo Сделать конфигурацию через динамический конфиг
   //todo сделать нормальное логирование
+  // todo Нужна метрика сбалансированности шардов
  private:
   TShardedMap Registry_;
   std::atomic<int64_t> OnlineCounter_{0};

@@ -127,13 +127,13 @@ components:
         recipient-username:
           type: string
           description: Username пользователя, которому отправляется сообщение
-        text:
+        payload:
           type: string
           description: Текст сообщения
           example: "Hello, World!"
       required:
-        - recipient_id
-        - text
+        - recipient-username
+        - payload
 
 paths:
   # Users

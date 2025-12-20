@@ -4,6 +4,8 @@
 
 #include <utils/jwt/jwt.hpp>
 
+#include <api/http/common/context.hpp>
+
 #include <userver/http/common_headers.hpp>
 #include <userver/storages/postgres/cluster.hpp>
 #include <userver/storages/postgres/component.hpp>
@@ -43,9 +45,9 @@ TAuthCheckerBearer::TAuthCheckResult TAuthCheckerBearer::CheckAuth(
 
   if (result.User.has_value()) {
     auto user = result.User.value();
-    request_context.SetData("user_id", user.UserId);
-    request_context.SetData("username", user.Username);
-    request_context.SetData("display_name", user.DisplayName);
+    request_context.SetData(ToString(NHandlers::EContextKey::UserId), user.UserId);
+    request_context.SetData(ToString(NHandlers::EContextKey::Username), user.Username);
+    request_context.SetData(ToString(NHandlers::EContextKey::DisplayName), user.DisplayName);
 
     return {};
   }

@@ -6,8 +6,11 @@ TSendMessageUseCase::TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCor
                                          NCore::IUserRepository& user_repo)
     : Registry_(registry), Limiter_(limiter), UserRepo_(user_repo) {}
 
-bool TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
-  //todo Rate Limiter
+// todo change to void?
+void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
+  if (Limiter_.TryAcquire(request.SenderId)) {
+    throw TTooManyRequests("Enhance your calm!");
+  };
 
   NCore::NDomain::TUsername recipient_username(std::move(request.RecipientUsername));
   std::string text = std::move(request.Text);  // todo валидация payload
@@ -15,12 +18,17 @@ bool TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
   // todo В будущем когда будут chat_id провести ACL, а пока резолвим в базе через КЭШ user_id
   auto recipient = UserRepo_.GetUserByUsername(recipient_username.Value());
 
-  // fixme Может тут GetOrCreate делать?
   auto mailbox = Registry_.CreateOrGetMailbox(recipient->GetId());
 
   auto message = ConstructMessage(recipient->GetId(), request.SenderId, std::move(text), request.SentAt);
 
-  return mailbox->SendMessage(std::move(message)); //todo нужно передавать количество попыток
+  // todo dynamic config нужно передавать количество попыток
+  const bool is_success = mailbox->SendMessage(std::move(message));
+
+  if (!is_success) {
+    throw TRecipientTemporaryUnavailable(
+        fmt::format("User {} is temporarily unable to accept new messages", recipient_username.Value()));
+  }
 }
 
 NCore::NDomain::TMessage TSendMessageUseCase::ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id,

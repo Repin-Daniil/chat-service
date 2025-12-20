@@ -11,7 +11,7 @@ struct TSendMessageRequest {
   NCore::NDomain::TUserId SenderId;
   std::string RecipientUsername;
   std::string Text;
-  std::chrono::steady_clock::time_point SentAt;
+  std::chrono::steady_clock::time_point SentAt{};
 };
 
 // struct TSendMessageResult {

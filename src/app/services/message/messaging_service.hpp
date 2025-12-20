@@ -13,14 +13,11 @@ class TMessagingService {
   TMessagingService(NCore::IMailboxRegistry& registry, NCore::ISendLimiter& limiter,
                     NCore::IUserRepository& repository);
 
-  bool SendMessage(NDto::TSendMessageRequest request);
+  void SendMessage(NDto::TSendMessageRequest request);
 
-  // SendMessage
-  // Если пользователь не онлайн, то создать ему очередь
+  // todo Тут нужно передавать штатный таймаут на висение на очереди
 
-  // todo Тут нужно передавать штатный таймаут
-  // Тут же реализуется ACL?
-  // PollMessages
+  // todo PollMessages
  private:
   TSendMessageUseCase SendMessageUseCase_;
 };

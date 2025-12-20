@@ -1,5 +1,6 @@
 #pragma once
 
+#include "app/exceptions.hpp"
 #include "core/messaging/send_limiter.hpp"
 #include <core/messaging/mailbox_registry.hpp>
 #include <core/users/user_repo.hpp>
@@ -8,13 +9,13 @@
 
 namespace NChat::NApp {
 
-// class TRegistrationTemporaryUnavailable : public TApplicationException {
-//   using TApplicationException::TApplicationException;
-// };
+class TRecipientTemporaryUnavailable : public TApplicationException {
+  using TApplicationException::TApplicationException;
+};
 
-// class TUserIdAlreadyExists : public TApplicationException {
-//   using TApplicationException::TApplicationException;
-// };
+class TTooManyRequests : public TApplicationException {
+  using TApplicationException::TApplicationException;
+};
 
 class TSendMessageUseCase final {
  public:
@@ -24,7 +25,7 @@ class TSendMessageUseCase final {
 
   TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCore::ISendLimiter& limiter, NCore::IUserRepository& user_repo);
 
-  bool Execute(NDto::TSendMessageRequest request);
+  void Execute(NDto::TSendMessageRequest request);
 
  private:
   TMessage ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id, std::string text, Timepoint sent_at);

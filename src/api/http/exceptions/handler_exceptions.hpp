@@ -6,6 +6,8 @@ namespace NChat::NInfra::NHandlers {
 userver::formats::json::Value MakeError(std::string_view field_name, std::string_view message);
 userver::formats::json::Value MakeServerError(std::optional<std::string_view> message = std::nullopt);
 
+// todo Поставить рядом с исключениями их код HTTP
+
 class TValidationException
     : public userver::server::handlers::ExceptionWithCode<userver::server::handlers::HandlerErrorCode::kClientError> {
  public:
@@ -20,6 +22,15 @@ class TConflictException
   TConflictException(std::string_view field, std::string_view msg) : BaseType(MakeError(field, msg)) {}
 
   explicit TConflictException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
+};
+
+class TTooManyRequestsException : public userver::server::handlers::ExceptionWithCode<
+                                      userver::server::handlers::HandlerErrorCode::kTooManyRequests> {
+ public:
+  // fixme Switch to new MakeError
+  TTooManyRequestsException(std::string_view msg) : BaseType(MakeServerError(msg)) {}
+
+  explicit TTooManyRequestsException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
 };
 
 class TServerException : public userver::server::handlers::ExceptionWithCode<

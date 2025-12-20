@@ -14,6 +14,7 @@ class IUserRepository {
   using TUserTinyProfile = NDomain::TUserTinyProfile;
 
   virtual void InsertNewUser(const TUser& user) const = 0;
+  virtual void DeleteUser(std::string_view username) const = 0;
 
   virtual std::optional<TUserId> FindByUsername(std::string_view username) const = 0;
   virtual std::optional<TUserTinyProfile> GetProfileById(const TUserId& id) const = 0;

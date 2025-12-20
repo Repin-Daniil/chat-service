@@ -35,7 +35,10 @@ userver::formats::json::Value TGetByUsernameHandler::HandleRequestJsonThrow(
   try {
     result = UserService_.GetProfileByUsername(username);
   } catch (const NCore::NDomain::TUsernameInvalidException& ex) {
-    throw TValidationException(ex.GetField(), ex.what());
+    throw TNotFoundException(fmt::format("User with username {} not found.", username));
+  } catch (const NApp::TGetProfileTemporaryUnavailable& ex) {
+    LOG_ERROR() << "Get profile unavailable: " << ex.what();
+    throw TServerException("Get profile temporary unavailable");
   }
 
   if (!result.has_value()) {

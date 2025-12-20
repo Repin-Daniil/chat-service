@@ -1,6 +1,7 @@
 #pragma once
 
 #include <app/use-cases/users/check_token/check_token.hpp>
+#include <app/use-cases/users/delete_user/delete_user.hpp>
 #include <app/use-cases/users/get_profile/get_profile.hpp>
 #include <app/use-cases/users/login/login.hpp>
 #include <app/use-cases/users/registration/registration.hpp>
@@ -14,16 +15,17 @@ class TUserService {
   TUserService(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service);
 
   NDto::TUserRegistrationResult Register(const NDto::TUserRegistrationRequest& request);
+  NDto::TUserLoginResult Login(const NDto::TUserLoginRequest& request);
   NDto::TCheckTokenResult CheckToken(const std::string& token, const bool is_required);
   std::optional<NDto::TUserProfileResult> GetProfileByUsername(const std::string& username);
-
-  NDto::TUserLoginResult Login(const NDto::TUserLoginRequest& request);
+  void DeleteUser(const NDto::TUserDeleteRequest& request);
 
  private:
   TRegistrationUseCase RegistrationUseCase_;
+  TLoginUseCase LoginUseCase_;
   TCheckTokenUseCase CheckTokenUseCase_;
   TGetProfileByNameUseCase ProfileByNameUseCase_;
-  TLoginUseCase LoginUseCase_;
+  TDeleteUserUseCase DeleteUserUseCase_;
 };
 
 }  // namespace NChat::NApp::NServices

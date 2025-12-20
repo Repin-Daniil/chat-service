@@ -20,6 +20,9 @@ COPY --from=builder /app/deps ./deps
 COPY --from=builder /app/configs/static_config.yaml ./configs/static_config.yaml
 COPY ./entrypoint.sh /app/entrypoint.sh
 
+EXPOSE 8080
+EXPOSE 8081
+
 RUN chmod +x /app/entrypoint.sh
 
 ENV LD_LIBRARY_PATH="/app/deps"

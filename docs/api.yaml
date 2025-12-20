@@ -105,6 +105,12 @@ components:
           example: alice
         token:
           $ref: "#/components/schemas/AuthToken"
+        
+    UserLoggedIn:
+      type: object
+      properties:
+        token:
+          $ref: "#/components/schemas/AuthToken"
 
     UserProfile:
       type: object
@@ -187,17 +193,13 @@ paths:
           content:
             application/json:
               schema:
-                type: string
-                format: JWT
-                example: "eyJhbGciO.iJIUzI1NiIsI.nR5cCI6IkpXVCJ9"
-        "400":
-          description: Неверные входные параметры
+                $ref: "#/components/schemas/UserLoggedIn"
+        "401":
+          description: Не авторизован
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-        "401":
-          description: Не авторизован
 
   /users/username/{username}:
     get:
@@ -222,36 +224,44 @@ paths:
                 $ref: "#/components/schemas/UserProfile"
         "401":
           description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "404":
           description: Пользователь не найден
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-
-  /users/id/{user_id}:
-    get:
+    delete:
       tags:
         - Users
-      summary: Получение профиля пользователя по user_id
-      description: Получить публичный профиль пользователя по его уникальному идентификатору.
-      operationId: getUserProfileById
+      summary: Удаление пользователя по username
+      operationId: deleteUserProfileByUsername
       security:
         - BearerAuth: []
       parameters:
-        - name: user_id
+        - name: username
           in: path
           required: true
           schema:
             type: string
-            format: uuid
       responses:
         "200":
-          description: Профиль получен
+          description: Пользователь удален
+        "401":
+          description: Не авторизован
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserProfile"
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "404":
           description: Пользователь не найден
           content:

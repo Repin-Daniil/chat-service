@@ -13,9 +13,12 @@ namespace NChat::NInfra::NRepository {
 
 class TPostgresUserRepository : public NCore::IUserRepository {
  public:
-  explicit TPostgresUserRepository(userver::storages::postgres::ClusterPtr pg_cluster, const TProfileCache& profile_cache);
+  explicit TPostgresUserRepository(userver::storages::postgres::ClusterPtr pg_cluster,
+                                   const TProfileCache& profile_cache);
 
   void InsertNewUser(const TUser& user) const override;
+  void DeleteUser(std::string_view username) const override;
+
   std::optional<TUserId> FindByUsername(std::string_view username) const override;
   std::unique_ptr<TUser> GetUserByUsername(std::string_view username) const override;
 

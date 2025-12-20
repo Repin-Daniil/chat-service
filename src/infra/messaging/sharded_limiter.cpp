@@ -20,6 +20,8 @@ TLimiterWrapper::TimePoint TLimiterWrapper::GetLastAccess() const {
   return LastAccess_.load(std::memory_order_relaxed);
 }
 
+TLimiterWrapper::TokenBucket& TLimiterWrapper::GetBucket() { return Bucket_; }
+
 TSendLimiter::TSendLimiter(std::size_t shard_amount) : Limiters_(shard_amount) {
   LOG_INFO() << "Start SendLimiterRegistry";
 }

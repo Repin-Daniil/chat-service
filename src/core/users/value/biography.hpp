@@ -2,7 +2,7 @@
 
 #include <core/common/exceptions.hpp>
 
-#include <utils/validator.hpp>
+#include <utils/text/validator.hpp>
 
 #include <fmt/format.h>
 
@@ -40,43 +40,36 @@ class TBiography {
   void Validate() {
     Value_ = NUtils::Trim(Value_);
 
-    if (Value_.size() > MAX_BIO_LENGTH) {
+    if (!NUtils::IsValidUtf8(Value_)) {
+      throw TBiographyInvalidException("Invalid UTF-8 encoding");
+    }
+
+    const auto length = NUtils::GetUtf8Length(Value_);
+
+    if (length > MAX_BIO_LENGTH) {
       throw TBiographyInvalidException(fmt::format("Biography must not exceed {} characters", MAX_BIO_LENGTH));
     }
 
-    if (!Value_.empty() && Value_.size() < MIN_BIO_LENGTH) {
+    if (length > 0 && length < MIN_BIO_LENGTH) {
       throw TBiographyInvalidException(
           fmt::format("Biography must be either empty or at least {} characters long", MIN_BIO_LENGTH));
     }
 
-    bool validChars = std::all_of(Value_.begin(), Value_.end(), [](unsigned char c) {
-      // printable ASCII + extended symbols for UTF-8
-      return c >= 32 || c == '\n' || c == '\r' || c == '\t';
-    });
+    bool has_invalid_controls = std::any_of(
+        Value_.begin(), Value_.end(), [](unsigned char c) { return c < 32 && c != '\n' && c != '\r' && c != '\t'; });
 
-    if (!validChars) {
+    if (has_invalid_controls) {
       throw TBiographyInvalidException("Biography contains invalid control characters");
     }
 
     int consecutiveNewlines = 0;
-    int maxConsecutiveNewlines = 0;
-
     for (char c : Value_) {
       if (c == '\n') {
-        consecutiveNewlines++;
-        maxConsecutiveNewlines = std::max(maxConsecutiveNewlines, consecutiveNewlines);
-      } else if (c != '\r') {  // Ignore \r
+        if (++consecutiveNewlines > 3) {
+          throw TBiographyInvalidException("Biography cannot contain more than 3 consecutive newlines");
+        }
+      } else if (c != '\r') {
         consecutiveNewlines = 0;
-      }
-    }
-
-    if (maxConsecutiveNewlines > 3) {
-      throw TBiographyInvalidException("Biography cannot contain more than 3 consecutive newlines");
-    }
-
-    if (!Value_.empty()) {
-      if (Value_.front() == '\n' || Value_.front() == '\r' || Value_.back() == '\n' || Value_.back() == '\r') {
-        throw TBiographyInvalidException("Biography cannot start or end with newline characters");
       }
     }
   }

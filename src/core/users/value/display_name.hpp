@@ -2,12 +2,11 @@
 
 #include <core/common/exceptions.hpp>
 
-#include <utils/validator.hpp>
+#include <utils/text/validator.hpp>
 
 #include <fmt/format.h>
 #include <userver/logging/log.hpp>
 
-#include <algorithm>
 #include <cctype>
 #include <string>
 
@@ -19,7 +18,7 @@ class TDisplayNameInvalidException : public TValidationException {
   std::string GetField() const noexcept override { return "display_name"; }
 };
 
-inline constexpr int MIN_DISPLAY_NAME_LENGTH = 3;
+inline constexpr int MIN_DISPLAY_NAME_LENGTH = 2;
 inline constexpr int MAX_DISPLAY_NAME_LENGTH = 50;
 
 static_assert(MIN_DISPLAY_NAME_LENGTH > 0);
@@ -39,34 +38,22 @@ class TDisplayName {
   void Validate() {
     Value_ = NUtils::Trim(Value_);
 
-    if (Value_.empty()) {
-      throw TDisplayNameInvalidException("Display name cannot consist only of whitespace");
+    if (!NUtils::IsValidUtf8(Value_)) {
+      throw TDisplayNameInvalidException("Invalid UTF-8 encoding");
     }
 
-    if (Value_.size() < MIN_DISPLAY_NAME_LENGTH) {
-      throw TDisplayNameInvalidException(
-          fmt::format("Display name must be at least {} characters long", MIN_DISPLAY_NAME_LENGTH));
+    const auto length = NUtils::GetUtf8Length(Value_);
+    if (length < MIN_DISPLAY_NAME_LENGTH || length > MAX_DISPLAY_NAME_LENGTH) {
+      throw TDisplayNameInvalidException(fmt::format("Display name length {} is out of range [{}-{}]", length,
+                                           MIN_DISPLAY_NAME_LENGTH, MAX_DISPLAY_NAME_LENGTH));
     }
 
-    if (Value_.size() > MAX_DISPLAY_NAME_LENGTH) {
-      throw TDisplayNameInvalidException(
-          fmt::format("Display name must not exceed {} characters", MAX_DISPLAY_NAME_LENGTH));
+    if (NUtils::HasConsecutiveSpaces(Value_)) {
+      throw TDisplayNameInvalidException("Consecutive spaces are not allowed");
     }
 
-    bool validChars = std::all_of(Value_.begin(), Value_.end(), [](unsigned char c) {
-      return std::isalnum(c) || c == ' ' || c == '-' || c == '_' || c == '.';
-    });
-
-    if (!validChars) {
-      throw TDisplayNameInvalidException(
-          "Display name can only contain letters, digits, spaces, hyphens, "
-          "underscores and dots");
-    }
-
-    for (std::size_t i = 0; i < Value_.size() - 1; ++i) {
-      if (Value_[i] == ' ' && Value_[i + 1] == ' ') {
-        throw TDisplayNameInvalidException("Display name cannot contain consecutive spaces");
-      }
+    if (!NUtils::IsAllowedChatSymbols(Value_)) {
+      throw TDisplayNameInvalidException("Display name contains forbidden special characters");
     }
   }
 

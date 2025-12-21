@@ -19,6 +19,8 @@ class TPostgresUserRepository : public NCore::IUserRepository {
 
   void InsertNewUser(const TUser& user) const override;
   void DeleteUser(std::string_view username) const override;
+  std::string UpdateUser(const TUsername& username_to_update,
+                         const NCore::IUserRepository::TUserUpdateParams& params) const override;
 
   std::optional<TUserId> FindByUsername(std::string_view username) const override;
   std::unique_ptr<TUser> GetUserByUsername(std::string_view username) const override;

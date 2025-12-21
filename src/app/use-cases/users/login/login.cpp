@@ -3,9 +3,6 @@
 #include <core/users/value/raw_password.hpp>
 #include <core/users/value/username.hpp>
 
-#include <utils/jwt/jwt.hpp>
-#include <utils/uuid/uuid_generator.hpp>
-
 #include <fmt/format.h>
 
 namespace NChat::NApp {

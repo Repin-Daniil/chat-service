@@ -116,6 +116,15 @@ components_manager:
                 types:
                   - bearer
                 required: true
+
+        handler-update-by-username:
+            path: /v1/users/{username}                 
+            method: PATCH            
+            task_processor: main-task-processor 
+            auth:
+                types:
+                  - bearer
+                required: true
         
         handler-user-login:
             path: /v1/users/login

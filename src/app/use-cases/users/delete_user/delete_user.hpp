@@ -1,6 +1,5 @@
 #pragma once
 
-#include <core/users/auth_service_interface.hpp>
 #include <core/users/user_repo.hpp>
 
 #include <app/dto/users/user_delete_dto.hpp>

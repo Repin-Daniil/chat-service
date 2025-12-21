@@ -55,23 +55,24 @@ userver::formats::json::Value TLoginUserHandler::HandleRequestJsonThrow(
     userver::server::request::RequestContext&) const {
   const auto user_login_data = request_json["user"].As<TUserLoginRequest>();
 
+  TUserLoginResult result;
   try {
-    const auto result = UserService_.Login(user_login_data);
-
-    if (result.Error.has_value()) {
-      throw TUnauthorizedException("credentials", result.Error.value());
-    }
-
-    userver::formats::json::ValueBuilder builder;
-    builder["token"] = result;
-
-    return builder.ExtractValue();
+    result = UserService_.Login(user_login_data);
   } catch (const NCore::TValidationException& ex) {
     throw TUnauthorizedException("credentials", "Invalid credentials");
   } catch (const NApp::TLoginTemporaryUnavailable& ex) {
     LOG_ERROR() << "Login unavailable: " << ex.what();
     throw TServerException("Login temporary unavailable");
   }
+
+  if (result.Error.has_value()) {
+    throw TUnauthorizedException("credentials", result.Error.value());
+  }
+
+  userver::formats::json::ValueBuilder builder;
+  builder["token"] = result;
+
+  return builder.ExtractValue();
 }
 
 }  // namespace NChat::NInfra::NHandlers

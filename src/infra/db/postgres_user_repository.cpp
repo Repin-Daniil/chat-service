@@ -37,6 +37,36 @@ void TPostgresUserRepository::DeleteUser(std::string_view username) const {
   PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kDeleteUser, username);
 }
 
+std::string TPostgresUserRepository::UpdateUser(const TUsername& username_to_update,
+                                                const NCore::IUserRepository::TUserUpdateParams& params) const {
+  std::optional<std::string> username_str =
+      params.Username.has_value() ? std::optional<std::string>{params.Username->Value()} : std::nullopt;
+  std::optional<std::string> display_name_str =
+      params.DisplayName.has_value() ? std::optional<std::string>{params.DisplayName->Value()} : std::nullopt;
+  std::optional<std::string> biography_str =
+      params.Biography.has_value() ? std::optional<std::string>{params.Biography->Value()} : std::nullopt;
+
+  std::optional<std::string> hash_hex = std::nullopt;
+  std::optional<std::string> salt_hex = std::nullopt;
+  if (params.PasswordHash.has_value()) {
+    hash_hex = userver::utils::encoding::ToHex(params.PasswordHash->GetHash());
+    salt_hex = userver::utils::encoding::ToHex(params.PasswordHash->GetSalt());
+  }
+
+  try {
+    auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kUpdateUser,
+                                      username_to_update.Value(), username_str, display_name_str, biography_str,
+                                      hash_hex, salt_hex);
+    if (result.IsEmpty()) {
+      return "";
+    }
+
+    return result.AsSingleRow<std::string>(userver::storages::postgres::kFieldTag);
+  } catch (const userver::storages::postgres::UniqueViolation& ex) {
+    throw NCore::NDomain::TUserAlreadyExistsException("Such user already exists");
+  }
+}
+
 std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view username) const {
   auto result =
       PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kFindUserByUsername, username);

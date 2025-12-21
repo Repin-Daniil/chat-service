@@ -124,6 +124,31 @@ components:
         biography:
           type: string
           example: "My biography"
+
+    UserUpdateRequest:
+      type: object
+      additionalProperties: false
+      required: [user]
+      properties:
+        user:
+          type: object
+          additionalProperties: false
+          properties:
+            username:
+              type: string
+              minLength: 3
+              maxLength: 32
+            password:
+              type: string
+              minLength: 8
+              format: password
+            display_name:
+              type: string
+              minLength: 3
+              maxLength: 50
+            biography:
+              type: string
+              maxLength: 180
     
     # Messages
     SendMessageRequest:
@@ -230,6 +255,59 @@ paths:
                 $ref: "#/components/schemas/Error"
         "404":
           description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      tags:
+        - Users
+      summary: Обновление профиля пользователя по username
+      operationId: updateUserProfileByUsername
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+      responses:
+        "200":
+          description: Профиль обновлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+        "400":
+          description: Некорректные входные данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "403":
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Username уже занят
           content:
             application/json:
               schema:

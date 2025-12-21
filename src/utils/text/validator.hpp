@@ -3,6 +3,7 @@
 #include <userver/utils/text_light.hpp>
 
 #include <string>
+#include <algorithm>
 
 namespace NUtils {
 

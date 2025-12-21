@@ -16,8 +16,7 @@
       "binaryDir": "${sourceDir}/build-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "USERVER_SANITIZE": "addr;ub",
-        "USERVER_DEBUG_INFO_COMPRESSION": "none"
+        "USERVER_SANITIZE": "addr;ub"
       }
     },
     {

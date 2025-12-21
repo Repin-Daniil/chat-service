@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/common/ids.hpp>
+#include <core/messaging/value/message_text.hpp>
 
 #include <chrono>
 #include <memory>
@@ -9,7 +10,7 @@ namespace NChat::NCore::NDomain {
 
 struct TMessagePaylod {
   TUserId Sender;
-  std::string Text;
+  TMessageText Text;
 };
 
 struct TDeliveryContext {

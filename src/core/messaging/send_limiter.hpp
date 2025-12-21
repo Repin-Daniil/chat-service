@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cstdint>
 #include <core/common/ids.hpp>
+
+#include <cstdint>
 
 namespace NChat::NCore {
 

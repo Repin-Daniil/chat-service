@@ -45,7 +45,7 @@ TEST(TBiographyTest, Utf8LengthCalculation) {
   // "Привет" = 6 characters, but more bytes
   TBiography bio("Привет");
   EXPECT_EQ(NUtils::GetUtf8Length(bio.Value()), 6);
-  
+
   // 3 emoji = 3 characters
   TBiography bioEmoji("👨‍💻🚀⭐");
   EXPECT_GT(NUtils::GetUtf8Length(bioEmoji.Value()), 0);
@@ -55,7 +55,7 @@ TEST(TBiographyTest, MaxLengthBoundary) {
   // Exactly MAX_BIO_LENGTH characters should be valid
   std::string maxBio(MAX_BIO_LENGTH, 'a');
   EXPECT_NO_THROW(TBiography{maxBio});
-  
+
   // MAX_BIO_LENGTH + 1 should throw
   std::string tooLong(MAX_BIO_LENGTH + 1, 'a');
   EXPECT_THROW(TBiography{tooLong}, TBiographyInvalidException);
@@ -68,7 +68,7 @@ TEST(TBiographyTest, MaxLengthBoundaryUtf8) {
     maxBio += "Я";
   }
   EXPECT_NO_THROW(TBiography{maxBio});
-  
+
   // MAX_BIO_LENGTH + 1 UTF-8 characters should throw
   std::string tooLong;
   for (int i = 0; i < MAX_BIO_LENGTH + 1; ++i) {
@@ -100,7 +100,7 @@ TEST(TBiographyTest, InvalidControlCharacters) {
   bioWithNull += '\0';
   bioWithNull += " World";
   EXPECT_THROW(TBiography{bioWithNull}, TBiographyInvalidException);
-  
+
   EXPECT_THROW(TBiography("Text\x01here"), TBiographyInvalidException);
   EXPECT_THROW(TBiography("Text\x1Fhere"), TBiographyInvalidException);
 }
@@ -134,10 +134,10 @@ TEST(TBiographyTest, StartsOrEndsWithNewline) {
   // These should be trimmed
   TBiography bio1("\nSome biography text here");
   EXPECT_EQ(bio1.Value(), "Some biography text here");
-  
+
   TBiography bio2("Some biography text here\n");
   EXPECT_EQ(bio2.Value(), "Some biography text here");
-  
+
   TBiography bio3("\n\nText\n\n");
   EXPECT_EQ(bio3.Value(), "Text");
 }
@@ -178,14 +178,15 @@ TEST(TBiographyTest, EqualityUtf8) {
 TEST(TBiographyTest, EqualityAfterTrim) {
   TBiography b1("  Trimmed text  ");
   TBiography b2("Trimmed text");
-  
+
   EXPECT_EQ(b1, b2);
 }
 
 TEST(TBiographyTest, ComplexUtf8Biography) {
-  std::string complex = "👨‍💻 Developer from 🇷🇺\nПрограммирование на C++\n日本語も少し";
+  std::string complex =
+      "👨‍💻 Developer from 🇷🇺\nПрограммирование на C++\n日本語も少し";
   EXPECT_NO_THROW(TBiography{complex});
-  
+
   TBiography bio(complex);
   EXPECT_EQ(bio.Value(), complex);
 }

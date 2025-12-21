@@ -1,5 +1,7 @@
 #include "mailbox.hpp"
 
+#include <core/messaging/value/message_text.hpp>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <userver/utils/datetime_light.hpp>
@@ -28,9 +30,7 @@ class MockMessageQueue : public IMessageQueue {
 // Хелпер для создания сообщений
 NDomain::TMessage CreateTestMessage(const std::string& sender_id, const std::string& recipient_id,
                                     const std::string& text) {
-  auto payload = std::make_shared<NDomain::TMessagePaylod>();
-  payload->Sender = NDomain::TUserId{sender_id};
-  payload->Text = text;
+  auto payload = std::make_shared<NDomain::TMessagePaylod>(NDomain::TUserId{sender_id}, NDomain::TMessageText(text));
 
   NDomain::TMessage msg;
   msg.Payload = payload;
@@ -127,7 +127,7 @@ TEST_F(MailboxTest, ValidScenarioSendAndReceive) {
 
   EXPECT_EQ(result.Messages.size(), 1);
   EXPECT_FALSE(result.ResyncRequired);
-  EXPECT_EQ(result.Messages[0].Payload->Text, "Hello");
+  EXPECT_EQ(result.Messages[0].Payload->Text.Value(), "Hello");
 }
 
 TEST_F(MailboxTest, QueueFullResyncRequired) {

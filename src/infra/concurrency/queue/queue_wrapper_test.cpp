@@ -12,7 +12,8 @@ namespace {
 
 TMessage CreateTestMessage(const std::string& text, const std::string& sender_id = "user1",
                            const std::string& recipient_id = "user2") {
-  return TMessage{.Payload = std::make_shared<NCore::NDomain::TMessagePaylod>(NCore::NDomain::TUserId(sender_id), text),
+  return TMessage{.Payload = std::make_shared<NCore::NDomain::TMessagePaylod>(NCore::NDomain::TUserId(sender_id),
+                                                                              NCore::NDomain::TMessageText(text)),
                   .RecipientId = NCore::NDomain::TUserId{recipient_id},
                   .Context = {}};
 }
@@ -26,7 +27,7 @@ UTEST(VyukovMessageQueue, BasicPushPop) {
 
   auto batch = queue.PopBatch(10, std::chrono::milliseconds(100));
   ASSERT_EQ(batch.size(), 1);
-  EXPECT_EQ(batch[0].Payload->Text, "Hello, World!");
+  EXPECT_EQ(batch[0].Payload->Text.Value(), "Hello, World!");
 }
 
 UTEST(VyukovMessageQueue, PushToFullQueue) {
@@ -47,8 +48,8 @@ UTEST(VyukovMessageQueue, PushToFullQueue) {
   ASSERT_FALSE(messages.empty()) << "Queue should reject at least one message";
 
   // Проверяем что сообщение не повредилось
-  EXPECT_FALSE(messages[0].Payload->Text.empty());
-  EXPECT_TRUE(messages[0].Payload->Text.find("Message") != std::string::npos);
+  EXPECT_FALSE(messages[0].Payload->Text.Value().empty());
+  EXPECT_TRUE(messages[0].Payload->Text.Value().find("Message") != std::string::npos);
 
   // Pop одно сообщение
   auto batch = queue.PopBatch(1, std::chrono::milliseconds(100));
@@ -86,7 +87,7 @@ UTEST(VyukovMessageQueue, PopBatchDelayedMessage) {
   auto batch = pop_task.Get();
 
   ASSERT_EQ(batch.size(), 1);
-  EXPECT_EQ(batch[0].Payload->Text, "Delayed message");
+  EXPECT_EQ(batch[0].Payload->Text.Value(), "Delayed message");
 }
 
 UTEST(VyukovMessageQueue, PopBatchMultipleMessages) {
@@ -104,7 +105,7 @@ UTEST(VyukovMessageQueue, PopBatchMultipleMessages) {
 
   ASSERT_EQ(batch.size(), kMessageCount);
   for (std::size_t i = 0; i < kMessageCount; ++i) {
-    EXPECT_EQ(batch[i].Payload->Text, "Message " + std::to_string(i));
+    EXPECT_EQ(batch[i].Payload->Text.Value(), "Message " + std::to_string(i));
   }
 }
 
@@ -181,7 +182,7 @@ UTEST(VyukovMessageQueue, PopBatchSizeZero) {
 
   // Должны получить хотя бы одно сообщение (первое из Pop)
   ASSERT_EQ(batch.size(), 1);
-  EXPECT_EQ(batch[0].Payload->Text, "Test message");
+  EXPECT_EQ(batch[0].Payload->Text.Value(), "Test message");
 }
 
 UTEST(VyukovMessageQueue, PopBatchSizeOne) {
@@ -197,7 +198,7 @@ UTEST(VyukovMessageQueue, PopBatchSizeOne) {
   auto batch = queue.PopBatch(1, std::chrono::milliseconds(100));
 
   ASSERT_EQ(batch.size(), 1);
-  EXPECT_EQ(batch[0].Payload->Text, "Message 0");
+  EXPECT_EQ(batch[0].Payload->Text.Value(), "Message 0");
 }
 
 UTEST(VyukovMessageQueue, EmptyQueueReturnsEmptyBatch) {
@@ -225,8 +226,8 @@ UTEST(VyukovMessageQueue, MoveSemantics) {
   // Получаем сообщение обратно
   auto batch = queue.PopBatch(10, std::chrono::milliseconds(100));
   ASSERT_EQ(batch.size(), 1);
-  EXPECT_EQ(batch[0].Payload->Text.size(), 1000);
-  EXPECT_EQ(batch[0].Payload->Text[0], 'X');
+  EXPECT_EQ(batch[0].Payload->Text.Value().size(), 1000);
+  EXPECT_EQ(batch[0].Payload->Text.Value()[0], 'X');
 }
 
 // ============================================================================
@@ -267,8 +268,8 @@ UTEST_MT(VyukovMessageQueue, MultiProducerSingleConsumer, 4) {
 
     // Проверяем что сообщения валидны
     for (const auto& msg : batch) {
-      EXPECT_FALSE(msg.Payload->Text.empty());
-      EXPECT_TRUE(msg.Payload->Text.find("P") == 0);
+      EXPECT_FALSE(msg.Payload->Text.Value().empty());
+      EXPECT_TRUE(msg.Payload->Text.Value().find("P") == 0);
     }
   }
 

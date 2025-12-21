@@ -1,12 +1,11 @@
 #pragma once
 
-#include "app/exceptions.hpp"
-#include "core/messaging/send_limiter.hpp"
-
 #include <core/messaging/mailbox_registry.hpp>
+#include <core/messaging/send_limiter.hpp>
 #include <core/users/user_repo.hpp>
 
 #include <app/dto/messages/send_request_dto.hpp>
+#include <app/exceptions.hpp>
 
 namespace NChat::NApp {
 
@@ -27,6 +26,7 @@ class TSendMessageUseCase final {
   using TMessage = NCore::NDomain::TMessage;
   using Timepoint = std::chrono::steady_clock::time_point;
   using TUserId = NCore::NDomain::TUserId;
+  using TMessageText = NCore::NDomain::TMessageText;
 
   TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCore::ISendLimiter& limiter,
                       NCore::IUserRepository& user_repo);

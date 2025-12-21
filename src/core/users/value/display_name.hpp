@@ -45,7 +45,7 @@ class TDisplayName {
     const auto length = NUtils::GetUtf8Length(Value_);
     if (length < MIN_DISPLAY_NAME_LENGTH || length > MAX_DISPLAY_NAME_LENGTH) {
       throw TDisplayNameInvalidException(fmt::format("Display name length {} is out of range [{}-{}]", length,
-                                           MIN_DISPLAY_NAME_LENGTH, MAX_DISPLAY_NAME_LENGTH));
+                                                     MIN_DISPLAY_NAME_LENGTH, MAX_DISPLAY_NAME_LENGTH));
     }
 
     if (NUtils::HasConsecutiveSpaces(Value_)) {

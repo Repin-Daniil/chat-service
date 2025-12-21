@@ -22,7 +22,6 @@ class TShardedRegistry : public NCore::IMailboxRegistry {
   // Offline API for metrics and periodic cleaning
   void TraverseRegistry() override;
   // todo Сделать конфигурацию через динамический конфиг
-  //todo сделать нормальное логирование
   // todo Нужна метрика сбалансированности шардов
  private:
   TShardedMap Registry_;

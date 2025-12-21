@@ -18,7 +18,8 @@ TUserRepoComponent::TUserRepoComponent(const userver::components::ComponentConfi
     const auto pg_component_name = config["postgres-component"].template As<std::string>("chat-postgres-database");
     auto& pg_component = context.template FindComponent<userver::components::Postgres>(pg_component_name);
 
-    return std::make_unique<NRepository::TPostgresUserRepository>(pg_component.GetCluster());
+    return std::make_unique<NRepository::TPostgresUserRepository>(pg_component.GetCluster(),
+                                                                  context.template FindComponent<TProfileCache>());
   });
 
   UserRepo_ = repo_factory.Create(config, context, "storage-type");

@@ -21,7 +21,7 @@ UTEST(ShardedRegistryTest, InitialStateEmpty) {
 UTEST(ShardedRegistryTest, GetNonExistentMailbox) {
   TShardedRegistry registry(256);
   TUserId user_id{"42"};
-  
+
   auto mailbox = registry.GetMailbox(user_id);
   EXPECT_EQ(mailbox, nullptr);
 }
@@ -29,7 +29,7 @@ UTEST(ShardedRegistryTest, GetNonExistentMailbox) {
 UTEST(ShardedRegistryTest, CreateMailboxIncreasesCounter) {
   TShardedRegistry registry(256);
   TUserId user_id{"42"};
-  
+
   auto mailbox = registry.CreateOrGetMailbox(user_id);
   EXPECT_NE(mailbox, nullptr);
   EXPECT_EQ(registry.GetOnlineAmount(), 1);
@@ -38,10 +38,10 @@ UTEST(ShardedRegistryTest, CreateMailboxIncreasesCounter) {
 UTEST(ShardedRegistryTest, CreateOrGetMailboxIdempotent) {
   TShardedRegistry registry(256);
   TUserId user_id{"42"};
-  
+
   auto mailbox1 = registry.CreateOrGetMailbox(user_id);
   auto mailbox2 = registry.CreateOrGetMailbox(user_id);
-  
+
   EXPECT_EQ(mailbox1, mailbox2);
   EXPECT_EQ(registry.GetOnlineAmount(), 1);
 }
@@ -49,20 +49,20 @@ UTEST(ShardedRegistryTest, CreateOrGetMailboxIdempotent) {
 UTEST(ShardedRegistryTest, GetMailboxAfterCreate) {
   TShardedRegistry registry(256);
   TUserId user_id{"42"};
-  
+
   auto created_mailbox = registry.CreateOrGetMailbox(user_id);
   auto retrieved_mailbox = registry.GetMailbox(user_id);
-  
+
   EXPECT_EQ(created_mailbox, retrieved_mailbox);
 }
 
 UTEST(ShardedRegistryTest, RemoveMailboxDecreasesCounter) {
   TShardedRegistry registry(256);
   TUserId user_id{"42"};
-  
+
   registry.CreateOrGetMailbox(user_id);
   EXPECT_EQ(registry.GetOnlineAmount(), 1);
-  
+
   registry.RemoveMailbox(user_id);
   EXPECT_EQ(registry.GetOnlineAmount(), 0);
 }
@@ -70,24 +70,24 @@ UTEST(ShardedRegistryTest, RemoveMailboxDecreasesCounter) {
 UTEST(ShardedRegistryTest, RemoveMailboxMakesItInaccessible) {
   TShardedRegistry registry(256);
   TUserId user_id{"42"};
-  
+
   registry.CreateOrGetMailbox(user_id);
   registry.RemoveMailbox(user_id);
-  
+
   auto mailbox = registry.GetMailbox(user_id);
   EXPECT_EQ(mailbox, nullptr);
 }
 
 UTEST(ShardedRegistryTest, MultipleMailboxes) {
   TShardedRegistry registry(256);
-  
+
   for (int i = 0; i < 10; ++i) {
     TUserId user_id{std::to_string(i)};
     registry.CreateOrGetMailbox(user_id);
   }
-  
+
   EXPECT_EQ(registry.GetOnlineAmount(), 10);
-  
+
   for (int i = 0; i < 10; ++i) {
     TUserId user_id{std::to_string(i)};
     auto mailbox = registry.GetMailbox(user_id);
@@ -99,14 +99,14 @@ UTEST(ShardedRegistryTest, TraverseRegistryRemovesExpiredMailboxes) {
   TShardedRegistry registry(256);
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
   TUserId user_id{"42"};
-  
+
   registry.CreateOrGetMailbox(user_id);
   EXPECT_EQ(registry.GetOnlineAmount(), 1);
-  
+
   // Ждем больше чем kIdleThreshold (60 секунд)
   userver::utils::datetime::MockSleep(std::chrono::seconds{61});
   registry.TraverseRegistry();
-  
+
   // После траверса expired mailbox'ы должны быть удалены
   EXPECT_EQ(registry.GetOnlineAmount(), 0);
 }
@@ -115,15 +115,15 @@ UTEST(ShardedRegistryTest, TraverseRegistryRemovesExpiredMailboxes) {
 UTEST_MT(ShardedRegistryTest, ConcurrentCreateDifferentUsers, 4) {
   const auto concurrent_jobs = GetThreadCount();
   TShardedRegistry registry(256);
-  
+
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
-  
+
   for (std::size_t thread_no = 0; thread_no < concurrent_jobs; ++thread_no) {
     tasks.push_back(userver::engine::AsyncNoSpan([&, thread_no]() {
       constexpr std::size_t kUsersPerThread = 100;
       const auto offset = thread_no * kUsersPerThread;
-      
+
       for (std::size_t i = 0; i < kUsersPerThread; ++i) {
         TUserId user_id{std::to_string(static_cast<int>(offset + i))};
         auto mailbox = registry.CreateOrGetMailbox(user_id);
@@ -131,11 +131,11 @@ UTEST_MT(ShardedRegistryTest, ConcurrentCreateDifferentUsers, 4) {
       }
     }));
   }
-  
+
   for (auto& task : tasks) {
     task.Wait();
   }
-  
+
   EXPECT_EQ(registry.GetOnlineAmount(), concurrent_jobs * 100);
 }
 
@@ -143,25 +143,25 @@ UTEST_MT(ShardedRegistryTest, ConcurrentCreateSameUser, 4) {
   const auto concurrent_jobs = GetThreadCount();
   TShardedRegistry registry(256);
   TUserId user_id{"42"};
-  
+
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
-  
+
   for (std::size_t thread_no = 0; thread_no < concurrent_jobs; ++thread_no) {
     tasks.push_back(userver::engine::AsyncNoSpan([&]() {
       constexpr std::size_t kIterations = 100;
-      
+
       for (std::size_t i = 0; i < kIterations; ++i) {
         auto mailbox = registry.CreateOrGetMailbox(user_id);
         EXPECT_NE(mailbox, nullptr);
       }
     }));
   }
-  
+
   for (auto& task : tasks) {
     task.Wait();
   }
-  
+
   // Должен быть создан только один mailbox
   EXPECT_EQ(registry.GetOnlineAmount(), 1);
 }
@@ -169,33 +169,33 @@ UTEST_MT(ShardedRegistryTest, ConcurrentCreateSameUser, 4) {
 UTEST_MT(ShardedRegistryTest, ConcurrentCreateAndGet, 4) {
   const auto concurrent_jobs = GetThreadCount();
   TShardedRegistry registry(256);
-  
+
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
-  
+
   for (std::size_t thread_no = 0; thread_no < concurrent_jobs; ++thread_no) {
     tasks.push_back(userver::engine::AsyncNoSpan([&, thread_no]() {
       constexpr std::size_t kUsersPerThread = 50;
       const auto offset = thread_no * kUsersPerThread;
-      
+
       for (std::size_t i = 0; i < kUsersPerThread; ++i) {
         TUserId user_id{std::to_string(static_cast<int>(offset + i))};
-        
+
         // Чередуем Create и Get
         if (i % 2 == 0) {
           auto mailbox = registry.CreateOrGetMailbox(user_id);
           EXPECT_NE(mailbox, nullptr);
         } else {
-          registry.GetMailbox(user_id); // Может вернуть nullptr
+          registry.GetMailbox(user_id);  // Может вернуть nullptr
         }
       }
     }));
   }
-  
+
   for (auto& task : tasks) {
     task.Wait();
   }
-  
+
   // Проверяем, что счетчик корректный
   EXPECT_GT(registry.GetOnlineAmount(), 0);
 }
@@ -203,56 +203,56 @@ UTEST_MT(ShardedRegistryTest, ConcurrentCreateAndGet, 4) {
 UTEST_MT(ShardedRegistryTest, ConcurrentCreateAndRemove, 4) {
   const auto concurrent_jobs = GetThreadCount();
   TShardedRegistry registry(256);
-  
+
   // Сначала создаем пользователей
   constexpr std::size_t kTotalUsers = 200;
   for (std::size_t i = 0; i < kTotalUsers; ++i) {
     TUserId user_id{std::to_string(static_cast<int>(i))};
     registry.CreateOrGetMailbox(user_id);
   }
-  
+
   EXPECT_EQ(registry.GetOnlineAmount(), kTotalUsers);
-  
+
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
-  
+
   // Конкурентно удаляем
   for (std::size_t thread_no = 0; thread_no < concurrent_jobs; ++thread_no) {
     tasks.push_back(userver::engine::AsyncNoSpan([&, thread_no]() {
       const auto users_per_thread = kTotalUsers / concurrent_jobs;
       const auto offset = thread_no * users_per_thread;
-      
+
       for (std::size_t i = 0; i < users_per_thread; ++i) {
         TUserId user_id{std::to_string(static_cast<int>(offset + i))};
         registry.RemoveMailbox(user_id);
       }
     }));
   }
-  
+
   for (auto& task : tasks) {
     task.Wait();
   }
-  
+
   EXPECT_EQ(registry.GetOnlineAmount(), 0);
 }
 
 UTEST_MT(ShardedRegistryTest, HighContentionMixedOperations, 8) {
   const auto concurrent_jobs = GetThreadCount();
   TShardedRegistry registry(256);
-  
+
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
-  
+
   for (std::size_t thread_no = 0; thread_no < concurrent_jobs; ++thread_no) {
     tasks.push_back(userver::engine::AsyncNoSpan([&, thread_no]() {
       constexpr std::size_t kIterations = 100;
       constexpr std::size_t kUsersPerThread = 50;
       const auto offset = thread_no * kUsersPerThread;
-      
+
       for (std::size_t iter = 0; iter < kIterations; ++iter) {
         for (std::size_t i = 0; i < kUsersPerThread; ++i) {
           TUserId user_id{std::to_string(static_cast<int>(offset + i))};
-          
+
           // Миксуем разные операции
           switch (iter % 3) {
             case 0:
@@ -262,7 +262,7 @@ UTEST_MT(ShardedRegistryTest, HighContentionMixedOperations, 8) {
               registry.GetMailbox(user_id);
               break;
             case 2:
-              if (iter > 10) { // Удаляем только после создания
+              if (iter > 10) {  // Удаляем только после создания
                 registry.RemoveMailbox(user_id);
               }
               break;
@@ -271,11 +271,11 @@ UTEST_MT(ShardedRegistryTest, HighContentionMixedOperations, 8) {
       }
     }));
   }
-  
+
   for (auto& task : tasks) {
     task.Wait();
   }
-  
+
   // Проверяем, что реестр в консистентном состоянии
   auto final_count = registry.GetOnlineAmount();
   EXPECT_GE(final_count, 0);
@@ -285,10 +285,10 @@ UTEST(ShardedRegistryTest, DifferentShardCounts) {
   // Проверяем, что работает с разным количеством шардов
   for (std::size_t shard_count : {1, 4, 16, 64, 256, 1024}) {
     TShardedRegistry registry(shard_count);
-    
+
     TUserId user_id{"42"};
     auto mailbox = registry.CreateOrGetMailbox(user_id);
-    
+
     EXPECT_NE(mailbox, nullptr);
     EXPECT_EQ(registry.GetOnlineAmount(), 1);
   }

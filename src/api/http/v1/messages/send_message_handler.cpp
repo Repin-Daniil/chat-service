@@ -53,30 +53,21 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
   try {
     MessageService_.SendMessage(std::move(request_dto));
   } catch (const NCore::NDomain::TUsernameInvalidException& ex) {
-    // todo поменять на исключение
-    auto& response = request.GetHttpResponse();
-    response.SetStatus(userver::server::http::HttpStatus::kNotFound);
-    return MakeError(ex.GetField(), "Recipient not Found");
+    throw TNotFoundException(ex.what());
   } catch (const NApp::TRecipientNotFound& ex) {
-    // todo поменять на исключение
-    auto& response = request.GetHttpResponse();
-    response.SetStatus(userver::server::http::HttpStatus::kNotFound);
-    return MakeServerError("Recipient not Found");  // fixme
+    throw TNotFoundException(ex.what());
   } catch (const NApp::TTooManyRequests& ex) {
     throw TTooManyRequestsException(ex.what());
   } catch (const NApp::TRecipientTemporaryUnavailable& ex) {
     auto& response = request.GetHttpResponse();
-    response.SetStatus(userver::server::http::HttpStatus::kNotFound);
-    // todo поменять на обычный MakeError
-    return MakeServerError(ex.what());
+    response.SetStatus(userver::server::http::HttpStatus::kServiceUnavailable);
+    return MakeError(ex.what());
   }
   // catch () {
   // todo Тут нужно проверить message payload, можно вернуть kPayloadTooLarge
   // Возвращать 400
   // }
 
-  // todo в Poll messages надо делать Streaming Serialization в JSON
-  // todo Есть какой-то GetResponseDataForLogging()
   auto& response = request.GetHttpResponse();
   response.SetStatus(userver::server::http::HttpStatus::kAccepted);
   return {};

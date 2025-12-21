@@ -47,7 +47,8 @@ async def test_empty_recipient(service_client, registered_user):
 
 async def test_empty_payload(service_client, multiple_users):
     sender, recipient = multiple_users
-    message = Message.model_construct(payload=None, recipient=recipient.username)
+    message = Message.model_construct(
+        payload=None, recipient=recipient.username)
     response = await send_message(service_client, message, sender.token)
 
     assert response.status == HTTPStatus.BAD_REQUEST

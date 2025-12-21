@@ -17,7 +17,6 @@ class TMessagingService {
 
   // todo Тут нужно передавать штатный таймаут на висение на очереди
 
-  // todo PollMessages
  private:
   TSendMessageUseCase SendMessageUseCase_;
 };

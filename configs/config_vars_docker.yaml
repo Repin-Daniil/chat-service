@@ -10,4 +10,9 @@ monitoring-port: 8081
 database: postgres
 token_expiry_hours: 1
 
+registry-shards-amount: 256
+mailbox-queue-type: Vyukov
+mailbox-registry-type: ShardedMap
+limiter-registry-type: ShardedMap
+
 pg-connection: 'postgresql://chat-user:password@service-postgres:5432/chat_service'

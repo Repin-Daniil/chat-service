@@ -429,7 +429,7 @@ void BM_GetOrCreateNew(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
     std::size_t i = 0;
-    
+
     for ([[maybe_unused]] auto _ : state) {
       TUserId user_id{std::to_string(i++)};
       auto factory = [&i]() { return std::make_shared<TDummyQueue>(false, i); };
@@ -437,7 +437,7 @@ void BM_GetOrCreateNew(benchmark::State& state) {
       benchmark::DoNotOptimize(value);
       benchmark::DoNotOptimize(inserted);
     }
-    
+
     state.SetItemsProcessed(state.iterations());
   });
 }
@@ -446,12 +446,12 @@ BENCHMARK(BM_GetOrCreateNew);
 void BM_GetOrCreateExisting(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
-    
+
     // Prepare data
     for (int i = 0; i < 10000; ++i) {
       map.Put(TUserId{std::to_string(i)}, std::make_shared<TDummyQueue>(false, i));
     }
-    
+
     std::size_t i = 0;
     for ([[maybe_unused]] auto _ : state) {
       TUserId user_id{std::to_string(i++ % 10000)};
@@ -460,7 +460,7 @@ void BM_GetOrCreateExisting(benchmark::State& state) {
       benchmark::DoNotOptimize(value);
       benchmark::DoNotOptimize(inserted);
     }
-    
+
     state.SetItemsProcessed(state.iterations());
   });
 }
@@ -468,18 +468,18 @@ BENCHMARK(BM_GetOrCreateExisting);
 
 void BM_GetOrCreateMixed(benchmark::State& state) {
   const auto hit_rate = state.range(0);  // 0-100
-  
+
   userver::engine::RunStandalone([&]() {
     TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
-    
+
     // Prepare some data based on hit rate
     const int total_keys = 10000;
     const int existing_keys = total_keys * hit_rate / 100;
-    
+
     for (int i = 0; i < existing_keys; ++i) {
       map.Put(TUserId{std::to_string(i)}, std::make_shared<TDummyQueue>(false, i));
     }
-    
+
     std::size_t i = 0;
     for ([[maybe_unused]] auto _ : state) {
       TUserId user_id{std::to_string(i++ % total_keys)};
@@ -488,26 +488,26 @@ void BM_GetOrCreateMixed(benchmark::State& state) {
       benchmark::DoNotOptimize(value);
       benchmark::DoNotOptimize(inserted);
     }
-    
+
     state.SetItemsProcessed(state.iterations());
   });
 }
 BENCHMARK(BM_GetOrCreateMixed)
-    ->Arg(0)     // 0% hit rate (all new)
-    ->Arg(50)    // 50% hit rate
-    ->Arg(90)    // 90% hit rate
-    ->Arg(99);   // 99% hit rate
+    ->Arg(0)    // 0% hit rate (all new)
+    ->Arg(50)   // 50% hit rate
+    ->Arg(90)   // 90% hit rate
+    ->Arg(99);  // 99% hit rate
 
 void BM_ConcurrentGetOrCreate(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     const auto thread_count = state.range(0);
     std::atomic<std::size_t> total_ops{0};
-    
+
     for ([[maybe_unused]] auto _ : state) {
       TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
       std::vector<userver::engine::Task> tasks;
       tasks.reserve(thread_count);
-      
+
       // All threads compete to create same keys
       for (int t = 0; t < thread_count; ++t) {
         tasks.push_back(userver::engine::AsyncNoSpan([&]() {
@@ -521,32 +521,27 @@ void BM_ConcurrentGetOrCreate(benchmark::State& state) {
           total_ops += 1000;
         }));
       }
-      
+
       for (auto& task : tasks) {
         task.Wait();
       }
     }
-    
+
     state.SetItemsProcessed(total_ops.load());
   });
 }
-BENCHMARK(BM_ConcurrentGetOrCreate)
-    ->Arg(1)
-    ->Arg(2)
-    ->Arg(4)
-    ->Arg(8)
-    ->Arg(16);
+BENCHMARK(BM_ConcurrentGetOrCreate)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
 
 void BM_ConcurrentGetOrCreateDistinct(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     const auto thread_count = state.range(0);
     std::atomic<std::size_t> total_ops{0};
-    
+
     for ([[maybe_unused]] auto _ : state) {
       TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
       std::vector<userver::engine::Task> tasks;
       tasks.reserve(thread_count);
-      
+
       // Each thread works on distinct keys
       for (int t = 0; t < thread_count; ++t) {
         tasks.push_back(userver::engine::AsyncNoSpan([&, t]() {
@@ -561,29 +556,24 @@ void BM_ConcurrentGetOrCreateDistinct(benchmark::State& state) {
           total_ops += 1000;
         }));
       }
-      
+
       for (auto& task : tasks) {
         task.Wait();
       }
     }
-    
+
     state.SetItemsProcessed(total_ops.load());
   });
 }
-BENCHMARK(BM_ConcurrentGetOrCreateDistinct)
-    ->Arg(1)
-    ->Arg(2)
-    ->Arg(4)
-    ->Arg(8)
-    ->Arg(16);
+BENCHMARK(BM_ConcurrentGetOrCreateDistinct)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
 
 void BM_GetOrCreateVsPutGet(benchmark::State& state) {
   const auto use_get_or_create = state.range(0);
-  
+
   userver::engine::RunStandalone([&]() {
     TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
     std::size_t i = 0;
-    
+
     if (use_get_or_create) {
       // Using GetOrCreate
       for ([[maybe_unused]] auto _ : state) {
@@ -604,7 +594,7 @@ void BM_GetOrCreateVsPutGet(benchmark::State& state) {
         benchmark::DoNotOptimize(value);
       }
     }
-    
+
     state.SetItemsProcessed(state.iterations());
   });
 }

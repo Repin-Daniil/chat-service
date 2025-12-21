@@ -17,7 +17,7 @@ class TLimiterWrapper {
 
   TLimiterWrapper();
   TLimiterWrapper(std::size_t max_rps, size_t token_refill_amount = 1,
-                  Duration token_refill_interval = std::chrono::seconds(1)); 
+                  Duration token_refill_interval = std::chrono::seconds(1));
 
   bool TryAcquire();
 

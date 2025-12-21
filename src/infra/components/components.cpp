@@ -1,8 +1,8 @@
 #include "components.hpp"
 
-#include <infra/components/user_service_component.hpp>
 #include <infra/components/messaging_service_component.hpp>
 #include <infra/components/user_repository_component.hpp>
+#include <infra/components/user_service_component.hpp>
 #include <infra/db/postgres_profile_cache.hpp>
 
 #include <api/http/middlewares/auth_bearer.hpp>

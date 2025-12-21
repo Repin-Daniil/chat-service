@@ -91,11 +91,9 @@ components_manager:
             registry-type: $mailbox-registry-type
             limiter-type: $limiter-registry-type
 
-            #todo в .docker тоже переменные занести
         # Handlers 
 
         # Users
-
         handler-user-register:
             path: /v1/users/register
             method: POST

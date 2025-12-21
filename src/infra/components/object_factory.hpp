@@ -2,10 +2,10 @@
 #include <userver/yaml_config/yaml_config.hpp>
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <map>
 
 namespace NChat::NInfra {
 
@@ -30,7 +30,7 @@ class TObjectFactory {
   }
 
  private:
-  std::map<std::string, Creator> creators_; //todo unordered
+  std::unordered_map<std::string, Creator> creators_;
 };
 
 }  // namespace NChat::NInfra

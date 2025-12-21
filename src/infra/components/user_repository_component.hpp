@@ -12,7 +12,7 @@ class TUserRepoComponent final : public userver::components::LoggableComponentBa
   static constexpr std::string_view kName = "user-repository-component";
 
   TUserRepoComponent(const userver::components::ComponentConfig& config,
-                        const userver::components::ComponentContext& context);
+                     const userver::components::ComponentContext& context);
 
   NCore::IUserRepository& GetRepository() { return *UserRepo_; }
 

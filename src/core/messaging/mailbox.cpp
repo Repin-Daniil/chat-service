@@ -19,8 +19,6 @@ bool TUserMailbox::SendMessage(NDomain::TMessage&& message, int max_try_amount) 
 
   // Backpressure due to queue overload
   MissedMessages_ = true;
-  // todo Возможно в будущем стоит полностью инвалидировать mailbox,
-  //  если клиент не справляется с его вычитыванием — пусть идет в БД
 
   return false;
 }

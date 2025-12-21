@@ -2,8 +2,8 @@
 
 #include <infra/components/user_repository_component.hpp>
 #include <infra/concurrency/queue/vyukov_queue.hpp>
-#include <infra/messaging/sharded_limiter.hpp>
 #include <infra/messaging/dummy_limiter.hpp>
+#include <infra/messaging/sharded_limiter.hpp>
 #include <infra/messaging/sharded_registry.hpp>
 
 #include <userver/components/component.hpp>

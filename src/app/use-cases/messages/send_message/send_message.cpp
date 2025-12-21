@@ -8,17 +8,16 @@ TSendMessageUseCase::TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCor
 
 // todo тест на use case
 void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
-  // todo отключать в .testing rate limiter или как-то лучше сделать сразу через дин конфиг
-   if (!Limiter_.TryAcquire(request.SenderId)) {
-     throw TTooManyRequests("Enhance your calm!");
-   };
+  if (!Limiter_.TryAcquire(request.SenderId)) {
+    throw TTooManyRequests("Enhance your calm!");
+  };
 
   NCore::NDomain::TUsername recipient_username(std::move(request.RecipientUsername));
   std::string text = std::move(request.Text);  // todo валидация payload
 
   // todo В будущем когда будут chat_id провести ACL, а пока резолвим в базе через КЭШ user_id
   auto recipient = UserRepo_.GetUserByUsername(recipient_username.Value());
-  if (!recipient.has_value()) {
+  if (!recipient) {
     throw TRecipientNotFound("Recipient Not Found");
   }
 

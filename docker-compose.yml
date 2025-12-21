@@ -1,0 +1,60 @@
+version: "2.3"
+
+services:
+  postgres:
+    container_name: service-postgres
+    image: postgres:12
+    environment: &db_env
+      POSTGRES_DB: chat_service
+      POSTGRES_USER: chat-user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432"
+    volumes:
+      - ./postgresql/schemas:/docker-entrypoint-initdb.d
+      - ./.pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  chat-server:
+      container_name: chat-server
+      build: . 
+      ports:
+        - "8080:8080"
+        - "8081:8081"
+      volumes:
+        - ./configs/config_vars_docker.yaml:/app/configs/config_vars.yaml
+      depends_on:
+        - postgres
+      networks:
+        - backend
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  grafana:

@@ -4,7 +4,9 @@
 #include <core/users/user_repo.hpp>
 
 #include <app/use-cases/users/check_token/check_token.hpp>
+#include <app/use-cases/users/delete_user/delete_user.hpp>
 #include <app/use-cases/users/get_profile/get_profile.hpp>
+#include <app/use-cases/users/login/login.hpp>
 #include <app/use-cases/users/registration/registration.hpp>
 
 namespace NChat::NApp::NServices {
@@ -13,17 +15,18 @@ class TUserService {
  public:
   TUserService(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service);
 
-  NDto::TUserRegistrationResult Register(NDto::TUserRegistrationData request);
-  NDto::TCheckTokenResult CheckToken(std::string token, const bool is_required);
-  std::optional<NDto::TUserProfileResult> GetProfileByUsername(std::string username);
-
-  // TLoginResult Login();
-  // GetInfoById();
+  NDto::TUserRegistrationResult Register(const NDto::TUserRegistrationRequest& request);
+  NDto::TUserLoginResult Login(const NDto::TUserLoginRequest& request);
+  NDto::TCheckTokenResult CheckToken(const std::string& token, const bool is_required);
+  std::optional<NDto::TUserProfileResult> GetProfileByUsername(const std::string& username);
+  void DeleteUser(const NDto::TUserDeleteRequest& request);
 
  private:
   TRegistrationUseCase RegistrationUseCase_;
+  TLoginUseCase LoginUseCase_;
   TCheckTokenUseCase CheckTokenUseCase_;
   TGetProfileByNameUseCase ProfileByNameUseCase_;
+  TDeleteUserUseCase DeleteUserUseCase_;
 };
 
 }  // namespace NChat::NApp::NServices

@@ -7,6 +7,10 @@ components_manager:
         fs-task-processor:            # Make a separate task processor for filesystem bound tasks.
             worker_threads: $worker-fs-threads
 
+        monitor-task-processor:       # Make a separate task processor for administrative tasks.
+            worker_threads: 2
+            thread_name: mon-worker
+
     default_task_processor: main-task-processor
 
     components:                       # Configuring components that were registered via component_list
@@ -14,6 +18,9 @@ components_manager:
             listener:                 # configuring the main listening socket...
                 port: $server-port            # ...to listen on this port and...
                 task_processor: main-task-processor    # ...process incoming requests on this task processor.
+            listener-monitor:
+                port: $monitoring-port
+                task_processor: monitor-task-processor
 
         logging:
             fs-task-processor: fs-task-processor
@@ -62,6 +69,11 @@ components_manager:
             throttling_enabled: false
             url_trailing_slash: strict-match
 
+        handler-server-monitor:
+            path: /service/monitor
+            method: GET
+            task_processor: monitor-task-processor
+
         # Components
         user-repository-component:
             storage-type: $database
@@ -83,10 +95,6 @@ components_manager:
         # Handlers 
 
         # Users
-        # handler-auth-login:
-        #     path: /v1/auth/login
-        #     method: POST
-        #     task_processor: main-task-processor
 
         handler-user-register:
             path: /v1/users/register
@@ -101,7 +109,21 @@ components_manager:
                 types:
                   - bearer
                 required: true
+
+        handler-delete-by-username:
+            path: /v1/users/{username}                 
+            method: DELETE            
+            task_processor: main-task-processor 
+            auth:
+                types:
+                  - bearer
+                required: true
         
+        handler-user-login:
+            path: /v1/users/login
+            method: POST
+            task_processor: main-task-processor
+
         # Messages
         handler-send-message:
             path: /v1/messages/send
@@ -121,4 +143,8 @@ components_manager:
             sync-start: true
             connlimit_mode: manual
 
+        profile-pg-cache:
+            pgcomponent: chat-postgres-database
+            chunk-size: 0 # due to libpq patch problem
+            update-interval: 10s
         

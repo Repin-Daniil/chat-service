@@ -20,7 +20,7 @@ class TRegistrationUseCase final {
  public:
   TRegistrationUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service);
 
-  NDto::TUserRegistrationResult Execute(NDto::TUserRegistrationData request) const;
+  NDto::TUserRegistrationResult Execute(const NDto::TUserRegistrationRequest& request) const;
 
  private:
   NCore::IUserRepository& UserRepo_;

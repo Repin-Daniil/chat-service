@@ -5,7 +5,7 @@ namespace NChat::NApp {
 TCheckTokenUseCase::TCheckTokenUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service)
     : UserRepo_(user_repo), AuthService_(auth_service) {}
 
-NDto::TCheckTokenResult TCheckTokenUseCase::Execute(std::string token, bool is_required) const {
+NDto::TCheckTokenResult TCheckTokenUseCase::Execute(const std::string& token, bool is_required) const {
   if (token.empty()) {
     if (!is_required) {
       return {};
@@ -26,13 +26,18 @@ NDto::TCheckTokenResult TCheckTokenUseCase::Execute(std::string token, bool is_r
     return {.User = {}, .Error = NAuthErrors::VerifyError};
   }
 
-  auto result = UserRepo_.GetProfileById(user_id.value());
+  std::optional<NCore::NDomain::TUserTinyProfile> profile;
+  try {
+    profile = UserRepo_.GetProfileById(user_id.value());
+  } catch (const std::exception& e) {
+    throw TCheckTokenTemporaryUnavailable(fmt::format("Failed to get profile by id: {}", e.what()));
+  }
 
-  if (!result.has_value()) {
+  if (!profile.has_value()) {
     return {.User = {}, .Error = NAuthErrors::InvalidUser};
   }
 
-  return {.User = {{*result->Id, result->Username, result->DisplayName}}, .Error = {}};
+  return {.User = {{*profile->Id, profile->Username, profile->DisplayName}}, .Error = {}};
 }
 
 }  // namespace NChat::NApp

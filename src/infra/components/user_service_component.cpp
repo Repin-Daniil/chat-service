@@ -14,6 +14,7 @@ TUserServiceComponent::TUserServiceComponent(const userver::components::Componen
                                              const userver::components::ComponentContext& context)
     : LoggableComponentBase(config, context) {
   auto& user_repo = context.FindComponent<NComponents::TUserRepoComponent>().GetRepository();
+
   AuthService_ = std::make_unique<TAuthServiceImpl>(config["token-expiry-hours"].As<int>());
   UserService_ = std::make_unique<NApp::NServices::TUserService>(user_repo, *AuthService_);
 }

@@ -5,6 +5,7 @@ logger-level: debug
 is-testing: true
 
 server-port: 8080
+monitoring-port: 8081
 
 database: postgres
 token_expiry_hours: 1

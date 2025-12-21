@@ -11,14 +11,14 @@
 #include <userver/crypto/random.hpp>
 #include <userver/formats/serialize/common_containers.hpp>
 
-using NChat::NApp::NDto::TUserRegistrationData;
+using NChat::NApp::NDto::TUserRegistrationRequest;
 using NChat::NApp::NDto::TUserRegistrationResult;
 
 namespace userver::formats::parse {
-TUserRegistrationData Parse(const formats::json::Value& json, formats::parse::To<TUserRegistrationData>) {
+TUserRegistrationRequest Parse(const formats::json::Value& json, formats::parse::To<TUserRegistrationRequest>) {
   using NChat::NInfra::NHandlers::TValidationException;
 
-  TUserRegistrationData dto{
+  TUserRegistrationRequest dto{
       .Username = json["username"].As<std::string>(""),
       .Password = json["password"].As<std::string>(""),
       .Biography = json["biography"].As<std::string>(""),
@@ -64,7 +64,7 @@ TRegisterUserHandler::TRegisterUserHandler(const userver::components::ComponentC
 userver::formats::json::Value TRegisterUserHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest&, const userver::formats::json::Value& request_json,
     userver::server::request::RequestContext&) const {
-  const auto user_command = request_json["user"].As<TUserRegistrationData>();
+  const auto user_command = request_json["user"].As<TUserRegistrationRequest>();
 
   try {
     const auto result = UserService_.Register(user_command);

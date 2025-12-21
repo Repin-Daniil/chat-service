@@ -3,7 +3,7 @@
 
 namespace NChat::NApp::NDto {
 
-struct TUserRegistrationData {
+struct TUserRegistrationRequest {
   std::string Username;
   std::string Password;
   std::string Biography;

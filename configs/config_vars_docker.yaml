@@ -1,0 +1,13 @@
+worker-threads: 4
+worker-fs-threads: 2
+logger-level: info
+
+is-testing: false
+
+server-port: 8080
+monitoring-port: 8081
+
+database: postgres
+token_expiry_hours: 1
+
+pg-connection: 'postgresql://chat-user:password@service-postgres:5432/chat_service'

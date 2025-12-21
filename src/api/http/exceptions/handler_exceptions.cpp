@@ -2,6 +2,12 @@
 
 namespace NChat::NInfra::NHandlers {
 
+userver::formats::json::Value MakeError(std::string_view error) {
+  userver::formats::json::ValueBuilder error_builder;
+  error_builder["errors"] = error;
+  return error_builder.ExtractValue();
+}
+
 userver::formats::json::Value MakeError(std::string_view field_name, std::string_view message) {
   userver::formats::json::ValueBuilder error_builder;
   error_builder["errors"][std::string{field_name}].PushBack(message);

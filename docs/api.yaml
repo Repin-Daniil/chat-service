@@ -124,16 +124,18 @@ components:
       type: object
       description: Сообщение для отправки
       properties:
-        recipient-username:
-          type: string
-          description: Username пользователя, которому отправляется сообщение
-        payload:
-          type: string
-          description: Текст сообщения
-          example: "Hello, World!"
-      required:
-        - recipient-username
-        - payload
+        message:
+          type: object
+          recipient:
+            type: string
+            description: Username пользователя, которому отправляется сообщение
+          payload:
+            type: string
+            description: Текст сообщения
+            example: "Hello, World!"
+        required:
+          - recipient
+          - payload
 
 paths:
   # Users

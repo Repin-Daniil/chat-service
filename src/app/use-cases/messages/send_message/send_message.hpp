@@ -2,6 +2,7 @@
 
 #include "app/exceptions.hpp"
 #include "core/messaging/send_limiter.hpp"
+
 #include <core/messaging/mailbox_registry.hpp>
 #include <core/users/user_repo.hpp>
 
@@ -17,13 +18,18 @@ class TTooManyRequests : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
 
+class TRecipientNotFound : public TApplicationException {
+  using TApplicationException::TApplicationException;
+};
+
 class TSendMessageUseCase final {
  public:
   using TMessage = NCore::NDomain::TMessage;
   using Timepoint = std::chrono::steady_clock::time_point;
   using TUserId = NCore::NDomain::TUserId;
 
-  TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCore::ISendLimiter& limiter, NCore::IUserRepository& user_repo);
+  TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCore::ISendLimiter& limiter,
+                      NCore::IUserRepository& user_repo);
 
   void Execute(NDto::TSendMessageRequest request);
 

@@ -17,12 +17,12 @@ TSendMessageRequest Parse(const formats::json::Value& json, formats::parse::To<T
   using NChat::NInfra::NHandlers::TValidationException;
 
   NChat::NApp::NDto::TSendMessageRequest dto{.SenderId{},
-                                             .RecipientUsername = json["recipient-username"].As<std::string>(""),
+                                             .RecipientUsername = json["recipient"].As<std::string>(""),
                                              .Text = json["payload"].As<std::string>("")};
 
   // Only Syntax Validation
   if (dto.RecipientUsername.empty()) {
-    throw TValidationException("recipient-username", "Field is missing");
+    throw TValidationException("recipient", "Field is missing");
   }
 
   if (dto.Text.empty()) {
@@ -45,9 +45,10 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     userver::server::request::RequestContext& request_context) const {
   const auto start_timepoint = userver::utils::datetime::SteadyNow();
 
-  auto request_dto = request_json.As<TSendMessageRequest>();
+  auto request_dto = request_json["message"].As<TSendMessageRequest>();
   request_dto.SentAt = start_timepoint;
   request_dto.SenderId = TUserId{request_context.GetData<std::string>(ToString(EContextKey::UserId))};
+  LOG_INFO() << "Пока все норм Recipient" << request_dto.RecipientUsername;
 
   try {
     MessageService_.SendMessage(std::move(request_dto));
@@ -56,6 +57,11 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     auto& response = request.GetHttpResponse();
     response.SetStatus(userver::server::http::HttpStatus::kNotFound);
     return MakeError(ex.GetField(), "Recipient not Found");
+  } catch (const NApp::TRecipientNotFound& ex) {
+    // todo поменять на исключение
+    auto& response = request.GetHttpResponse();
+    response.SetStatus(userver::server::http::HttpStatus::kNotFound);
+    return MakeServerError("Recipient not Found");  // fixme
   } catch (const NApp::TTooManyRequests& ex) {
     throw TTooManyRequestsException(ex.what());
   } catch (const NApp::TRecipientTemporaryUnavailable& ex) {
@@ -71,7 +77,8 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
 
   // todo в Poll messages надо делать Streaming Serialization в JSON
   // todo Есть какой-то GetResponseDataForLogging()
-
+  auto& response = request.GetHttpResponse();
+  response.SetStatus(userver::server::http::HttpStatus::kAccepted);
   return {};
 }
 

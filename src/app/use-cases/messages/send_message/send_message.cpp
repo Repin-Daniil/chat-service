@@ -6,17 +6,21 @@ TSendMessageUseCase::TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCor
                                          NCore::IUserRepository& user_repo)
     : Registry_(registry), Limiter_(limiter), UserRepo_(user_repo) {}
 
-// todo change to void?
+// todo тест на use case
 void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
-  if (Limiter_.TryAcquire(request.SenderId)) {
-    throw TTooManyRequests("Enhance your calm!");
-  };
+  // todo отключать в .testing rate limiter или как-то лучше сделать сразу через дин конфиг
+   if (!Limiter_.TryAcquire(request.SenderId)) {
+     throw TTooManyRequests("Enhance your calm!");
+   };
 
   NCore::NDomain::TUsername recipient_username(std::move(request.RecipientUsername));
   std::string text = std::move(request.Text);  // todo валидация payload
 
   // todo В будущем когда будут chat_id провести ACL, а пока резолвим в базе через КЭШ user_id
   auto recipient = UserRepo_.GetUserByUsername(recipient_username.Value());
+  if (!recipient.has_value()) {
+    throw TRecipientNotFound("Recipient Not Found");
+  }
 
   auto mailbox = Registry_.CreateOrGetMailbox(recipient->GetId());
 

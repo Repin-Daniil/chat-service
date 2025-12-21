@@ -1,6 +1,8 @@
 #include "components.hpp"
 
 #include <infra/components/user_service_component.hpp>
+#include <infra/components/messaging_service_component.hpp>
+#include <infra/components/user_repository_component.hpp>
 
 #include <api/http/middlewares/auth_bearer.hpp>
 #include <api/http/v1/messages/send_message_handler.hpp>
@@ -47,8 +49,12 @@ void RegisterMessagesHandlers(userver::components::ComponentList& list) {
 }
 
 // Components
-void RegisterUserServiceComponent(userver::components::ComponentList& list) {
-  list.Append<NComponents::TUserServiceComponent>();
+void RegisterServiceComponents(userver::components::ComponentList& list) {
+  list.Append<NComponents::TUserServiceComponent>().Append<NComponents::TMessagingServiceComponent>();
+}
+
+void RegisterRepositoryComponents(userver::components::ComponentList& list) {
+  list.Append<NComponents::TUserRepoComponent>();
 }
 
 }  // namespace NChat::NInfra

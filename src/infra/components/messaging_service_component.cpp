@@ -3,6 +3,7 @@
 #include <infra/components/user_repository_component.hpp>
 #include <infra/concurrency/queue/vyukov_queue.hpp>
 #include <infra/messaging/sharded_limiter.hpp>
+#include <infra/messaging/dummy_limiter.hpp>
 #include <infra/messaging/sharded_registry.hpp>
 
 #include <userver/components/component.hpp>
@@ -40,6 +41,9 @@ TObjectFactory<NCore::ISendLimiter> TMessagingServiceComponent::GetLimiterFactor
     return std::make_unique<TSendLimiter>(shards_amount);
   });
 
+  limiter_factory.Register(
+      "None", [](const auto& /* config */, const auto& /* context */) { return std::make_unique<TDummyLimiter>(); });
+
   return limiter_factory;
 }
 
@@ -67,6 +71,7 @@ properties:
         type: string
         description: Algorithm of rate limiting
         enum:
+          - None  
           - ShardedMap
 )");
 }

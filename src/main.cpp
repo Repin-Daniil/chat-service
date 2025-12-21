@@ -10,7 +10,8 @@ int main(int argc, char* argv[]) {
   NChat::NInfra::RegisterUserverComponents(component_list);
   NChat::NInfra::RegisterPostrgesComponent(component_list);
 
-  NChat::NInfra::RegisterUserServiceComponent(component_list);
+  NChat::NInfra::RegisterServiceComponents(component_list);
+  NChat::NInfra::RegisterRepositoryComponents(component_list);
 
   NChat::NInfra::RegisterUserHandlers(component_list);
   NChat::NInfra::RegisterMessagesHandlers(component_list);

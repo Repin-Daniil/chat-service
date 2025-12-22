@@ -69,8 +69,6 @@ userver::formats::json::Value TUpdateByUsernameHandler::HandleRequestJsonThrow(
     result = UserService_.UpdateUser(dto);
   } catch (const NCore::TValidationException& ex) {
     throw TValidationException(ex.GetField(), ex.what());
-  } catch (const NCore::NDomain::TUsernameInvalidException& ex) {
-    throw TNotFoundException(fmt::format("User with username {} not found.", dto.UsernameToUpdate));
   } catch (const NApp::TUpdateUserForbidden& ex) {
     throw TForbiddenException(ex.what());
   } catch (const NCore::NDomain::TUserAlreadyExistsException& ex) {

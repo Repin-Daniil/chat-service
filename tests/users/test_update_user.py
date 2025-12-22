@@ -22,6 +22,20 @@ async def test_update_user_username(service_client, registered_user):
     assert response.json().get('username') == new_username
 
 
+async def test_update_user_nothing(service_client, registered_user):
+    """Проверяет обновление, где ничего не меняется"""
+    user_fields = {"user": {}}
+    response = await update_user_by_name(
+        service_client, 
+        registered_user.username, 
+        registered_user.token,
+        user_fields
+    )
+
+    assert response.status == HTTPStatus.OK
+    assert response.json().get('username') == registered_user.username
+
+
 async def test_update_user_password(service_client, registered_user):
     """Проверяет успешное обновление пароля пользователя."""
     new_password = "new_secure_Password123"

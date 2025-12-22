@@ -7,7 +7,8 @@ TUserService::TUserService(NCore::IUserRepository& user_repo, NCore::IAuthServic
       LoginUseCase_(user_repo, auth_service),
       CheckTokenUseCase_(user_repo, auth_service),
       ProfileByNameUseCase_(user_repo),
-      DeleteUserUseCase_(user_repo) {}
+      DeleteUserUseCase_(user_repo),
+      UpdateUserUseCase_(user_repo, auth_service) {}
 
 NDto::TUserRegistrationResult TUserService::Register(const NDto::TUserRegistrationRequest& request) {
   return RegistrationUseCase_.Execute(request);
@@ -26,5 +27,9 @@ std::optional<NDto::TUserProfileResult> TUserService::GetProfileByUsername(const
 }
 
 void TUserService::DeleteUser(const NDto::TUserDeleteRequest& request) { DeleteUserUseCase_.Execute(request); }
+
+NDto::TUserUpdateResult TUserService::UpdateUser(const NDto::TUserUpdateRequest& request) {
+  return UpdateUserUseCase_.Execute(request);
+}
 
 }  // namespace NChat::NApp::NServices

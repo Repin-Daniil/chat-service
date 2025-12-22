@@ -9,6 +9,8 @@
 
 #include <userver/storages/postgres/component.hpp>
 
+using NChat::NApp::NDto::TUserDeleteRequest;
+
 namespace NChat::NInfra::NHandlers {
 
 TDeleteByUsernameHandler::TDeleteByUsernameHandler(const userver::components::ComponentConfig& config,
@@ -22,7 +24,7 @@ userver::formats::json::Value TDeleteByUsernameHandler::HandleRequestJsonThrow(
   const auto& username = request.GetPathArg(ToString(EContextKey::Username));
   const auto& requester_username = request_context.GetData<std::string>("username");
 
-  NApp::NDto::TUserDeleteRequest dto{.UsernameToDelete = username, .RequesterUsername = requester_username};
+  TUserDeleteRequest dto{.UsernameToDelete = username, .RequesterUsername = requester_username};
 
   try {
     UserService_.DeleteUser(dto);

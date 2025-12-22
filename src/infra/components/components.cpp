@@ -9,6 +9,7 @@
 #include <api/http/v1/messages/send_message_handler.hpp>
 #include <api/http/v1/users/delete_by_username_handler.hpp>
 #include <api/http/v1/users/get_by_username_handler.hpp>
+#include <api/http/v1/users/update_by_username_handler.hpp>
 #include <api/http/v1/users/user_login_handler.hpp>
 #include <api/http/v1/users/user_register_handler.hpp>
 
@@ -52,6 +53,7 @@ void RegisterUserHandlers(userver::components::ComponentList& list) {
   list.Append<NHandlers::TRegisterUserHandler>()
       .Append<NHandlers::TGetByUsernameHandler>()
       .Append<NHandlers::TDeleteByUsernameHandler>()
+      .Append<NHandlers::TUpdateByUsernameHandler>()
       .Append<NHandlers::TLoginUserHandler>();
 }
 

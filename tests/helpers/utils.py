@@ -14,7 +14,7 @@ class Routes(str, Enum):
     # users
     LOGIN = '/v1/users/login'
     REGISTRATION = '/v1/users/register'
-    GET_USER_BY_NAME = '/v1/users/{username}'
+    USER_BY_NAME = '/v1/users/{username}'
 
     # messages
     SEND_MESSAGE = '/v1/messages/send'

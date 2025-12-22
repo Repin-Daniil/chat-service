@@ -12,9 +12,22 @@ class IUserRepository {
   using TUser = NDomain::TUser;
   using TUserId = NDomain::TUserId;
   using TUserTinyProfile = NDomain::TUserTinyProfile;
+  using TUsername = NDomain::TUsername;
+  using TPasswordHash = NDomain::TPasswordHash;
+  using TBiography = NDomain::TBiography;
+  using TDisplayName = NDomain::TDisplayName;
+
+  struct TUserUpdateParams {
+    std::optional<TUsername> Username;
+    std::optional<TBiography> Biography;
+    std::optional<TDisplayName> DisplayName;
+    std::optional<TPasswordHash> PasswordHash;
+  };
 
   virtual void InsertNewUser(const TUser& user) const = 0;
   virtual void DeleteUser(std::string_view username) const = 0;
+
+  virtual std::string UpdateUser(const TUsername& username_to_update, const TUserUpdateParams& params) const = 0;
 
   virtual std::optional<TUserId> FindByUsername(std::string_view username) const = 0;
   virtual std::optional<TUserTinyProfile> GetProfileById(const TUserId& id) const = 0;
@@ -22,4 +35,5 @@ class IUserRepository {
 
   virtual ~IUserRepository() = default;
 };
+
 }  // namespace NChat::NCore

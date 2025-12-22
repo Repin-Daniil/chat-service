@@ -10,15 +10,23 @@ async def register_user(service_client, user):
 
 async def get_user_by_name(service_client, username, token):
     return await service_client.get(
-        Routes.GET_USER_BY_NAME.format(username=(username or "")),
+        Routes.USER_BY_NAME.format(username=(username or "")),
         headers={'Authorization': token or ""},
     )
 
 
 async def delete_user_by_name(service_client, username, token):
     return await service_client.delete(
-        Routes.GET_USER_BY_NAME.format(username=(username or "")),
+        Routes.USER_BY_NAME.format(username=(username or "")),
         headers={'Authorization': token or ""},
+    )
+
+
+async def update_user_by_name(service_client, username, token, user_fields):
+    return await service_client.patch(
+        Routes.USER_BY_NAME.format(username=(username or "")),
+        headers={'Authorization': token or ""},
+        json=user_fields,
     )
 
 

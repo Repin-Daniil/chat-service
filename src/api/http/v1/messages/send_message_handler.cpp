@@ -55,9 +55,7 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     throw TNotFoundException(ex.what());
   } catch (const NCore::NDomain::TMessageTextInvalidException& ex) {
     throw TValidationException(ex.GetField(), ex.what());
-  }
-
-  catch (const NApp::TRecipientNotFound& ex) {
+  } catch (const NApp::TRecipientNotFound& ex) {
     throw TNotFoundException(ex.what());
   } catch (const NApp::TTooManyRequests& ex) {
     throw TTooManyRequestsException(ex.what());

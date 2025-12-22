@@ -35,7 +35,7 @@ void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
 }
 
 NCore::NDomain::TMessage TSendMessageUseCase::ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id,
-                                                               std::string text, Timepoint sent_at) {
+                                                               std::string text, TTimePoint sent_at) {
   auto payload = std::make_shared<NCore::NDomain::TMessagePaylod>(sender_id, TMessageText(std::move(text)));
 
   NCore::NDomain::TDeliveryContext context{.Get = sent_at};

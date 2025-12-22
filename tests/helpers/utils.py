@@ -18,6 +18,7 @@ class Routes(str, Enum):
 
     # messages
     SEND_MESSAGE = '/v1/messages/send'
+    POLL_MESSAGES = '/v1/messages/poll'
 
     def __str__(self) -> str:
         return self.value

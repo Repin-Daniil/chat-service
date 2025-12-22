@@ -4,7 +4,7 @@
 #include <core/messaging/send_limiter.hpp>
 #include <core/users/user_repo.hpp>
 
-#include <app/dto/messages/send_request_dto.hpp>
+#include <app/dto/messages/send_message_dto.hpp>
 #include <app/exceptions.hpp>
 
 namespace NChat::NApp {
@@ -24,7 +24,7 @@ class TRecipientNotFound : public TApplicationException {
 class TSendMessageUseCase final {
  public:
   using TMessage = NCore::NDomain::TMessage;
-  using Timepoint = std::chrono::steady_clock::time_point;
+  using TTimePoint = std::chrono::steady_clock::time_point;
   using TUserId = NCore::NDomain::TUserId;
   using TMessageText = NCore::NDomain::TMessageText;
 
@@ -34,7 +34,8 @@ class TSendMessageUseCase final {
   void Execute(NDto::TSendMessageRequest request);
 
  private:
-  TMessage ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id, std::string text, Timepoint sent_at);
+  TMessage ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id, std::string text,
+                            TTimePoint sent_at);
 
  private:
   NCore::IMailboxRegistry& Registry_;

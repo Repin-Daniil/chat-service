@@ -122,7 +122,7 @@ TEST_F(MailboxTest, ValidScenarioSendAndReceive) {
 
   EXPECT_CALL(*queue_raw_, PopBatch(10, testing::Eq(5s))).WillOnce(Return(expected_messages));
 
-  auto now = std::chrono::steady_clock::now();
+  auto now = []() { return std::chrono::steady_clock::now(); };
   auto result = mailbox_->PollMessages(now, 10, 5s);
 
   EXPECT_EQ(result.Messages.size(), 1);
@@ -141,7 +141,7 @@ TEST_F(MailboxTest, QueueFullResyncRequired) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*queue_raw_, PopBatch(_, _)).WillOnce(Return(empty_result));
 
-  auto now = std::chrono::steady_clock::now();
+  auto now = []() { return std::chrono::steady_clock::now(); };
   auto result = mailbox_->PollMessages(now, 10, 1s);
 
   EXPECT_TRUE(result.ResyncRequired);
@@ -157,7 +157,7 @@ TEST_F(MailboxTest, ResyncFlagClearedAfterFirstPoll) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*queue_raw_, PopBatch(_, _)).Times(2).WillRepeatedly(Return(empty_result));
 
-  auto now = std::chrono::steady_clock::now();
+  auto now = []() { return std::chrono::steady_clock::now(); };
 
   // Первый poll - флаг установлен
   auto result1 = mailbox_->PollMessages(now, 10, 1s);
@@ -173,7 +173,7 @@ TEST_F(MailboxTest, PollEmptyQueueWithTimeout) {
 
   EXPECT_CALL(*queue_raw_, PopBatch(10, testing::Eq(2s))).WillOnce(Return(empty_result));
 
-  auto now = std::chrono::steady_clock::now();
+  auto now = []() { return std::chrono::steady_clock::now(); };
   auto result = mailbox_->PollMessages(now, 10, 2s);
 
   EXPECT_TRUE(result.Messages.empty());
@@ -188,7 +188,7 @@ TEST_F(MailboxTest, PollMultipleMessages) {
 
   EXPECT_CALL(*queue_raw_, PopBatch(100, testing::Eq(5s))).WillOnce(Return(messages));
 
-  auto now = std::chrono::steady_clock::now();
+  auto now = []() { return std::chrono::steady_clock::now(); };
   auto result = mailbox_->PollMessages(now, 100, 5s);
 
   EXPECT_EQ(result.Messages.size(), 3);
@@ -200,10 +200,10 @@ TEST_F(MailboxTest, NoConsumerAfterIdleThreshold) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*queue_raw_, PopBatch(_, _)).WillOnce(Return(empty_result));
 
-  auto start_time = std::chrono::steady_clock::now();
-
+  auto now = []() { return std::chrono::steady_clock::now(); };
+  auto start_time = now();
   // Делаем poll, чтобы обновить LastConsumerActivity_
-  mailbox_->PollMessages(start_time, 10, 1s);
+  mailbox_->PollMessages(now, 10, 1s);
 
   // Проверяем через 10 секунд с порогом 5 секунд
   auto check_time = start_time + 10s;
@@ -214,10 +214,11 @@ TEST_F(MailboxTest, ConsumerActiveWithinThreshold) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*queue_raw_, PopBatch(_, _)).WillOnce(Return(empty_result));
 
-  auto start_time = std::chrono::steady_clock::now();
+  auto now = []() { return std::chrono::steady_clock::now(); };
+  auto start_time = now();
 
   // Делаем poll
-  mailbox_->PollMessages(start_time, 10, 1s);
+  mailbox_->PollMessages(now, 10, 1s);
 
   // Проверяем через 3 секунды с порогом 5 секунд
   auto check_time = start_time + 3s;
@@ -228,8 +229,9 @@ TEST_F(MailboxTest, ExactThresholdBoundary) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*queue_raw_, PopBatch(_, _)).WillOnce(Return(empty_result));
 
-  auto start_time = std::chrono::steady_clock::now();
-  mailbox_->PollMessages(start_time, 10, 1s);
+  auto now = []() { return std::chrono::steady_clock::now(); };
+  auto start_time = now();
+  mailbox_->PollMessages(now, 10, 1s);
 
   // Ровно на границе порога
   auto check_time = start_time + 5s;
@@ -244,19 +246,21 @@ TEST_F(MailboxTest, MultiplePolls) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*queue_raw_, PopBatch(_, _)).Times(2).WillRepeatedly(Return(empty_result));
 
-  auto time1 = std::chrono::steady_clock::now();
-  mailbox_->PollMessages(time1, 10, 1s);
+  auto base_time = std::chrono::steady_clock::now();
+
+  auto now1 = [base_time]() { return base_time; };
+  mailbox_->PollMessages(now1, 10, 1s);
 
   // Второй poll через 3 секунды
-  auto time2 = time1 + 3s;
-  mailbox_->PollMessages(time2, 10, 1s);
+  auto now2 = [base_time]() { return base_time + 3s; };
+  mailbox_->PollMessages(now2, 10, 1s);
 
   // Проверяем через 8 секунд от начала (5 секунд от последнего poll)
-  auto check_time = time1 + 8s;
+  auto check_time = base_time + 8s;
   EXPECT_FALSE(mailbox_->HasNoConsumer(check_time, 5s));
 
   // Проверяем через 10 секунд от начала (7 секунд от последнего poll)
-  check_time = time1 + 10s;
+  check_time = base_time + 10s;
   EXPECT_TRUE(mailbox_->HasNoConsumer(check_time, 5s));
 }
 
@@ -292,7 +296,7 @@ TEST_F(MailboxTest, MultipleSendsAndSinglePoll) {
 
   EXPECT_CALL(*queue_raw_, PopBatch(_, _)).WillOnce(Return(messages));
 
-  auto now = std::chrono::steady_clock::now();
+  auto now = []() { return std::chrono::steady_clock::now(); };
   auto result = mailbox_->PollMessages(now, 10, 5s);
 
   EXPECT_EQ(result.Messages.size(), 3);
@@ -318,7 +322,7 @@ TEST_F(MailboxTest, MixedSuccessAndFailure) {
 
   EXPECT_CALL(*queue_raw_, PopBatch(_, _)).WillOnce(Return(messages));
 
-  auto now = std::chrono::steady_clock::now();
+  auto now = []() { return std::chrono::steady_clock::now(); };
   auto result = mailbox_->PollMessages(now, 10, 5s);
 
   EXPECT_EQ(result.Messages.size(), 2);
@@ -331,16 +335,19 @@ TEST_F(MailboxTest, ConsumerActivityTracking) {
 
   auto t0 = std::chrono::steady_clock::now();
 
+  auto get_t0 = [t0]() { return t0; };
   // Первая активность
-  mailbox_->PollMessages(t0, 10, 1s);
+  mailbox_->PollMessages(get_t0, 10, 1s);
   EXPECT_FALSE(mailbox_->HasNoConsumer(t0 + 2s, 5s));
 
   // Вторая активность через 4 секунды
-  mailbox_->PollMessages(t0 + 4s, 10, 1s);
+  auto get_t1 = [t0]() { return t0 + 4s; };
+  mailbox_->PollMessages(get_t1, 10, 1s);
   EXPECT_FALSE(mailbox_->HasNoConsumer(t0 + 8s, 5s));
 
   // Третья активность через 7 секунд
-  mailbox_->PollMessages(t0 + 7s, 10, 1s);
+  auto get_t2 = [t0]() { return t0 + 7s; };
+  mailbox_->PollMessages(get_t2, 10, 1s);
 
   // Проверяем через 14 секунд (7 секунд после последней активности)
   EXPECT_TRUE(mailbox_->HasNoConsumer(t0 + 14s, 5s));

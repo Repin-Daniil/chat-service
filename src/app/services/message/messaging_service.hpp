@@ -3,7 +3,9 @@
 #include <core/messaging/mailbox_registry.hpp>
 #include <core/users/user_repo.hpp>
 
-#include <app/dto/messages/send_request_dto.hpp>
+#include <app/dto/messages/poll_messages_dto.hpp>
+#include <app/dto/messages/send_message_dto.hpp>
+#include <app/use-cases/messages/poll_messages/poll_messages.hpp>
 #include <app/use-cases/messages/send_message/send_message.hpp>
 
 namespace NChat::NApp::NServices {
@@ -15,9 +17,10 @@ class TMessagingService {
 
   void SendMessage(NDto::TSendMessageRequest request);
 
-  // todo PollMessages Тут нужно передавать штатный таймаут на висение на очереди (через дин конфиг)
+  NDto::TPollMessagesResult PollMessages(const NDto::TPollMessagesRequest& request);
 
  private:
   TSendMessageUseCase SendMessageUseCase_;
+  TPollMessagesUseCase PollMessagesUseCase_;
 };
 }  // namespace NChat::NApp::NServices

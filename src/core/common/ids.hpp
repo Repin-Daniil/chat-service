@@ -7,11 +7,7 @@
 namespace NChat::NCore::NDomain {
 
 struct UserIdTag {};
-struct ChatIdTag {};
-struct TMessageIdTag {};
 
-using TUserId = NUtils::TStrongTypedef<std::string, UserIdTag>;  // fixme Switch to uint?
-// using TChatId = NUtils::TStrongTypedef<std::string, ChatIdTag>;
-// using TMessageId = NUtils::TStrongTypedef<uint64_t, TMessageIdTag>;
+using TUserId = NUtils::TStrongTypedef<std::string, UserIdTag>;
 
 }  // namespace NChat::NCore::NDomain

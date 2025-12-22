@@ -52,9 +52,11 @@ def username_generator():
 def password_generator():
     return generate_string(8, 32, lambda: fake.password(length=12), fill_char="A")
 
+
 def display_name_generator():
     chosen_fake = random.choice([fake, russin_fake])
     return generate_string(3, 50, chosen_fake.name)
+
 
 def biography_generator():
     chosen_fake = random.choice([fake, russin_fake])

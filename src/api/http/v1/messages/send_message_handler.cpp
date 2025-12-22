@@ -53,7 +53,11 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     MessageService_.SendMessage(std::move(request_dto));
   } catch (const NCore::NDomain::TUsernameInvalidException& ex) {
     throw TNotFoundException(ex.what());
-  } catch (const NApp::TRecipientNotFound& ex) {
+  } catch (const NCore::NDomain::TMessageTextInvalidException& ex) {
+    throw TValidationException(ex.GetField(), ex.what());
+  }
+
+  catch (const NApp::TRecipientNotFound& ex) {
     throw TNotFoundException(ex.what());
   } catch (const NApp::TTooManyRequests& ex) {
     throw TTooManyRequestsException(ex.what());
@@ -62,10 +66,6 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     response.SetStatus(userver::server::http::HttpStatus::kServiceUnavailable);
     return MakeError(ex.what());
   }
-  // catch () {
-  // todo Тут нужно проверить message payload, можно вернуть kPayloadTooLarge
-  // Возвращать 400
-  // }
 
   auto& response = request.GetHttpResponse();
   response.SetStatus(userver::server::http::HttpStatus::kAccepted);

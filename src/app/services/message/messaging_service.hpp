@@ -15,7 +15,7 @@ class TMessagingService {
 
   void SendMessage(NDto::TSendMessageRequest request);
 
-  // todo Тут нужно передавать штатный таймаут на висение на очереди
+  // todo PollMessages Тут нужно передавать штатный таймаут на висение на очереди (через дин конфиг)
 
  private:
   TSendMessageUseCase SendMessageUseCase_;

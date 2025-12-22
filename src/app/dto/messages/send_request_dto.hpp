@@ -14,8 +14,4 @@ struct TSendMessageRequest {
   std::chrono::steady_clock::time_point SentAt{};
 };
 
-// struct TSendMessageResult {
-//   NCore::NDomain::TMessageId MessageId;
-// };
-
 }  // namespace NChat::NApp::NDto

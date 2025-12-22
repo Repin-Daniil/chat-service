@@ -2,8 +2,8 @@
 
 #include <core/users/value/username.hpp>
 
-#include <infra/serializer/serializer.hpp>
 #include <infra/components/messaging_service_component.hpp>
+#include <infra/serializer/serializer.hpp>
 
 #include <api/http/common/context.hpp>
 #include <api/http/exceptions/handler_exceptions.hpp>
@@ -24,12 +24,22 @@ userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& /*request*/, const userver::formats::json::Value& /*request_json*/,
     userver::server::request::RequestContext& request_context) const {
   TUserId consumer_id{request_context.GetData<std::string>(ToString(EContextKey::UserId))};
-  std::size_t max_size{100}; // todo get from dynconfig
-  std::chrono::seconds poll_time{10}; // todo get from dynconfig
+  std::size_t max_size{100};           // todo get from dynconfig
+  std::chrono::seconds poll_time{10};  // todo get from dynconfig
 
-  TPollMessagesRequest request_dto{.ConsumerId=consumer_id, .MaxSize = max_size, .PollTime=poll_time,};
+  TPollMessagesRequest request_dto{
+      .ConsumerId = consumer_id,
+      .MaxSize = max_size,
+      .PollTime = poll_time,
+  };
 
-  auto result = MessageService_.PollMessages(request_dto);
+  TPollMessagesResult result;
+  try {
+    result = MessageService_.PollMessages(request_dto);
+  } catch (const NApp::TPollingTemporaryUnavailable& ex) {
+    LOG_ERROR() << "Message polling unavailable: " << ex.what();
+    throw TServerException("Message polling temporary unavailable");
+  }
 
   userver::formats::json::StringBuilder sb;
   NInfra::WriteToStream(result, sb);

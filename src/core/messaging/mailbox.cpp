@@ -45,4 +45,6 @@ NDomain::TUserId TUserMailbox::GetConsumerId() const { return ConsumerId_; }
 
 std::size_t TUserMailbox::GetSizeApproximate() const { return MessageBus_->GetSizeApproximate(); }
 
+void TUserMailbox::ResyncRequired() { MissedMessages_ = true; }
+
 }  // namespace NChat::NCore

@@ -9,6 +9,10 @@
 
 namespace NChat::NApp {
 
+class TPollingTemporaryUnavailable : public TApplicationException {
+  using TApplicationException::TApplicationException;
+};
+
 class TPollMessagesUseCase final {
  public:
   using TMessage = NCore::NDomain::TMessage;
@@ -16,12 +20,13 @@ class TPollMessagesUseCase final {
   using TUserId = NCore::NDomain::TUserId;
   using TMessageText = NCore::NDomain::TMessageText;
 
-  TPollMessagesUseCase(NCore::IMailboxRegistry& registry);
+  TPollMessagesUseCase(NCore::IMailboxRegistry& registry, NCore::IUserRepository& user_repo);
 
   NDto::TPollMessagesResult Execute(const NDto::TPollMessagesRequest request);
 
  private:
   NCore::IMailboxRegistry& Registry_;
+  NCore::IUserRepository& UserRepo_;
 };
 
 }  // namespace NChat::NApp

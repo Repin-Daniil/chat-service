@@ -352,3 +352,16 @@ TEST_F(MailboxTest, ConsumerActivityTracking) {
   // Проверяем через 14 секунд (7 секунд после последней активности)
   EXPECT_TRUE(mailbox_->HasNoConsumer(t0 + 14s, 5s));
 }
+
+TEST_F(MailboxTest, SetResyncRequired) {
+  mailbox_->ResyncRequired();
+
+  // При поллинге получаем флаг ResyncRequired
+  std::vector<NDomain::TMessage> empty_result;
+  EXPECT_CALL(*queue_raw_, PopBatch(_, _)).WillOnce(Return(empty_result));
+
+  auto now = []() { return std::chrono::steady_clock::now(); };
+  auto result = mailbox_->PollMessages(now, 10, 1s);
+
+  EXPECT_TRUE(result.ResyncRequired);
+}

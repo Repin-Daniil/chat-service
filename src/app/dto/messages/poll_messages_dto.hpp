@@ -2,6 +2,8 @@
 
 #include <core/common/ids.hpp>
 #include <core/messaging/mailbox.hpp>
+#include <core/messaging/value/message_text.hpp>
+#include <core/users/user.hpp>
 
 #include <chrono>
 
@@ -14,7 +16,15 @@ struct TPollMessagesRequest {
 };
 
 struct TPollMessagesResult {
-  NCore::TMessages Messages;
+  bool ResyncRequired;
+
+  struct TResultMessage {
+    NCore::NDomain::TUsername Sender;
+    NCore::NDomain::TMessageText Text;
+    NCore::NDomain::TDeliveryContext Context;
+  };
+
+  std::vector<TResultMessage> Messages;
 };
 
 }  // namespace NChat::NApp::NDto

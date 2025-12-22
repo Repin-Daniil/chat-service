@@ -10,5 +10,10 @@ monitoring-port: 8081
 database: postgres
 token_expiry_hours: 1
 
+registry-shards-amount: 256
+mailbox-queue-type: Vyukov
+mailbox-registry-type: ShardedMap
+limiter-registry-type: ShardedMap
+
 # change to URI of your postgres database
 pg-connection: postgresql://testsuite@localhost:15433/chat_service

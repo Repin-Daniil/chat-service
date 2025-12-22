@@ -1,8 +1,12 @@
+import random
+
 from enum import Enum
 
 from faker import Faker
 
-fake = Faker()  # todo Faker("ru_RU")
+fake = Faker()
+russin_fake = Faker("ru_RU")
+
 fake.seed_instance(4321)
 
 
@@ -50,8 +54,10 @@ def password_generator():
 
 
 def display_name_generator():
-    return generate_string(3, 50, fake.name)
+    chosen_fake = random.choice([fake, russin_fake])
+    return generate_string(3, 50, chosen_fake.name)
 
 
 def biography_generator():
-    return generate_string(0, 180, fake.paragraph)
+    chosen_fake = random.choice([fake, russin_fake])
+    return generate_string(0, 180, chosen_fake.paragraph)

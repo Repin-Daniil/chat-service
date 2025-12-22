@@ -29,6 +29,8 @@ can also be `debug-custom`, `release-custom`.
 * `make docker-COMMAND` - run `make COMMAND` in docker environment
 * `make docker-clean-data` - stop docker containers
 
+## Debug
+Add in CMakePresets.json "USERVER_DEBUG_INFO_COMPRESSION": "none"
 
 ## License
 

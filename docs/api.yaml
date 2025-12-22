@@ -130,16 +130,18 @@ components:
       type: object
       description: Сообщение для отправки
       properties:
-        recipient-username:
-          type: string
-          description: Username пользователя, которому отправляется сообщение
-        text:
-          type: string
-          description: Текст сообщения
-          example: "Hello, World!"
-      required:
-        - recipient_id
-        - text
+        message:
+          type: object
+          recipient:
+            type: string
+            description: Username пользователя, которому отправляется сообщение
+          payload:
+            type: string
+            description: Текст сообщения
+            example: "Hello, World!"
+        required:
+          - recipient
+          - payload
 
 paths:
   # Users
@@ -298,3 +300,5 @@ paths:
           description: Не авторизован
         "404":
           description: Получатель не найден
+        "409":
+          description: Пользователь офлайн

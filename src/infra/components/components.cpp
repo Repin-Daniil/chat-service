@@ -1,13 +1,16 @@
 #include "components.hpp"
 
+#include <infra/components/messaging_service_component.hpp>
+#include <infra/components/user_repository_component.hpp>
+#include <infra/components/user_service_component.hpp>
+#include <infra/db/postgres_profile_cache.hpp>
+
 #include <api/http/middlewares/auth_bearer.hpp>
 #include <api/http/v1/messages/send_message_handler.hpp>
 #include <api/http/v1/users/delete_by_username_handler.hpp>
 #include <api/http/v1/users/get_by_username_handler.hpp>
 #include <api/http/v1/users/user_login_handler.hpp>
 #include <api/http/v1/users/user_register_handler.hpp>
-#include <infra/components/user_service_component.hpp>
-#include <infra/db/postgres_profile_cache.hpp>
 
 #include <userver/clients/dns/component.hpp>
 #include <userver/clients/http/component.hpp>
@@ -57,8 +60,12 @@ void RegisterMessagesHandlers(userver::components::ComponentList& list) {
 }
 
 // Components
-void RegisterUserServiceComponent(userver::components::ComponentList& list) {
-  list.Append<NComponents::TUserServiceComponent>();
+void RegisterServiceComponents(userver::components::ComponentList& list) {
+  list.Append<NComponents::TUserServiceComponent>().Append<NComponents::TMessagingServiceComponent>();
+}
+
+void RegisterRepositoryComponents(userver::components::ComponentList& list) {
+  list.Append<NComponents::TUserRepoComponent>();
 }
 
 }  // namespace NChat::NInfra

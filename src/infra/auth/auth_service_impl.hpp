@@ -20,4 +20,5 @@ class TAuthServiceImpl : public NCore::IAuthService {
   int ExpiryDuration_ = 0;
   std::size_t SaltLength_ = 0;
 };
+
 }  // namespace NChat::NInfra

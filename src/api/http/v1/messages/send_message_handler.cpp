@@ -48,7 +48,6 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
   auto request_dto = request_json["message"].As<TSendMessageRequest>();
   request_dto.SentAt = start_timepoint;
   request_dto.SenderId = TUserId{request_context.GetData<std::string>(ToString(EContextKey::UserId))};
-  LOG_INFO() << "Пока все норм Recipient" << request_dto.RecipientUsername;
 
   try {
     MessageService_.SendMessage(std::move(request_dto));

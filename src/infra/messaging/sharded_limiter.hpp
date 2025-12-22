@@ -7,26 +7,28 @@
 #include <userver/utils/datetime.hpp>
 #include <userver/utils/token_bucket.hpp>
 
+#include <chrono>
+
 namespace NChat::NInfra {
 
 class TLimiterWrapper {
  public:
-  using TimePoint = std::chrono::steady_clock::time_point;
-  using Duration = std::chrono::steady_clock::duration;
-  using TokenBucket = userver::utils::TokenBucket;
+  using TTimePoint = std::chrono::steady_clock::time_point;
+  using TDuration = std::chrono::steady_clock::duration;
+  using TTokenBucket = userver::utils::TokenBucket;
 
   TLimiterWrapper();
   TLimiterWrapper(std::size_t max_rps, size_t token_refill_amount = 1,
-                  Duration token_refill_interval = std::chrono::seconds(1));
+                  TDuration token_refill_interval = std::chrono::seconds(1));
 
   bool TryAcquire();
 
-  TokenBucket& GetBucket();
-  TimePoint GetLastAccess() const;
+  TTokenBucket& GetBucket();
+  TTimePoint GetLastAccess() const;
 
  private:
-  TokenBucket Bucket_;
-  std::atomic<TimePoint> LastAccess_;
+  TTokenBucket Bucket_;
+  std::atomic<TTimePoint> LastAccess_;
 };
 
 using TLimiterPtr = std::shared_ptr<TLimiterWrapper>;

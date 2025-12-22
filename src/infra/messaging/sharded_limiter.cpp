@@ -7,7 +7,7 @@ namespace NChat::NInfra {
 TLimiterWrapper::TLimiterWrapper()
     : Bucket_(userver::utils::TokenBucket::MakeUnbounded()), LastAccess_(userver::utils::datetime::SteadyNow()) {}
 
-TLimiterWrapper::TLimiterWrapper(std::size_t max_rps, std::size_t token_refill_amount, Duration token_refill_interval)
+TLimiterWrapper::TLimiterWrapper(std::size_t max_rps, std::size_t token_refill_amount, TDuration token_refill_interval)
     : Bucket_(max_rps, {token_refill_amount, token_refill_interval}),
       LastAccess_(userver::utils::datetime::SteadyNow()) {}
 
@@ -16,11 +16,11 @@ bool TLimiterWrapper::TryAcquire() {
   return Bucket_.Obtain();
 }
 
-TLimiterWrapper::TimePoint TLimiterWrapper::GetLastAccess() const {
+TLimiterWrapper::TTimePoint TLimiterWrapper::GetLastAccess() const {
   return LastAccess_.load(std::memory_order_relaxed);
 }
 
-TLimiterWrapper::TokenBucket& TLimiterWrapper::GetBucket() { return Bucket_; }
+TLimiterWrapper::TTokenBucket& TLimiterWrapper::GetBucket() { return Bucket_; }
 
 TSendLimiter::TSendLimiter(std::size_t shard_amount) : Limiters_(shard_amount) {
   LOG_INFO() << "Start SendLimiterRegistry";

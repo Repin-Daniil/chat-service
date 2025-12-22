@@ -15,4 +15,4 @@ class User(BaseModel):
 
 class Message(BaseModel):
     recipient: str = Field(default="")
-    text: str = Field(default_factory=fake.paragraph)
+    payload: str = Field(default_factory=fake.paragraph)

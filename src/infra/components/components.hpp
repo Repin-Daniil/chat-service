@@ -16,6 +16,6 @@ void RegisterUserHandlers(userver::components::ComponentList&);
 void RegisterMessagesHandlers(userver::components::ComponentList&);
 
 // Components
-void RegisterUserServiceComponent(userver::components::ComponentList&);
-
+void RegisterServiceComponents(userver::components::ComponentList&);
+void RegisterRepositoryComponents(userver::components::ComponentList&);
 }  // namespace NChat::NInfra

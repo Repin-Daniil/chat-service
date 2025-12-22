@@ -1,5 +1,8 @@
 #pragma once
 
+#include <core/users/auth_service_interface.hpp>
+#include <core/users/user_repo.hpp>
+
 #include <app/use-cases/users/check_token/check_token.hpp>
 #include <app/use-cases/users/delete_user/delete_user.hpp>
 #include <app/use-cases/users/get_profile/get_profile.hpp>

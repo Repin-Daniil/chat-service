@@ -20,7 +20,8 @@ async def test_login_success(service_client, registered_user):
 
 async def test_login_wrong_password(service_client, registered_user):
     """Проверяет, что логин с неверным паролем отклоняется."""
-    user = User(username=registered_user.username, password='WrongPassword!123')
+    user = User(username=registered_user.username,
+                password='WrongPassword!123')
     response = await login_user(service_client, user)
 
     assert response.status == HTTPStatus.UNAUTHORIZED
@@ -35,7 +36,8 @@ async def test_login_nonexistent_user(service_client):
     assert response.status == HTTPStatus.UNAUTHORIZED
     assert 'errors' in response.json()['details']
     assert 'credentials' in response.json()['details']['errors']
-    assert response.json()['details']['errors']['credentials'] == ['Wrong credentials']
+    assert response.json()['details']['errors']['credentials'] == [
+        'Wrong credentials']
 
 
 async def test_login_multiple_times(service_client, registered_user):
@@ -50,16 +52,16 @@ async def test_login_multiple_times(service_client, registered_user):
 async def test_login_different_users(service_client):
     """Проверяет логин нескольких разных пользователей."""
     users = [User() for _ in range(3)]
-    
+
     # Регистрируем пользователей
     for user in users:
         from endpoints import register_user
         await register_user(service_client, user)
-    
+
     # Логинимся каждым
     for user in users:
         response = await login_user(service_client, user)
-        
+
         assert response.status == HTTPStatus.OK
         assert 'token' in response.json()
 
@@ -93,7 +95,8 @@ async def test_login_invalid_login(service_client, registered_user):
     assert response.status == HTTPStatus.UNAUTHORIZED
     assert 'errors' in response.json()['details']
     assert 'credentials' in response.json()['details']['errors']
-    assert response.json()['details']['errors']['credentials'] == ['Invalid credentials']
+    assert response.json()['details']['errors']['credentials'] == [
+        'Invalid credentials']
 
 
 async def test_login_invalid_password(service_client, registered_user):
@@ -104,4 +107,5 @@ async def test_login_invalid_password(service_client, registered_user):
     assert response.status == HTTPStatus.UNAUTHORIZED
     assert 'errors' in response.json()['details']
     assert 'credentials' in response.json()['details']['errors']
-    assert response.json()['details']['errors']['credentials'] == ['Invalid credentials']
+    assert response.json()['details']['errors']['credentials'] == [
+        'Invalid credentials']

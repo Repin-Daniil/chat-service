@@ -1,8 +1,10 @@
 #include "user_login_handler.hpp"
 
-#include <api/http/exceptions/handler_exceptions.hpp>
 #include <app/dto/users/login_dto.hpp>
+
 #include <infra/components/user_service_component.hpp>
+
+#include <api/http/exceptions/handler_exceptions.hpp>
 
 #include <userver/components/component.hpp>
 #include <userver/formats/serialize/common_containers.hpp>

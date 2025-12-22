@@ -75,18 +75,25 @@ components_manager:
             task_processor: monitor-task-processor
 
         # Components
-        user-service-component:
-            load-enabled: true
-            token-expiry-hours: $token_expiry_hours
+        user-repository-component:
             storage-type: $database
             postgres-component: chat-postgres-database
             ydb-component: chat-ydb-database
 
+        user-service-component:
+            load-enabled: true
+            token-expiry-hours: $token_expiry_hours
+
+        messaging-service-component:
+            load-enabled: true
+            shards-amount: $registry-shards-amount
+            queue-type: $mailbox-queue-type
+            registry-type: $mailbox-registry-type
+            limiter-type: $limiter-registry-type
 
         # Handlers 
 
         # Users
-
         handler-user-register:
             path: /v1/users/register
             method: POST

@@ -20,7 +20,6 @@ class TUserServiceComponent final : public userver::components::LoggableComponen
 
  private:
   std::unique_ptr<NCore::IAuthService> AuthService_;
-  std::unique_ptr<NCore::IUserRepository> UserRepo_;
   std::unique_ptr<NApp::NServices::TUserService> UserService_;
 };
 

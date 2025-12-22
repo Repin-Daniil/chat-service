@@ -11,21 +11,33 @@ IncludeCategories:
   - Regex: '^".*"$'
     Priority: 1
 
-  # 2 — project sources
-  - Regex: '^<(app|core|infra|api|utils)/.*>$'
+  # 2-6 — project sources
+  - Regex: '^<core/.*>$'
     Priority: 2
 
-  # 3 — external libs (userver, fmt, etc.)
-  - Regex: '^<[^/]+/.*>$'
+  - Regex: '^<app/.*>$'
     Priority: 3
 
-  # 4 — C headers (*.h in root)
-  - Regex: '^<[^>/]+\.h>$'
+  - Regex: '^<infra/.*>$'
     Priority: 4
-
-  # 5 — C++ std headers without .h
-  - Regex: '^<[A-Za-z0-9_]+>$'
+  
+  - Regex: '^<utils/.*>$'
     Priority: 5
+  
+  - Regex: '^<api/.*>$'
+    Priority: 6
+
+  # 7 — external libs (userver, fmt, etc.)
+  - Regex: '^<[^/]+/.*>$'
+    Priority: 7
+
+  # 8 — C headers (*.h in root)
+  - Regex: '^<[^>/]+\.h>$'
+    Priority: 8
+
+  # 9 — C++ std headers without .h
+  - Regex: '^<[A-Za-z0-9_]+>$'
+    Priority: 9
 
 
 

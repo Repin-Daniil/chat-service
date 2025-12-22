@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/users/user_repo.hpp>
+
 #include <infra/db/postgres_profile_cache.hpp>
 
 #include <userver/components/loggable_component_base.hpp>

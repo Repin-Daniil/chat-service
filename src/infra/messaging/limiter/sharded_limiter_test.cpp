@@ -3,6 +3,7 @@
 #include <core/common/ids.hpp>
 
 #include <gtest/gtest.h>
+#include <userver/dynamic_config/test_helpers.hpp>
 #include <userver/engine/async.hpp>
 #include <userver/utest/utest.hpp>
 #include <userver/utils/mock_now.hpp>
@@ -86,12 +87,12 @@ UTEST(LimiterWrapperTest, MultipleRefills) {
 // ============================================================================
 
 UTEST(SendLimiterTest, InitialState) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   EXPECT_EQ(limiter.GetTotalLimiters(), 0);
 }
 
 UTEST(SendLimiterTest, SingleUserLimiting) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id("1");
 
   // Default is 5 RPS, should allow 5 tokens
@@ -106,7 +107,7 @@ UTEST(SendLimiterTest, SingleUserLimiting) {
 }
 
 UTEST(SendLimiterTest, MultipleUsersIndependentLimits) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   TUserId user1("1");
   TUserId user2("2");
 
@@ -126,7 +127,7 @@ UTEST(SendLimiterTest, MultipleUsersIndependentLimits) {
 }
 
 UTEST(SendLimiterTest, LimiterCounterIncrement) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
 
   EXPECT_EQ(limiter.GetTotalLimiters(), 0);
 
@@ -142,7 +143,7 @@ UTEST(SendLimiterTest, LimiterCounterIncrement) {
 }
 
 UTEST(SendLimiterTest, TraverseLimitersCleanup) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
   TUserId user1("1");
   TUserId user2("2");
@@ -161,7 +162,7 @@ UTEST(SendLimiterTest, TraverseLimitersCleanup) {
 }
 
 UTEST(SendLimiterTest, TraverseLimitersKeepsActive) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   TUserId user1("1");
   TUserId user2("2");
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
@@ -183,7 +184,7 @@ UTEST(SendLimiterTest, TraverseLimitersKeepsActive) {
 }
 
 UTEST(SendLimiterTest, TraverseLimitersEmptyMap) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
 
   // Should not crash on empty map
   limiter.TraverseLimiters();
@@ -195,7 +196,7 @@ UTEST(SendLimiterTest, TraverseLimitersEmptyMap) {
 // ============================================================================
 
 UTEST_MT(SendLimiterTest, ConcurrentAccess, 4) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   const auto concurrent_jobs = GetThreadCount();
 
   std::vector<userver::engine::Task> tasks;
@@ -224,7 +225,7 @@ UTEST_MT(SendLimiterTest, ConcurrentAccess, 4) {
 }
 
 UTEST_MT(SendLimiterTest, ConcurrentSameUser, 4) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   const auto concurrent_jobs = GetThreadCount();
   TUserId shared_user("42");
 
@@ -258,7 +259,7 @@ UTEST_MT(SendLimiterTest, ConcurrentSameUser, 4) {
 }
 
 UTEST_MT(SendLimiterTest, ConcurrentTraversal, 4) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   const auto concurrent_jobs = GetThreadCount();
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
 
@@ -298,7 +299,7 @@ UTEST_MT(SendLimiterTest, ConcurrentTraversal, 4) {
 }
 
 UTEST_MT(SendLimiterTest, StressTest, 8) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   const auto concurrent_jobs = GetThreadCount();
 
   std::atomic<std::size_t> total_attempts{0};
@@ -344,11 +345,11 @@ UTEST_MT(SendLimiterTest, StressTest, 8) {
 
 UTEST(SendLimiterTest, ZeroShards) {
   // Should handle edge case gracefully (though likely not recommended in practice)
-  EXPECT_THROW(TSendLimiter limiter(0), std::invalid_argument);
+  EXPECT_THROW(TSendLimiter limiter(0, userver::dynamic_config::GetDefaultSource()), std::invalid_argument);
 }
 
 UTEST(SendLimiterTest, SingleShard) {
-  TSendLimiter limiter(1);
+  TSendLimiter limiter(1, userver::dynamic_config::GetDefaultSource());
 
   limiter.TryAcquire(TUserId("1"));
   limiter.TryAcquire(TUserId("2"));
@@ -357,7 +358,7 @@ UTEST(SendLimiterTest, SingleShard) {
 }
 
 UTEST(SendLimiterTest, ManyShards) {
-  TSendLimiter limiter(1024);
+  TSendLimiter limiter(1024, userver::dynamic_config::GetDefaultSource());
 
   for (int i = 0; i < 100; ++i) {
     limiter.TryAcquire(TUserId(std::to_string(i)));
@@ -367,7 +368,7 @@ UTEST(SendLimiterTest, ManyShards) {
 }
 
 UTEST(SendLimiterTest, RepeatedTraversal) {
-  TSendLimiter limiter(256);
+  TSendLimiter limiter(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id("1");
 
   limiter.TryAcquire(user_id);

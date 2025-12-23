@@ -168,6 +168,43 @@ components:
           - recipient
           - payload
 
+    Message:
+      type: object
+      required:
+        - sender
+        - text
+      properties:
+        sender:
+          type: string
+          description: Username пользователя-отправителя
+          example: "user123"
+        text:
+          type: string
+          description: Текст сообщения
+          example: "Hello, World!"
+      description: Сообщение
+
+    PolledMessages:
+      type: object
+      required:
+        - resync_required
+      properties:
+        resync_required:
+          type: boolean
+          description: Флаг необходимости ресинхронизации сообщений
+          example: false
+        messages:
+          type: array
+          description: Массив сообщений
+          items:
+            $ref: '#/components/schemas/Message'
+          example:
+            - sender: "alice"
+              text: "First message"
+            - sender: "bob"
+              text: "Second message"
+      description: Новые сообщения
+
 paths:
   # Users
   /users/register:
@@ -380,3 +417,20 @@ paths:
           description: Получатель не найден
         "409":
           description: Пользователь офлайн
+  /messages/poll:
+    post:
+      tags:
+        - Messages
+      summary: Получить сообщения пользователя
+      operationId: pollMessages
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Полученные сообщения
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolledMessages"
+        "401":
+          description: Не авторизован

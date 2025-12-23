@@ -1,8 +1,10 @@
 #include "update_by_username_handler.hpp"
 
-#include <api/http/exceptions/handler_exceptions.hpp>
 #include <app/dto/users/user_update_dto.hpp>
+
 #include <infra/components/user_service_component.hpp>
+
+#include <api/http/exceptions/handler_exceptions.hpp>
 
 #include <userver/storages/postgres/component.hpp>
 

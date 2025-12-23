@@ -15,14 +15,14 @@ void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
   TMessageText text(std::move(request.Text));
 
   // todo В будущем когда будут chat_id провести ACL, а пока резолвим в базе через КЭШ user_id
-  auto recipient = UserRepo_.GetUserByUsername(recipient_username.Value());
-  if (!recipient) {
+  auto recipient_id = UserRepo_.FindByUsername(recipient_username.Value());
+  if (!recipient_id.has_value()) {
     throw TRecipientNotFound("Recipient Not Found");
   }
 
-  auto mailbox = Registry_.CreateOrGetMailbox(recipient->GetId());
+  auto mailbox = Registry_.CreateOrGetMailbox(*recipient_id);
 
-  auto message = ConstructMessage(recipient->GetId(), request.SenderId, std::move(text), request.SentAt);
+  auto message = ConstructMessage(*recipient_id, request.SenderId, std::move(text), request.SentAt);
 
   // todo dynamic config нужно передавать количество попыток
   const bool is_success = mailbox->SendMessage(std::move(message));

@@ -14,8 +14,11 @@ using NCore::NDomain::TUserTinyProfile;
 }  // namespace
 
 TPostgresUserRepository::TPostgresUserRepository(userver::storages::postgres::ClusterPtr pg_cluster,
-                                                 const TProfileCache& profile_cache)
-    : PgCluster_(pg_cluster), ProfileCache_(profile_cache) {}
+                                                 const TProfileByUsernameCache& profile_by_username_cache,
+                                                 const TProfileByUserIdCache& profile_by_user_id_cache)
+    : PgCluster_(pg_cluster),
+      ProfileByUsernameCache_(profile_by_username_cache),
+      ProfileByUserIdCache_(profile_by_user_id_cache) {}
 
 void TPostgresUserRepository::InsertNewUser(const TUser& user) const {
   try {
@@ -68,6 +71,13 @@ std::string TPostgresUserRepository::UpdateUser(const TUsername& username_to_upd
 }
 
 std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view username) const {
+  const auto snapshot = ProfileByUsernameCache_.Get();
+
+  auto it = snapshot->find(username.data());
+  if (it != snapshot->end()) {
+    return TUserId{it->second.UserId};
+  }
+
   auto result =
       PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kFindUserByUsername, username);
   if (result.IsEmpty()) {
@@ -78,7 +88,7 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
 }
 
 std::optional<TUserTinyProfile> TPostgresUserRepository::GetProfileById(const TUserId& id) const {
-  const auto snapshot = ProfileCache_.Get();
+  const auto snapshot = ProfileByUserIdCache_.Get();
 
   auto it = snapshot->find(*id);
   if (it != snapshot->end()) {

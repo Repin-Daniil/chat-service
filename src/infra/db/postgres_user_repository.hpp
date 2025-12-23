@@ -2,7 +2,8 @@
 
 #include <core/users/user_repo.hpp>
 
-#include <infra/db/postgres_profile_cache.hpp>
+#include <infra/db/postgres_profile_by_user_id_cache.hpp>
+#include <infra/db/postgres_profile_by_username_cache.hpp>
 
 #include <userver/components/loggable_component_base.hpp>
 #include <userver/storages/postgres/cluster.hpp>
@@ -15,7 +16,8 @@ namespace NChat::NInfra::NRepository {
 class TPostgresUserRepository : public NCore::IUserRepository {
  public:
   explicit TPostgresUserRepository(userver::storages::postgres::ClusterPtr pg_cluster,
-                                   const TProfileCache& profile_cache);
+                                   const TProfileByUsernameCache& profile_by_username_cache,
+                                   const TProfileByUserIdCache& profile_by_user_id_cache);
 
   void InsertNewUser(const TUser& user) const override;
   void DeleteUser(std::string_view username) const override;
@@ -29,7 +31,8 @@ class TPostgresUserRepository : public NCore::IUserRepository {
 
  private:
   userver::storages::postgres::ClusterPtr PgCluster_;
-  const TProfileCache& ProfileCache_;
+  const TProfileByUsernameCache& ProfileByUsernameCache_;
+  const TProfileByUserIdCache& ProfileByUserIdCache_;
 };
 
 }  // namespace NChat::NInfra::NRepository

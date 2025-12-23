@@ -1,0 +1,1159 @@
+cmake --build build-debug -j 2
+ninja: no work to do.
+cd build-debug && ((test -t 1 && GTEST_COLOR=1 PYTEST_ADDOPTS="--color=yes" ctest -V) || ctest -V)
+UpdateCTestConfiguration  from :/workspaces/chat-service/build-debug/DartConfiguration.tcl
+Parse Config file:/workspaces/chat-service/build-debug/DartConfiguration.tcl
+Test project /workspaces/chat-service/build-debug
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: chat_service_unittest
+
+1: Test command: /workspaces/chat-service/build-debug/chat_service_unittest "--gtest_output=xml:/workspaces/chat-service/build-debug/test-results/chat_service_unittest.xml"
+1: Working Directory: /workspaces/chat-service/build-debug
+1: Test timeout computed to be: 1500
+1: [==========] Running 327 tests from 24 test suites.
+1: [----------] Global test environment set-up.
+1: [----------] 8 tests from CheckTokenUseCaseIntegrationTest
+1: [ RUN      ] CheckTokenUseCaseIntegrationTest.EmptyTokenNotRequired_ReturnsEmptyResult
+1: [       OK ] CheckTokenUseCaseIntegrationTest.EmptyTokenNotRequired_ReturnsEmptyResult (0 ms)
+1: [ RUN      ] CheckTokenUseCaseIntegrationTest.EmptyTokenRequired_ReturnsEmptyAuthError
+1: [       OK ] CheckTokenUseCaseIntegrationTest.EmptyTokenRequired_ReturnsEmptyAuthError (0 ms)
+1: [ RUN      ] CheckTokenUseCaseIntegrationTest.TokenWithWrongPrefix_ReturnsInvalidFormatError
+1: [       OK ] CheckTokenUseCaseIntegrationTest.TokenWithWrongPrefix_ReturnsInvalidFormatError (0 ms)
+1: [ RUN      ] CheckTokenUseCaseIntegrationTest.TokenWithSpaces_ReturnsInvalidFormatError
+1: [       OK ] CheckTokenUseCaseIntegrationTest.TokenWithSpaces_ReturnsInvalidFormatError (0 ms)
+1: [ RUN      ] CheckTokenUseCaseIntegrationTest.BearerWithoutToken_ReturnsVerifyError
+1: [       OK ] CheckTokenUseCaseIntegrationTest.BearerWithoutToken_ReturnsVerifyError (0 ms)
+1: [ RUN      ] CheckTokenUseCaseIntegrationTest.InvalidJwt_ReturnsVerifyError
+1: [       OK ] CheckTokenUseCaseIntegrationTest.InvalidJwt_ReturnsVerifyError (0 ms)
+1: [ RUN      ] CheckTokenUseCaseIntegrationTest.ValidJwtButUserNotExists_ReturnsInvalidUserError
+1: [       OK ] CheckTokenUseCaseIntegrationTest.ValidJwtButUserNotExists_ReturnsInvalidUserError (0 ms)
+1: [ RUN      ] CheckTokenUseCaseIntegrationTest.ValidTokenAndUserExists_ReturnsUserId
+1: [       OK ] CheckTokenUseCaseIntegrationTest.ValidTokenAndUserExists_ReturnsUserId (0 ms)
+1: [----------] 8 tests from CheckTokenUseCaseIntegrationTest (2 ms total)
+1: 
+1: [----------] 5 tests from DeleteUserUseCaseIntegrationTest
+1: [ RUN      ] DeleteUserUseCaseIntegrationTest.UserDeletesSelf
+1: [       OK ] DeleteUserUseCaseIntegrationTest.UserDeletesSelf (0 ms)
+1: [ RUN      ] DeleteUserUseCaseIntegrationTest.UserDeletesAnotherUser_ThrowsForbidden
+1: [       OK ] DeleteUserUseCaseIntegrationTest.UserDeletesAnotherUser_ThrowsForbidden (0 ms)
+1: [ RUN      ] DeleteUserUseCaseIntegrationTest.EmptyUsernameToDelete_ThrowsException
+1: [       OK ] DeleteUserUseCaseIntegrationTest.EmptyUsernameToDelete_ThrowsException (0 ms)
+1: [ RUN      ] DeleteUserUseCaseIntegrationTest.InvalidUsername_TooShort_ThrowsException
+1: [       OK ] DeleteUserUseCaseIntegrationTest.InvalidUsername_TooShort_ThrowsException (0 ms)
+1: [ RUN      ] DeleteUserUseCaseIntegrationTest.RepositoryThrowsException_ThrowsTemporaryUnavailable
+1: [       OK ] DeleteUserUseCaseIntegrationTest.RepositoryThrowsException_ThrowsTemporaryUnavailable (0 ms)
+1: [----------] 5 tests from DeleteUserUseCaseIntegrationTest (1 ms total)
+1: 
+1: [----------] 4 tests from GetProfileByNameUseCaseIntegrationTest
+1: [ RUN      ] GetProfileByNameUseCaseIntegrationTest.UserFound_ReturnsProfile
+1: [       OK ] GetProfileByNameUseCaseIntegrationTest.UserFound_ReturnsProfile (0 ms)
+1: [ RUN      ] GetProfileByNameUseCaseIntegrationTest.UserNotFound_ReturnsEmpty
+1: [       OK ] GetProfileByNameUseCaseIntegrationTest.UserNotFound_ReturnsEmpty (0 ms)
+1: [ RUN      ] GetProfileByNameUseCaseIntegrationTest.EmptyUsername_ThrowsOrReturnsEmpty
+1: [       OK ] GetProfileByNameUseCaseIntegrationTest.EmptyUsername_ThrowsOrReturnsEmpty (0 ms)
+1: [ RUN      ] GetProfileByNameUseCaseIntegrationTest.InvalidUsername_TooShort_ThrowsException
+1: [       OK ] GetProfileByNameUseCaseIntegrationTest.InvalidUsername_TooShort_ThrowsException (0 ms)
+1: [----------] 4 tests from GetProfileByNameUseCaseIntegrationTest (0 ms total)
+1: 
+1: [----------] 4 tests from LoginUseCaseIntegrationTest
+1: [ RUN      ] LoginUseCaseIntegrationTest.SuccessfulLogin
+1: [       OK ] LoginUseCaseIntegrationTest.SuccessfulLogin (0 ms)
+1: [ RUN      ] LoginUseCaseIntegrationTest.UserDoesNotExist
+1: [       OK ] LoginUseCaseIntegrationTest.UserDoesNotExist (0 ms)
+1: [ RUN      ] LoginUseCaseIntegrationTest.WrongPassword
+1: [       OK ] LoginUseCaseIntegrationTest.WrongPassword (0 ms)
+1: [ RUN      ] LoginUseCaseIntegrationTest.RepositoryError
+1: [       OK ] LoginUseCaseIntegrationTest.RepositoryError (0 ms)
+1: [----------] 4 tests from LoginUseCaseIntegrationTest (2 ms total)
+1: 
+1: [----------] 7 tests from RegistrationUseCaseIntegrationTest
+1: [ RUN      ] RegistrationUseCaseIntegrationTest.SuccessfulRegistration
+1: [       OK ] RegistrationUseCaseIntegrationTest.SuccessfulRegistration (0 ms)
+1: [ RUN      ] RegistrationUseCaseIntegrationTest.UserAlreadyExists
+1: [       OK ] RegistrationUseCaseIntegrationTest.UserAlreadyExists (0 ms)
+1: [ RUN      ] RegistrationUseCaseIntegrationTest.UuidCollisionWithSuccessfulRetry
+1: [       OK ] RegistrationUseCaseIntegrationTest.UuidCollisionWithSuccessfulRetry (1 ms)
+1: [ RUN      ] RegistrationUseCaseIntegrationTest.UuidCollisionMaxAttemptsExceeded
+1: [       OK ] RegistrationUseCaseIntegrationTest.UuidCollisionMaxAttemptsExceeded (1 ms)
+1: [ RUN      ] RegistrationUseCaseIntegrationTest.CompleteIntegrationFlow
+1: [       OK ] RegistrationUseCaseIntegrationTest.CompleteIntegrationFlow (0 ms)
+1: [ RUN      ] RegistrationUseCaseIntegrationTest.CorrectUserDataPassed
+1: [       OK ] RegistrationUseCaseIntegrationTest.CorrectUserDataPassed (0 ms)
+1: [ RUN      ] RegistrationUseCaseIntegrationTest.RepositoryError
+1: [       OK ] RegistrationUseCaseIntegrationTest.RepositoryError (0 ms)
+1: [----------] 7 tests from RegistrationUseCaseIntegrationTest (5 ms total)
+1: 
+1: [----------] 12 tests from UpdateUserUseCaseIntegrationTest
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.UserUpdatesSelfAllFields
+1: [       OK ] UpdateUserUseCaseIntegrationTest.UserUpdatesSelfAllFields (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.UserUpdatesSelfPartialFields
+1: [       OK ] UpdateUserUseCaseIntegrationTest.UserUpdatesSelfPartialFields (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.UserUpdatesAnotherUser_ThrowsForbidden
+1: [       OK ] UpdateUserUseCaseIntegrationTest.UserUpdatesAnotherUser_ThrowsForbidden (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.EmptyUsernameToUpdate_ThrowsException
+1: [       OK ] UpdateUserUseCaseIntegrationTest.EmptyUsernameToUpdate_ThrowsException (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.InvalidUsername_TooShort_ThrowsException
+1: [       OK ] UpdateUserUseCaseIntegrationTest.InvalidUsername_TooShort_ThrowsException (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.NewUsernameAlreadyExists_ThrowsException
+1: [       OK ] UpdateUserUseCaseIntegrationTest.NewUsernameAlreadyExists_ThrowsException (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.InvalidNewUsername_TooShort_ThrowsException
+1: [       OK ] UpdateUserUseCaseIntegrationTest.InvalidNewUsername_TooShort_ThrowsException (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.InvalidNewPassword_TooShort_ThrowsException
+1: [       OK ] UpdateUserUseCaseIntegrationTest.InvalidNewPassword_TooShort_ThrowsException (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.RepositoryThrowsException_ThrowsTemporaryUnavailable
+1: [       OK ] UpdateUserUseCaseIntegrationTest.RepositoryThrowsException_ThrowsTemporaryUnavailable (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.UserUpdatesPasswordOnly
+1: [       OK ] UpdateUserUseCaseIntegrationTest.UserUpdatesPasswordOnly (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.UserUpdatesPasswordOnlyError
+1: [       OK ] UpdateUserUseCaseIntegrationTest.UserUpdatesPasswordOnlyError (0 ms)
+1: [ RUN      ] UpdateUserUseCaseIntegrationTest.UserUpdatesUsernameOnly
+1: [       OK ] UpdateUserUseCaseIntegrationTest.UserUpdatesUsernameOnly (0 ms)
+1: [----------] 12 tests from UpdateUserUseCaseIntegrationTest (3 ms total)
+1: 
+1: [----------] 21 tests from MailboxTest
+1: [ RUN      ] MailboxTest.ValidConstruction
+1: [       OK ] MailboxTest.ValidConstruction (0 ms)
+1: [ RUN      ] MailboxTest.InvalidCounstructionNullQueue
+1: [       OK ] MailboxTest.InvalidCounstructionNullQueue (0 ms)
+1: [ RUN      ] MailboxTest.InvalidConstructionEmptyUserId
+1: [       OK ] MailboxTest.InvalidConstructionEmptyUserId (0 ms)
+1: [ RUN      ] MailboxTest.SendMessageSuccessOnFirstAttempt
+1: [       OK ] MailboxTest.SendMessageSuccessOnFirstAttempt (0 ms)
+1: [ RUN      ] MailboxTest.SendMessageSuccessOnSecondAttempt
+1: [       OK ] MailboxTest.SendMessageSuccessOnSecondAttempt (0 ms)
+1: [ RUN      ] MailboxTest.SendMessageFailedAfterMaxRetries
+1: [       OK ] MailboxTest.SendMessageFailedAfterMaxRetries (0 ms)
+1: [ RUN      ] MailboxTest.SendMessageCustomRetryAmount
+1: [       OK ] MailboxTest.SendMessageCustomRetryAmount (0 ms)
+1: [ RUN      ] MailboxTest.ValidScenarioSendAndReceive
+1: [       OK ] MailboxTest.ValidScenarioSendAndReceive (0 ms)
+1: [ RUN      ] MailboxTest.QueueFullResyncRequired
+1: [       OK ] MailboxTest.QueueFullResyncRequired (0 ms)
+1: [ RUN      ] MailboxTest.ResyncFlagClearedAfterFirstPoll
+1: [       OK ] MailboxTest.ResyncFlagClearedAfterFirstPoll (0 ms)
+1: [ RUN      ] MailboxTest.PollEmptyQueueWithTimeout
+1: [       OK ] MailboxTest.PollEmptyQueueWithTimeout (0 ms)
+1: [ RUN      ] MailboxTest.PollMultipleMessages
+1: [       OK ] MailboxTest.PollMultipleMessages (0 ms)
+1: [ RUN      ] MailboxTest.NoConsumerAfterIdleThreshold
+1: [       OK ] MailboxTest.NoConsumerAfterIdleThreshold (0 ms)
+1: [ RUN      ] MailboxTest.ConsumerActiveWithinThreshold
+1: [       OK ] MailboxTest.ConsumerActiveWithinThreshold (0 ms)
+1: [ RUN      ] MailboxTest.ExactThresholdBoundary
+1: [       OK ] MailboxTest.ExactThresholdBoundary (0 ms)
+1: [ RUN      ] MailboxTest.MultiplePolls
+1: [       OK ] MailboxTest.MultiplePolls (0 ms)
+1: [ RUN      ] MailboxTest.GetSizeReturnsQueueSize
+1: [       OK ] MailboxTest.GetSizeReturnsQueueSize (0 ms)
+1: [ RUN      ] MailboxTest.GetSizeReturnsZeroForEmpty
+1: [       OK ] MailboxTest.GetSizeReturnsZeroForEmpty (0 ms)
+1: [ RUN      ] MailboxTest.MultipleSendsAndSinglePoll
+1: [       OK ] MailboxTest.MultipleSendsAndSinglePoll (0 ms)
+1: [ RUN      ] MailboxTest.MixedSuccessAndFailure
+1: [       OK ] MailboxTest.MixedSuccessAndFailure (0 ms)
+1: [ RUN      ] MailboxTest.ConsumerActivityTracking
+1: [       OK ] MailboxTest.ConsumerActivityTracking (0 ms)
+1: [----------] 21 tests from MailboxTest (6 ms total)
+1: 
+1: [----------] 58 tests from TMessageTextTest
+1: [ RUN      ] TMessageTextTest.ValidSimpleMessage
+1: [       OK ] TMessageTextTest.ValidSimpleMessage (0 ms)
+1: [ RUN      ] TMessageTextTest.ValidMessageWithNewlines
+1: [       OK ] TMessageTextTest.ValidMessageWithNewlines (0 ms)
+1: [ RUN      ] TMessageTextTest.ValidMessageWithTabs
+1: [       OK ] TMessageTextTest.ValidMessageWithTabs (0 ms)
+1: [ RUN      ] TMessageTextTest.SingleCharacter
+1: [       OK ] TMessageTextTest.SingleCharacter (0 ms)
+1: [ RUN      ] TMessageTextTest.TrimLeadingWhitespace
+1: [       OK ] TMessageTextTest.TrimLeadingWhitespace (0 ms)
+1: [ RUN      ] TMessageTextTest.TrimTrailingWhitespace
+1: [       OK ] TMessageTextTest.TrimTrailingWhitespace (0 ms)
+1: [ RUN      ] TMessageTextTest.TrimBothSides
+1: [       OK ] TMessageTextTest.TrimBothSides (0 ms)
+1: [ RUN      ] TMessageTextTest.TrimWithNewlines
+1: [       OK ] TMessageTextTest.TrimWithNewlines (0 ms)
+1: [ RUN      ] TMessageTextTest.InternalWhitespacePreserved
+1: [       OK ] TMessageTextTest.InternalWhitespacePreserved (0 ms)
+1: [ RUN      ] TMessageTextTest.EmptyStringThrows
+1: [       OK ] TMessageTextTest.EmptyStringThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.OnlyWhitespaceThrows
+1: [       OK ] TMessageTextTest.OnlyWhitespaceThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.OnlyNewlinesThrows
+1: [       OK ] TMessageTextTest.OnlyNewlinesThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.OnlyTabsThrows
+1: [       OK ] TMessageTextTest.OnlyTabsThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.MixedWhitespaceThrows
+1: [       OK ] TMessageTextTest.MixedWhitespaceThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.CyrillicText
+1: [       OK ] TMessageTextTest.CyrillicText (0 ms)
+1: [ RUN      ] TMessageTextTest.ChineseText
+1: [       OK ] TMessageTextTest.ChineseText (0 ms)
+1: [ RUN      ] TMessageTextTest.ArabicText
+1: [       OK ] TMessageTextTest.ArabicText (0 ms)
+1: [ RUN      ] TMessageTextTest.JapaneseText
+1: [       OK ] TMessageTextTest.JapaneseText (0 ms)
+1: [ RUN      ] TMessageTextTest.EmojiSimple
+1: [       OK ] TMessageTextTest.EmojiSimple (0 ms)
+1: [ RUN      ] TMessageTextTest.MultipleEmojis
+1: [       OK ] TMessageTextTest.MultipleEmojis (0 ms)
+1: [ RUN      ] TMessageTextTest.ComplexEmoji
+1: [       OK ] TMessageTextTest.ComplexEmoji (0 ms)
+1: [ RUN      ] TMessageTextTest.MixedLanguages
+1: [       OK ] TMessageTextTest.MixedLanguages (0 ms)
+1: [ RUN      ] TMessageTextTest.SpecialUnicodeCharacters
+1: [       OK ] TMessageTextTest.SpecialUnicodeCharacters (0 ms)
+1: [ RUN      ] TMessageTextTest.MathematicalSymbols
+1: [       OK ] TMessageTextTest.MathematicalSymbols (0 ms)
+1: [ RUN      ] TMessageTextTest.NullCharacterThrows
+1: [       OK ] TMessageTextTest.NullCharacterThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.BellCharacterThrows
+1: [       OK ] TMessageTextTest.BellCharacterThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.BackspaceThrows
+1: [       OK ] TMessageTextTest.BackspaceThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.EscapeCharacterThrows
+1: [       OK ] TMessageTextTest.EscapeCharacterThrows (0 ms)
+1: [ RUN      ] TMessageTextTest.MultipleControlCharactersThrow
+1: [       OK ] TMessageTextTest.MultipleControlCharactersThrow (0 ms)
+1: [ RUN      ] TMessageTextTest.MaxLengthASCII
+1: [       OK ] TMessageTextTest.MaxLengthASCII (0 ms)
+1: [ RUN      ] TMessageTextTest.ExceedMaxLengthASCII
+1: [       OK ] TMessageTextTest.ExceedMaxLengthASCII (0 ms)
+1: [ RUN      ] TMessageTextTest.MaxLengthCyrillic
+1: [       OK ] TMessageTextTest.MaxLengthCyrillic (1 ms)
+1: [ RUN      ] TMessageTextTest.ExceedMaxLengthCyrillic
+1: [       OK ] TMessageTextTest.ExceedMaxLengthCyrillic (1 ms)
+1: [ RUN      ] TMessageTextTest.MaxLengthChinese
+1: [       OK ] TMessageTextTest.MaxLengthChinese (1 ms)
+1: [ RUN      ] TMessageTextTest.MaxLengthEmojis
+1: [       OK ] TMessageTextTest.MaxLengthEmojis (1 ms)
+1: [ RUN      ] TMessageTextTest.ExceedMaxBytesButValidChars
+1: [       OK ] TMessageTextTest.ExceedMaxBytesButValidChars (0 ms)
+1: [ RUN      ] TMessageTextTest.ExactlyMaxBytes
+1: [       OK ] TMessageTextTest.ExactlyMaxBytes (1 ms)
+1: [ RUN      ] TMessageTextTest.ExceedMaxBytes
+1: [       OK ] TMessageTextTest.ExceedMaxBytes (0 ms)
+1: [ RUN      ] TMessageTextTest.MixedCharacterSizes
+1: [       OK ] TMessageTextTest.MixedCharacterSizes (3 ms)
+1: [ RUN      ] TMessageTextTest.AllowedControlCharactersOnly
+1: [       OK ] TMessageTextTest.AllowedControlCharactersOnly (0 ms)
+1: [ RUN      ] TMessageTextTest.EdgeCase4096Characters
+1: [       OK ] TMessageTextTest.EdgeCase4096Characters (0 ms)
+1: [ RUN      ] TMessageTextTest.EdgeCase4097Characters
+1: [       OK ] TMessageTextTest.EdgeCase4097Characters (0 ms)
+1: [ RUN      ] TMessageTextTest.ExceptionFieldName
+1: [       OK ] TMessageTextTest.ExceptionFieldName (0 ms)
+1: [ RUN      ] TMessageTextTest.ExceptionMessageForEmpty
+1: [       OK ] TMessageTextTest.ExceptionMessageForEmpty (0 ms)
+1: [ RUN      ] TMessageTextTest.ExceptionMessageForTooLong
+1: [       OK ] TMessageTextTest.ExceptionMessageForTooLong (0 ms)
+1: [ RUN      ] TMessageTextTest.ExceptionMessageForControlChars
+1: [       OK ] TMessageTextTest.ExceptionMessageForControlChars (0 ms)
+1: [ RUN      ] TMessageTextTest.OnlySpacesInMiddle
+1: [       OK ] TMessageTextTest.OnlySpacesInMiddle (0 ms)
+1: [ RUN      ] TMessageTextTest.RepeatedEmojis
+1: [       OK ] TMessageTextTest.RepeatedEmojis (0 ms)
+1: [ RUN      ] TMessageTextTest.ZeroWidthCharacters
+1: [       OK ] TMessageTextTest.ZeroWidthCharacters (0 ms)
+1: [ RUN      ] TMessageTextTest.RightToLeftMarks
+1: [       OK ] TMessageTextTest.RightToLeftMarks (0 ms)
+1: [ RUN      ] TMessageTextTest.CombiningDiacritics
+1: [       OK ] TMessageTextTest.CombiningDiacritics (0 ms)
+1: [ RUN      ] TMessageTextTest.SurrogatePairsInEmojis
+1: [       OK ] TMessageTextTest.SurrogatePairsInEmojis (0 ms)
+1: [ RUN      ] TMessageTextTest.UTF8CountingAscii
+1: [       OK ] TMessageTextTest.UTF8CountingAscii (0 ms)
+1: [ RUN      ] TMessageTextTest.UTF8CountingMultibyte
+1: [       OK ] TMessageTextTest.UTF8CountingMultibyte (0 ms)
+1: [ RUN      ] TMessageTextTest.ContinuationBytesNotCountedAsChars
+1: [       OK ] TMessageTextTest.ContinuationBytesNotCountedAsChars (0 ms)
+1: [ RUN      ] TMessageTextTest.NoMemoryLeakOnException
+1: [       OK ] TMessageTextTest.NoMemoryLeakOnException (52 ms)
+1: [ RUN      ] TMessageTextTest.MoveSemantics
+1: [       OK ] TMessageTextTest.MoveSemantics (0 ms)
+1: [ RUN      ] TMessageTextTest.LargeValidMessage
+1: [       OK ] TMessageTextTest.LargeValidMessage (0 ms)
+1: [----------] 58 tests from TMessageTextTest (74 ms total)
+1: 
+1: [----------] 11 tests from UserTest
+1: [ RUN      ] UserTest.CreateNewUser
+1: [       OK ] UserTest.CreateNewUser (0 ms)
+1: [ RUN      ] UserTest.RestoreUser
+1: [       OK ] UserTest.RestoreUser (0 ms)
+1: [ RUN      ] UserTest.UpdateDisplayName
+1: [       OK ] UserTest.UpdateDisplayName (0 ms)
+1: [ RUN      ] UserTest.UpdateBiography
+1: [       OK ] UserTest.UpdateBiography (0 ms)
+1: [ RUN      ] UserTest.UpdateUsername
+1: [       OK ] UserTest.UpdateUsername (0 ms)
+1: [ RUN      ] UserTest.UpdatePassword
+1: [       OK ] UserTest.UpdatePassword (0 ms)
+1: [ RUN      ] UserTest.EqualityOperator
+1: [       OK ] UserTest.EqualityOperator (0 ms)
+1: [ RUN      ] UserTest.InequalityOperator
+1: [       OK ] UserTest.InequalityOperator (0 ms)
+1: [ RUN      ] UserTest.GettersReturnCorrectValues
+1: [       OK ] UserTest.GettersReturnCorrectValues (0 ms)
+1: [ RUN      ] UserTest.IdIsImmutable
+1: [       OK ] UserTest.IdIsImmutable (0 ms)
+1: [ RUN      ] UserTest.MultipleUpdates
+1: [       OK ] UserTest.MultipleUpdates (0 ms)
+1: [----------] 11 tests from UserTest (1 ms total)
+1: 
+1: [----------] 24 tests from TBiographyTest
+1: [ RUN      ] TBiographyTest.ValidBiographies
+1: [       OK ] TBiographyTest.ValidBiographies (0 ms)
+1: [ RUN      ] TBiographyTest.ValidUtf8Biographies
+1: [       OK ] TBiographyTest.ValidUtf8Biographies (0 ms)
+1: [ RUN      ] TBiographyTest.InvalidUtf8
+1: [       OK ] TBiographyTest.InvalidUtf8 (0 ms)
+1: [ RUN      ] TBiographyTest.TooLong
+1: [       OK ] TBiographyTest.TooLong (0 ms)
+1: [ RUN      ] TBiographyTest.TooLongUtf8
+1: [       OK ] TBiographyTest.TooLongUtf8 (0 ms)
+1: [ RUN      ] TBiographyTest.Utf8LengthCalculation
+1: [       OK ] TBiographyTest.Utf8LengthCalculation (0 ms)
+1: [ RUN      ] TBiographyTest.MaxLengthBoundary
+1: [       OK ] TBiographyTest.MaxLengthBoundary (0 ms)
+1: [ RUN      ] TBiographyTest.MaxLengthBoundaryUtf8
+1: [       OK ] TBiographyTest.MaxLengthBoundaryUtf8 (0 ms)
+1: [ RUN      ] TBiographyTest.EmptyIsValid
+1: [       OK ] TBiographyTest.EmptyIsValid (0 ms)
+1: [ RUN      ] TBiographyTest.OnlyWhitespace
+1: [       OK ] TBiographyTest.OnlyWhitespace (0 ms)
+1: [ RUN      ] TBiographyTest.WhitespaceWithUtf8
+1: [       OK ] TBiographyTest.WhitespaceWithUtf8 (0 ms)
+1: [ RUN      ] TBiographyTest.InvalidControlCharacters
+1: [       OK ] TBiographyTest.InvalidControlCharacters (0 ms)
+1: [ RUN      ] TBiographyTest.AllowedControlCharacters
+1: [       OK ] TBiographyTest.AllowedControlCharacters (0 ms)
+1: [ RUN      ] TBiographyTest.TooManyConsecutiveNewlines
+1: [       OK ] TBiographyTest.TooManyConsecutiveNewlines (0 ms)
+1: [ RUN      ] TBiographyTest.ExactlyThreeConsecutiveNewlines
+1: [       OK ] TBiographyTest.ExactlyThreeConsecutiveNewlines (0 ms)
+1: [ RUN      ] TBiographyTest.ConsecutiveNewlinesWithCarriageReturn
+1: [       OK ] TBiographyTest.ConsecutiveNewlinesWithCarriageReturn (0 ms)
+1: [ RUN      ] TBiographyTest.StartsOrEndsWithNewline
+1: [       OK ] TBiographyTest.StartsOrEndsWithNewline (0 ms)
+1: [ RUN      ] TBiographyTest.MixedNewlinesAndWhitespace
+1: [       OK ] TBiographyTest.MixedNewlinesAndWhitespace (0 ms)
+1: [ RUN      ] TBiographyTest.ValueAccess
+1: [       OK ] TBiographyTest.ValueAccess (0 ms)
+1: [ RUN      ] TBiographyTest.ValueAccessUtf8
+1: [       OK ] TBiographyTest.ValueAccessUtf8 (0 ms)
+1: [ RUN      ] TBiographyTest.Equality
+1: [       OK ] TBiographyTest.Equality (0 ms)
+1: [ RUN      ] TBiographyTest.EqualityUtf8
+1: [       OK ] TBiographyTest.EqualityUtf8 (0 ms)
+1: [ RUN      ] TBiographyTest.EqualityAfterTrim
+1: [       OK ] TBiographyTest.EqualityAfterTrim (0 ms)
+1: [ RUN      ] TBiographyTest.ComplexUtf8Biography
+1: [       OK ] TBiographyTest.ComplexUtf8Biography (0 ms)
+1: [----------] 24 tests from TBiographyTest (3 ms total)
+1: 
+1: [----------] 28 tests from TDisplayNameTest
+1: [ RUN      ] TDisplayNameTest.ValidNames
+1: [       OK ] TDisplayNameTest.ValidNames (0 ms)
+1: [ RUN      ] TDisplayNameTest.TooShort
+1: [       OK ] TDisplayNameTest.TooShort (0 ms)
+1: [ RUN      ] TDisplayNameTest.TooLong
+1: [       OK ] TDisplayNameTest.TooLong (0 ms)
+1: [ RUN      ] TDisplayNameTest.OnlyWhitespace
+1: [       OK ] TDisplayNameTest.OnlyWhitespace (0 ms)
+1: [ RUN      ] TDisplayNameTest.InvalidCharacters
+1: [       OK ] TDisplayNameTest.InvalidCharacters (2 ms)
+1: [ RUN      ] TDisplayNameTest.LeadingOrTrailingWhitespace
+1: [       OK ] TDisplayNameTest.LeadingOrTrailingWhitespace (0 ms)
+1: [ RUN      ] TDisplayNameTest.ConsecutiveSpaces
+1: [       OK ] TDisplayNameTest.ConsecutiveSpaces (0 ms)
+1: [ RUN      ] TDisplayNameTest.CyrillicCharacters
+1: [       OK ] TDisplayNameTest.CyrillicCharacters (0 ms)
+1: [ RUN      ] TDisplayNameTest.MixedLatinCyrillic
+1: [       OK ] TDisplayNameTest.MixedLatinCyrillic (0 ms)
+1: [ RUN      ] TDisplayNameTest.OtherScripts
+1: [       OK ] TDisplayNameTest.OtherScripts (0 ms)
+1: [ RUN      ] TDisplayNameTest.Emoji
+1: [       OK ] TDisplayNameTest.Emoji (0 ms)
+1: [ RUN      ] TDisplayNameTest.Utf8LengthValidation
+1: [       OK ] TDisplayNameTest.Utf8LengthValidation (0 ms)
+1: [ RUN      ] TDisplayNameTest.InvalidUtf8
+1: [       OK ] TDisplayNameTest.InvalidUtf8 (0 ms)
+1: [ RUN      ] TDisplayNameTest.ControlCharactersAtEdges
+1: [       OK ] TDisplayNameTest.ControlCharactersAtEdges (0 ms)
+1: [ RUN      ] TDisplayNameTest.ControlCharactersInside
+1: [       OK ] TDisplayNameTest.ControlCharactersInside (0 ms)
+1: [ RUN      ] TDisplayNameTest.OtherControlCharacters
+1: [       OK ] TDisplayNameTest.OtherControlCharacters (0 ms)
+1: [ RUN      ] TDisplayNameTest.ExactMinLength
+1: [       OK ] TDisplayNameTest.ExactMinLength (0 ms)
+1: [ RUN      ] TDisplayNameTest.ExactMaxLength
+1: [       OK ] TDisplayNameTest.ExactMaxLength (0 ms)
+1: [ RUN      ] TDisplayNameTest.WhitespaceAfterTrimBecomesTooShort
+1: [       OK ] TDisplayNameTest.WhitespaceAfterTrimBecomesTooShort (0 ms)
+1: [ RUN      ] TDisplayNameTest.WhitespaceAfterTrimBecomesTooLong
+1: [       OK ] TDisplayNameTest.WhitespaceAfterTrimBecomesTooLong (0 ms)
+1: [ RUN      ] TDisplayNameTest.MultipleConsecutiveSpaces
+1: [       OK ] TDisplayNameTest.MultipleConsecutiveSpaces (0 ms)
+1: [ RUN      ] TDisplayNameTest.MixedWhitespaceTypes
+1: [       OK ] TDisplayNameTest.MixedWhitespaceTypes (0 ms)
+1: [ RUN      ] TDisplayNameTest.ZeroWidthCharacters
+1: [       OK ] TDisplayNameTest.ZeroWidthCharacters (0 ms)
+1: [ RUN      ] TDisplayNameTest.ValueAccess
+1: [       OK ] TDisplayNameTest.ValueAccess (0 ms)
+1: [ RUN      ] TDisplayNameTest.Equality
+1: [       OK ] TDisplayNameTest.Equality (0 ms)
+1: [ RUN      ] TDisplayNameTest.EqualityWithTrimming
+1: [       OK ] TDisplayNameTest.EqualityWithTrimming (0 ms)
+1: [ RUN      ] TDisplayNameTest.ComplexValidNames
+1: [       OK ] TDisplayNameTest.ComplexValidNames (0 ms)
+1: [ RUN      ] TDisplayNameTest.RealWorldExamples
+1: [       OK ] TDisplayNameTest.RealWorldExamples (0 ms)
+1: [----------] 28 tests from TDisplayNameTest (7 ms total)
+1: 
+1: [----------] 11 tests from TRawPasswordTest
+1: [ RUN      ] TRawPasswordTest.ValidPassword
+1: [       OK ] TRawPasswordTest.ValidPassword (0 ms)
+1: [ RUN      ] TRawPasswordTest.TooShort
+1: [       OK ] TRawPasswordTest.TooShort (0 ms)
+1: [ RUN      ] TRawPasswordTest.TooLong
+1: [       OK ] TRawPasswordTest.TooLong (0 ms)
+1: [ RUN      ] TRawPasswordTest.NoDigit
+1: [       OK ] TRawPasswordTest.NoDigit (0 ms)
+1: [ RUN      ] TRawPasswordTest.NoLetter
+1: [       OK ] TRawPasswordTest.NoLetter (0 ms)
+1: [ RUN      ] TRawPasswordTest.NoUppercase
+1: [       OK ] TRawPasswordTest.NoUppercase (0 ms)
+1: [ RUN      ] TRawPasswordTest.NoLowercase
+1: [       OK ] TRawPasswordTest.NoLowercase (0 ms)
+1: [ RUN      ] TRawPasswordTest.ContainsWhitespace
+1: [       OK ] TRawPasswordTest.ContainsWhitespace (0 ms)
+1: [ RUN      ] TRawPasswordTest.NonASCII
+1: [       OK ] TRawPasswordTest.NonASCII (0 ms)
+1: [ RUN      ] TRawPasswordTest.ValueAccess
+1: [       OK ] TRawPasswordTest.ValueAccess (0 ms)
+1: [ RUN      ] TRawPasswordTest.Equality
+1: [       OK ] TRawPasswordTest.Equality (0 ms)
+1: [----------] 11 tests from TRawPasswordTest (1 ms total)
+1: 
+1: [----------] 16 tests from TUsername
+1: [ RUN      ] TUsername.ValidUsername_Simple
+1: [       OK ] TUsername.ValidUsername_Simple (0 ms)
+1: [ RUN      ] TUsername.ValidUsername_MinLength
+1: [       OK ] TUsername.ValidUsername_MinLength (0 ms)
+1: [ RUN      ] TUsername.ValidUsername_MaxLength
+1: [       OK ] TUsername.ValidUsername_MaxLength (0 ms)
+1: [ RUN      ] TUsername.ValidUsername_MixedCase
+1: [       OK ] TUsername.ValidUsername_MixedCase (0 ms)
+1: [ RUN      ] TUsername.ValidUsername_WithSingleSpecialChars
+1: [       OK ] TUsername.ValidUsername_WithSingleSpecialChars (0 ms)
+1: [ RUN      ] TUsername.InvalidUsername_TooShort
+1: [       OK ] TUsername.InvalidUsername_TooShort (0 ms)
+1: [ RUN      ] TUsername.InvalidUsername_TooLong
+1: [       OK ] TUsername.InvalidUsername_TooLong (0 ms)
+1: [ RUN      ] TUsername.InvalidUsername_StartsWithDigit
+1: [       OK ] TUsername.InvalidUsername_StartsWithDigit (0 ms)
+1: [ RUN      ] TUsername.InvalidUsername_ConsecutiveSpecialChars
+1: [       OK ] TUsername.InvalidUsername_ConsecutiveSpecialChars (0 ms)
+1: [ RUN      ] TUsername.InvalidUsername_InvalidCharacters
+1: [       OK ] TUsername.InvalidUsername_InvalidCharacters (0 ms)
+1: [ RUN      ] TUsername.UsernameNotCaseSensitive
+1: [       OK ] TUsername.UsernameNotCaseSensitive (0 ms)
+1: [ RUN      ] TUsername.EdgeCase_OnlyLetters
+1: [       OK ] TUsername.EdgeCase_OnlyLetters (0 ms)
+1: [ RUN      ] TUsername.EdgeCase_OnlyNumbers_ExceptFirst
+1: [       OK ] TUsername.EdgeCase_OnlyNumbers_ExceptFirst (0 ms)
+1: [ RUN      ] TUsername.EdgeCase_AllAllowedChars
+1: [       OK ] TUsername.EdgeCase_AllAllowedChars (0 ms)
+1: [ RUN      ] TUsername.EdgeCase_SpecialCharAtEnd
+1: [       OK ] TUsername.EdgeCase_SpecialCharAtEnd (0 ms)
+1: [ RUN      ] TUsername.Value_ReturnsConstReference
+1: [       OK ] TUsername.Value_ReturnsConstReference (0 ms)
+1: [----------] 16 tests from TUsername (2 ms total)
+1: 
+1: [----------] 22 tests from AuthServiceImplTest
+1: [ RUN      ] AuthServiceImplTest.HashPasswordReturnsNonEmptyHash
+1: [       OK ] AuthServiceImplTest.HashPasswordReturnsNonEmptyHash (0 ms)
+1: [ RUN      ] AuthServiceImplTest.HashPasswordReturnsSaltOfCorrectLength
+1: [       OK ] AuthServiceImplTest.HashPasswordReturnsSaltOfCorrectLength (0 ms)
+1: [ RUN      ] AuthServiceImplTest.HashPasswordGeneratesDifferentHashesForSamePassword
+1: [       OK ] AuthServiceImplTest.HashPasswordGeneratesDifferentHashesForSamePassword (0 ms)
+1: [ RUN      ] AuthServiceImplTest.HashPasswordHandlesEmptyPassword
+1: [       OK ] AuthServiceImplTest.HashPasswordHandlesEmptyPassword (0 ms)
+1: [ RUN      ] AuthServiceImplTest.HashPasswordHandlesLongPassword
+1: [       OK ] AuthServiceImplTest.HashPasswordHandlesLongPassword (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CheckPasswordReturnsTrueForCorrectPassword
+1: [       OK ] AuthServiceImplTest.CheckPasswordReturnsTrueForCorrectPassword (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CheckPasswordReturnsFalseForWrongPassword
+1: [       OK ] AuthServiceImplTest.CheckPasswordReturnsFalseForWrongPassword (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CheckPasswordReturnsFalseForWrongHash
+1: [       OK ] AuthServiceImplTest.CheckPasswordReturnsFalseForWrongHash (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CheckPasswordReturnsFalseForWrongSalt
+1: [       OK ] AuthServiceImplTest.CheckPasswordReturnsFalseForWrongSalt (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CheckPasswordIsCaseSensitive
+1: [       OK ] AuthServiceImplTest.CheckPasswordIsCaseSensitive (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CheckPasswordWithEmptyPassword
+1: [       OK ] AuthServiceImplTest.CheckPasswordWithEmptyPassword (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CreateJwtReturnsNonEmptyString
+1: [       OK ] AuthServiceImplTest.CreateJwtReturnsNonEmptyString (3 ms)
+1: [ RUN      ] AuthServiceImplTest.CreateJwtReturnsValidJwtFormat
+1: [       OK ] AuthServiceImplTest.CreateJwtReturnsValidJwtFormat (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CreateJwtGeneratesDifferentTokensForSameUser
+1: [       OK ] AuthServiceImplTest.CreateJwtGeneratesDifferentTokensForSameUser (0 ms)
+1: [ RUN      ] AuthServiceImplTest.CreateJwtWorksWithDifferentUserIds
+1: [       OK ] AuthServiceImplTest.CreateJwtWorksWithDifferentUserIds (0 ms)
+1: [ RUN      ] AuthServiceImplTest.DecodeJwtReturnsOriginalUserIdForValidToken
+1: [       OK ] AuthServiceImplTest.DecodeJwtReturnsOriginalUserIdForValidToken (0 ms)
+1: [ RUN      ] AuthServiceImplTest.DecodeJwtReturnsNulloptForInvalidToken
+1: JWT Error: Invalid input: too much fill
+1: [       OK ] AuthServiceImplTest.DecodeJwtReturnsNulloptForInvalidToken (0 ms)
+1: [ RUN      ] AuthServiceImplTest.DecodeJwtReturnsNulloptForEmptyToken
+1: JWT Error: invalid token supplied
+1: [       OK ] AuthServiceImplTest.DecodeJwtReturnsNulloptForEmptyToken (0 ms)
+1: [ RUN      ] AuthServiceImplTest.DecodeJwtReturnsNulloptForMalformedToken
+1: JWT Error: Invalid input: too much fill
+1: [       OK ] AuthServiceImplTest.DecodeJwtReturnsNulloptForMalformedToken (0 ms)
+1: [ RUN      ] AuthServiceImplTest.DecodeJwtRoundtripMultipleUsers
+1: [       OK ] AuthServiceImplTest.DecodeJwtRoundtripMultipleUsers (2 ms)
+1: [ RUN      ] AuthServiceImplTest.FullAuthenticationFlow
+1: [       OK ] AuthServiceImplTest.FullAuthenticationFlow (0 ms)
+1: [ RUN      ] AuthServiceImplTest.TokenValidationAfterFailedPasswordCheck
+1: [       OK ] AuthServiceImplTest.TokenValidationAfterFailedPasswordCheck (0 ms)
+1: [----------] 22 tests from AuthServiceImplTest (12 ms total)
+1: 
+1: [----------] 15 tests from VyukovMessageQueue
+1: [ RUN      ] VyukovMessageQueue.BasicPushPop
+1: ==111936==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
+1: [       OK ] VyukovMessageQueue.BasicPushPop (13 ms)
+1: [ RUN      ] VyukovMessageQueue.PushToFullQueue
+1: [       OK ] VyukovMessageQueue.PushToFullQueue (17 ms)
+1: [ RUN      ] VyukovMessageQueue.PopBatchTimeout
+1: [       OK ] VyukovMessageQueue.PopBatchTimeout (1019 ms)
+1: [ RUN      ] VyukovMessageQueue.PopBatchDelayedMessage
+1: [       OK ] VyukovMessageQueue.PopBatchDelayedMessage (120 ms)
+1: [ RUN      ] VyukovMessageQueue.PopBatchMultipleMessages
+1: [       OK ] VyukovMessageQueue.PopBatchMultipleMessages (19 ms)
+1: [ RUN      ] VyukovMessageQueue.PopBatchWithLimit
+1: [       OK ] VyukovMessageQueue.PopBatchWithLimit (20 ms)
+1: [ RUN      ] VyukovMessageQueue.GetSizeApproximate
+1: [       OK ] VyukovMessageQueue.GetSizeApproximate (10 ms)
+1: [ RUN      ] VyukovMessageQueue.SetGetMaxSize
+1: [       OK ] VyukovMessageQueue.SetGetMaxSize (18 ms)
+1: [ RUN      ] VyukovMessageQueue.PopBatchSizeZero
+1: [       OK ] VyukovMessageQueue.PopBatchSizeZero (18 ms)
+1: [ RUN      ] VyukovMessageQueue.PopBatchSizeOne
+1: [       OK ] VyukovMessageQueue.PopBatchSizeOne (19 ms)
+1: [ RUN      ] VyukovMessageQueue.EmptyQueueReturnsEmptyBatch
+1: [       OK ] VyukovMessageQueue.EmptyQueueReturnsEmptyBatch (19 ms)
+1: [ RUN      ] VyukovMessageQueue.MoveSemantics
+1: [       OK ] VyukovMessageQueue.MoveSemantics (13 ms)
+1: [ RUN      ] VyukovMessageQueue.MultiProducerSingleConsumer
+1: [       OK ] VyukovMessageQueue.MultiProducerSingleConsumer (33 ms)
+1: [ RUN      ] VyukovMessageQueue.ConcurrentPushPop
+1: [       OK ] VyukovMessageQueue.ConcurrentPushPop (122 ms)
+1: [ RUN      ] VyukovMessageQueue.MultipleBatchesExhaustQueue
+1: [       OK ] VyukovMessageQueue.MultipleBatchesExhaustQueue (32 ms)
+1: [----------] 15 tests from VyukovMessageQueue (1500 ms total)
+1: 
+1: [----------] 28 tests from ShardedMap
+1: [ RUN      ] ShardedMap.ConstructionPowerOfTwo
+1: [       OK ] ShardedMap.ConstructionPowerOfTwo (24 ms)
+1: [ RUN      ] ShardedMap.ConstructionNotPowerOfTwo
+1: [       OK ] ShardedMap.ConstructionNotPowerOfTwo (21 ms)
+1: [ RUN      ] ShardedMap.ConstructionZero
+1: [       OK ] ShardedMap.ConstructionZero (18 ms)
+1: [ RUN      ] ShardedMap.PutValid
+1: [       OK ] ShardedMap.PutValid (18 ms)
+1: [ RUN      ] ShardedMap.PutSameKeyMultipleTimes
+1: [       OK ] ShardedMap.PutSameKeyMultipleTimes (19 ms)
+1: [ RUN      ] ShardedMap.GetNonExistent
+1: [       OK ] ShardedMap.GetNonExistent (18 ms)
+1: [ RUN      ] ShardedMap.GetAfterPut
+1: [       OK ] ShardedMap.GetAfterPut (20 ms)
+1: [ RUN      ] ShardedMap.GetMultipleKeys
+1: [       OK ] ShardedMap.GetMultipleKeys (21 ms)
+1: [ RUN      ] ShardedMap.RemoveExisting
+1: [       OK ] ShardedMap.RemoveExisting (18 ms)
+1: [ RUN      ] ShardedMap.RemoveNonExistent
+1: [       OK ] ShardedMap.RemoveNonExistent (19 ms)
+1: [ RUN      ] ShardedMap.RemoveAlreadyRemoved
+1: [       OK ] ShardedMap.RemoveAlreadyRemoved (19 ms)
+1: [ RUN      ] ShardedMap.CleanupBasic
+1: [       OK ] ShardedMap.CleanupBasic (22 ms)
+1: [ RUN      ] ShardedMap.CleanupWithMetrics
+1: [       OK ] ShardedMap.CleanupWithMetrics (23 ms)
+1: [ RUN      ] ShardedMap.CleanupEmpty
+1: [       OK ] ShardedMap.CleanupEmpty (21 ms)
+1: [ RUN      ] ShardedMap.CleanupWithDelay
+1: [       OK ] ShardedMap.CleanupWithDelay (59 ms)
+1: [ RUN      ] ShardedMap.GetOrCreateNew
+1: [       OK ] ShardedMap.GetOrCreateNew (9 ms)
+1: [ RUN      ] ShardedMap.GetOrCreateExisting
+1: [       OK ] ShardedMap.GetOrCreateExisting (7 ms)
+1: [ RUN      ] ShardedMap.GetOrCreateFactoryCalledOnce
+1: [       OK ] ShardedMap.GetOrCreateFactoryCalledOnce (10 ms)
+1: [ RUN      ] ShardedMap.GetOrCreateMultipleKeys
+1: [       OK ] ShardedMap.GetOrCreateMultipleKeys (15 ms)
+1: [ RUN      ] ShardedMap.ConcurrentGets
+1: [       OK ] ShardedMap.ConcurrentGets (1516 ms)
+1: [ RUN      ] ShardedMap.ConcurrentPutsAndGets
+1: [       OK ] ShardedMap.ConcurrentPutsAndGets (307 ms)
+1: [ RUN      ] ShardedMap.ConcurrentPutsRemovesGets
+1: [       OK ] ShardedMap.ConcurrentPutsRemovesGets (26 ms)
+1: [ RUN      ] ShardedMap.RealisticWorkload
+1: [       OK ] ShardedMap.RealisticWorkload (478 ms)
+1: [ RUN      ] ShardedMap.CleanupDuringReads
+1: [       OK ] ShardedMap.CleanupDuringReads (112 ms)
+1: [ RUN      ] ShardedMap.StressTest
+1: [       OK ] ShardedMap.StressTest (77 ms)
+1: [ RUN      ] ShardedMap.GetOrCreateConcurrent
+1: [       OK ] ShardedMap.GetOrCreateConcurrent (18 ms)
+1: [ RUN      ] ShardedMap.GetOrCreateRaceCondition
+1: [       OK ] ShardedMap.GetOrCreateRaceCondition (29 ms)
+1: [ RUN      ] ShardedMap.GetOrCreateWithGetAndPut
+1: [       OK ] ShardedMap.GetOrCreateWithGetAndPut (33 ms)
+1: [----------] 28 tests from ShardedMap (2993 ms total)
+1: 
+1: [----------] 5 tests from LimiterWrapperTest
+1: [ RUN      ] LimiterWrapperTest.DefaultConstructor
+1: [       OK ] LimiterWrapperTest.DefaultConstructor (14 ms)
+1: [ RUN      ] LimiterWrapperTest.RateLimitEnforcement
+1: [       OK ] LimiterWrapperTest.RateLimitEnforcement (7 ms)
+1: [ RUN      ] LimiterWrapperTest.TokenRefill
+1: [       OK ] LimiterWrapperTest.TokenRefill (3 ms)
+1: [ RUN      ] LimiterWrapperTest.LastAccessUpdate
+1: [       OK ] LimiterWrapperTest.LastAccessUpdate (6 ms)
+1: [ RUN      ] LimiterWrapperTest.MultipleRefills
+1: [       OK ] LimiterWrapperTest.MultipleRefills (14 ms)
+1: [----------] 5 tests from LimiterWrapperTest (47 ms total)
+1: 
+1: [----------] 15 tests from SendLimiterTest
+1: [ RUN      ] SendLimiterTest.InitialState
+1: [       OK ] SendLimiterTest.InitialState (4 ms)
+1: [ RUN      ] SendLimiterTest.SingleUserLimiting
+1: [       OK ] SendLimiterTest.SingleUserLimiting (14 ms)
+1: [ RUN      ] SendLimiterTest.MultipleUsersIndependentLimits
+1: [       OK ] SendLimiterTest.MultipleUsersIndependentLimits (15 ms)
+1: [ RUN      ] SendLimiterTest.LimiterCounterIncrement
+1: [       OK ] SendLimiterTest.LimiterCounterIncrement (14 ms)
+1: [ RUN      ] SendLimiterTest.TraverseLimitersCleanup
+1: [       OK ] SendLimiterTest.TraverseLimitersCleanup (21 ms)
+1: [ RUN      ] SendLimiterTest.TraverseLimitersKeepsActive
+1: [       OK ] SendLimiterTest.TraverseLimitersKeepsActive (11 ms)
+1: [ RUN      ] SendLimiterTest.TraverseLimitersEmptyMap
+1: [       OK ] SendLimiterTest.TraverseLimitersEmptyMap (20 ms)
+1: [ RUN      ] SendLimiterTest.ConcurrentAccess
+1: [       OK ] SendLimiterTest.ConcurrentAccess (26 ms)
+1: [ RUN      ] SendLimiterTest.ConcurrentSameUser
+1: [       OK ] SendLimiterTest.ConcurrentSameUser (40 ms)
+1: [ RUN      ] SendLimiterTest.ConcurrentTraversal
+1: [       OK ] SendLimiterTest.ConcurrentTraversal (108 ms)
+1: [ RUN      ] SendLimiterTest.StressTest
+1: [       OK ] SendLimiterTest.StressTest (53 ms)
+1: [ RUN      ] SendLimiterTest.ZeroShards
+1: [       OK ] SendLimiterTest.ZeroShards (13 ms)
+1: [ RUN      ] SendLimiterTest.SingleShard
+1: [       OK ] SendLimiterTest.SingleShard (3 ms)
+1: [ RUN      ] SendLimiterTest.ManyShards
+1: [       OK ] SendLimiterTest.ManyShards (17 ms)
+1: [ RUN      ] SendLimiterTest.RepeatedTraversal
+1: [       OK ] SendLimiterTest.RepeatedTraversal (32 ms)
+1: [----------] 15 tests from SendLimiterTest (401 ms total)
+1: 
+1: [----------] 15 tests from ShardedRegistryTest
+1: [ RUN      ] ShardedRegistryTest.InitialStateEmpty
+1: [       OK ] ShardedRegistryTest.InitialStateEmpty (14 ms)
+1: [ RUN      ] ShardedRegistryTest.GetNonExistentMailbox
+1: [       OK ] ShardedRegistryTest.GetNonExistentMailbox (14 ms)
+1: [ RUN      ] ShardedRegistryTest.CreateMailboxIncreasesCounter
+1: [       OK ] ShardedRegistryTest.CreateMailboxIncreasesCounter (14 ms)
+1: [ RUN      ] ShardedRegistryTest.CreateOrGetMailboxIdempotent
+1: [       OK ] ShardedRegistryTest.CreateOrGetMailboxIdempotent (14 ms)
+1: [ RUN      ] ShardedRegistryTest.GetMailboxAfterCreate
+1: [       OK ] ShardedRegistryTest.GetMailboxAfterCreate (15 ms)
+1: [ RUN      ] ShardedRegistryTest.RemoveMailboxDecreasesCounter
+1: [       OK ] ShardedRegistryTest.RemoveMailboxDecreasesCounter (16 ms)
+1: [ RUN      ] ShardedRegistryTest.RemoveMailboxMakesItInaccessible
+1: [       OK ] ShardedRegistryTest.RemoveMailboxMakesItInaccessible (14 ms)
+1: [ RUN      ] ShardedRegistryTest.MultipleMailboxes
+1: [       OK ] ShardedRegistryTest.MultipleMailboxes (15 ms)
+1: [ RUN      ] ShardedRegistryTest.TraverseRegistryRemovesExpiredMailboxes
+1: [       OK ] ShardedRegistryTest.TraverseRegistryRemovesExpiredMailboxes (21 ms)
+1: [ RUN      ] ShardedRegistryTest.ConcurrentCreateDifferentUsers
+1: [       OK ] ShardedRegistryTest.ConcurrentCreateDifferentUsers (23 ms)
+1: [ RUN      ] ShardedRegistryTest.ConcurrentCreateSameUser
+1: [       OK ] ShardedRegistryTest.ConcurrentCreateSameUser (17 ms)
+1: [ RUN      ] ShardedRegistryTest.ConcurrentCreateAndGet
+1: [       OK ] ShardedRegistryTest.ConcurrentCreateAndGet (9 ms)
+1: [ RUN      ] ShardedRegistryTest.ConcurrentCreateAndRemove
+1: [       OK ] ShardedRegistryTest.ConcurrentCreateAndRemove (24 ms)
+1: [ RUN      ] ShardedRegistryTest.HighContentionMixedOperations
+1: [       OK ] ShardedRegistryTest.HighContentionMixedOperations (289 ms)
+1: [ RUN      ] ShardedRegistryTest.DifferentShardCounts
+1: [       OK ] ShardedRegistryTest.DifferentShardCounts (18 ms)
+1: [----------] 15 tests from ShardedRegistryTest (525 ms total)
+1: 
+1: [----------] 2 tests from TMessageSerializer
+1: [ RUN      ] TMessageSerializer.SimpleMessage
+1: [       OK ] TMessageSerializer.SimpleMessage (0 ms)
+1: [ RUN      ] TMessageSerializer.SpecialCharactersInText
+1: [       OK ] TMessageSerializer.SpecialCharactersInText (0 ms)
+1: [----------] 2 tests from TMessageSerializer (0 ms total)
+1: 
+1: [----------] 4 tests from TPollMessagesResultSerializer
+1: [ RUN      ] TPollMessagesResultSerializer.EmptyMessages
+1: chat_service_unittest: userver/third_party/rapidjson/include/rapidjson/writer.h:484: void rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>>>::Prefix(Type) [OutputStream = rapidjson::GenericStringBuffer<rapidjson::UTF8<char>>, SourceEncoding = rapidjson::UTF8<char>, TargetEncoding = rapidjson::UTF8<char>, StackAllocator = rapidjson::CrtAllocator, writeFlags = 0]: Assertion `type == kStringType' failed.
+1/2 Test #1: chat_service_unittest ............Subprocess aborted***Exception:   5.76 sec
+test 2
+    Start 2: testsuite-chat_service
+
+2: Test command: /workspaces/chat-service/build-debug/venv-testsuite-chat_service/bin/python "/workspaces/chat-service/build-debug/runtests-chat_service" "--service-logs-pretty" "-vv"
+2: Working Directory: /workspaces/chat-service/build-debug
+2: Test timeout computed to be: 1500
+2: ============================= test session starts ==============================
+2: platform linux -- Python 3.10.12, pytest-9.0.2, pluggy-1.6.0 -- /workspaces/chat-service/build-debug/venv-testsuite-chat_service/bin/python
+2: cachedir: .pytest_cache
+2: yandex-taxi-testsuite: version 0.3.9
+2: PostgreSQL: postgresql:///?host=localhost&port=15433&user=testsuite
+2: testsuite env: new, dir: /tmp/.yasuite-user
+2: rootdir: /workspaces/chat-service/tests
+2: configfile: pytest.ini
+2: plugins: aiohttp-1.1.0, Faker-39.0.0, asyncio-0.21.2
+2: asyncio: mode=auto
+2: collecting ... collected 68 items
+2: 
+2: ../tests/messages/test_poll.py::test_poll_messages_success FAILED        [  1%]
+2: ../tests/messages/test_send.py::test_send_message PASSED                 [  2%]
+2: ../tests/messages/test_send.py::test_send_yourself PASSED                [  4%]
+2: ../tests/messages/test_send.py::test_wrong_recipient PASSED              [  5%]
+2: ../tests/messages/test_send.py::test_wrong_token[None] PASSED            [  7%]
+2: ../tests/messages/test_send.py::test_wrong_token[wrong_token] PASSED     [  8%]
+2: ../tests/messages/test_send.py::test_empty_recipient PASSED              [ 10%]
+2: ../tests/messages/test_send.py::test_empty_payload PASSED                [ 11%]
+2: ../tests/messages/test_send.py::test_too_large_payload PASSED            [ 13%]
+2: ../tests/users/test_delete_user.py::test_delete_user PASSED              [ 14%]
+2: ../tests/users/test_delete_user.py::test_delete_user_multiple_times PASSED [ 16%]
+2: ../tests/users/test_delete_user.py::test_delete_multiple_users[3] PASSED [ 17%]
+2: ../tests/users/test_delete_user.py::test_delete_user_unauthorized[None] PASSED [ 19%]
+2: ../tests/users/test_delete_user.py::test_delete_user_unauthorized[wrong_token] PASSED [ 20%]
+2: ../tests/users/test_delete_user.py::test_delete_user_empty_username PASSED [ 22%]
+2: ../tests/users/test_delete_user.py::test_delete_user_forbidden[2] PASSED [ 23%]
+2: ../tests/users/test_get_user.py::test_get_user PASSED                    [ 25%]
+2: ../tests/users/test_get_user.py::test_get_user_multiple_times PASSED     [ 26%]
+2: ../tests/users/test_get_user.py::test_get_multiple_users[3] PASSED       [ 27%]
+2: ../tests/users/test_get_user.py::test_get_user_unauthorized[None] PASSED [ 29%]
+2: ../tests/users/test_get_user.py::test_get_user_unauthorized[wrong_token] PASSED [ 30%]
+2: ../tests/users/test_get_user.py::test_get_user_wrong_token_format[Bearer-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkIn0.d9NfuI8JzGnYtjPa5rHRh4Jr104WKp-yls9POZJbe9U] PASSED [ 32%]
+2: ../tests/users/test_get_user.py::test_get_user_wrong_token_format[Token-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImlkIn0.d9NfuI8JzGnYtjPa5rHRh4Jr104WKp-yls9POZJbe9U] PASSED [ 33%]
+2: ../tests/users/test_get_user.py::test_get_user_empty_username PASSED     [ 35%]
+2: ../tests/users/test_login.py::test_login_success PASSED                  [ 36%]
+2: ../tests/users/test_login.py::test_login_wrong_password PASSED           [ 38%]
+2: ../tests/users/test_login.py::test_login_nonexistent_user PASSED         [ 39%]
+2: ../tests/users/test_login.py::test_login_multiple_times PASSED           [ 41%]
+2: ../tests/users/test_login.py::test_login_different_users PASSED          [ 42%]
+2: ../tests/users/test_login.py::test_login_missing_fields[user0-HTTPStatus.BAD_REQUEST] PASSED [ 44%]
+2: ../tests/users/test_login.py::test_login_missing_fields[user1-HTTPStatus.BAD_REQUEST] PASSED [ 45%]
+2: ../tests/users/test_login.py::test_login_missing_fields[user2-HTTPStatus.BAD_REQUEST] PASSED [ 47%]
+2: ../tests/users/test_login.py::test_login_invalid_json PASSED             [ 48%]
+2: ../tests/users/test_login.py::test_login_invalid_login PASSED            [ 50%]
+2: ../tests/users/test_login.py::test_login_invalid_password PASSED         [ 51%]
+2: ../tests/users/test_register.py::test_register PASSED                    [ 52%]
+2: ../tests/users/test_register.py::test_register_same_username PASSED      [ 54%]
+2: ../tests/users/test_register.py::test_register_same_password PASSED      [ 55%]
+2: ../tests/users/test_register.py::test_register_multiple_users PASSED     [ 57%]
+2: ../tests/users/test_register.py::test_register_case_sensitive_username PASSED [ 58%]
+2: ../tests/users/test_register.py::test_register_invalid_username[-username] PASSED [ 60%]
+2: ../tests/users/test_register.py::test_register_invalid_username[ab-username] PASSED [ 61%]
+2: ../tests/users/test_register.py::test_register_invalid_password[-password] PASSED [ 63%]
+2: ../tests/users/test_register.py::test_register_invalid_password[123456789-password] PASSED [ 64%]
+2: ../tests/users/test_register.py::test_register_missing_fields[user0-HTTPStatus.BAD_REQUEST] PASSED [ 66%]
+2: ../tests/users/test_register.py::test_register_missing_fields[user1-HTTPStatus.OK] PASSED [ 67%]
+2: ../tests/users/test_register.py::test_register_missing_fields[user2-HTTPStatus.BAD_REQUEST] PASSED [ 69%]
+2: ../tests/users/test_register.py::test_register_invalid_json PASSED       [ 70%]
+2: ../tests/users/test_update_user.py::test_update_user_username PASSED     [ 72%]
+2: ../tests/users/test_update_user.py::test_update_user_nothing PASSED      [ 73%]
+2: ../tests/users/test_update_user.py::test_update_user_password PASSED     [ 75%]
+2: ../tests/users/test_update_user.py::test_update_user_display_name PASSED [ 76%]
+2: ../tests/users/test_update_user.py::test_update_user_biography PASSED    [ 77%]
+2: ../tests/users/test_update_user.py::test_update_user_multiple_fields PASSED [ 79%]
+2: ../tests/users/test_update_user.py::test_update_multiple_users[3] PASSED [ 80%]
+2: ../tests/users/test_update_user.py::test_update_user_unauthorized[None] PASSED [ 82%]
+2: ../tests/users/test_update_user.py::test_update_user_unauthorized[wrong_token] PASSED [ 83%]
+2: ../tests/users/test_update_user.py::test_update_nontexistent_user PASSED [ 85%]
+2: ../tests/users/test_update_user.py::test_update_user_forbidden[2] PASSED [ 86%]
+2: ../tests/users/test_update_user.py::test_update_user_invalid_username[-username] PASSED [ 88%]
+2: ../tests/users/test_update_user.py::test_update_user_invalid_username[ab-username] PASSED [ 89%]
+2: ../tests/users/test_update_user.py::test_update_user_invalid_password[-password] PASSED [ 91%]
+2: ../tests/users/test_update_user.py::test_update_user_invalid_password[123-password] PASSED [ 92%]
+2: ../tests/users/test_update_user.py::test_update_user_invalid_display_name[-display_name] PASSED [ 94%]
+2: ../tests/users/test_update_user.py::test_update_user_duplicate_username[2] PASSED [ 95%]
+2: ../tests/users/test_update_user.py::test_update_user_biography_can_be_empty PASSED [ 97%]
+2: ../tests/users/test_update_user.py::test_update_user_empty_username_in_path PASSED [ 98%]
+2: ../tests/test_sql_coverage.py::test_sql_coverage <- ../../../usr/lib/cmake/userver/testsuite/include_tests/sql_coverage/test_sql_coverage.py PASSED [100%]
+2: 
+2: =================================== FAILURES ===================================
+2: __________________________ test_poll_messages_success __________________________
+2: 
+2: service_client = <pytest_userver.client.Client object at 0x7967d0c49840>
+2: registered_user = User(username='jacksonlisa', password='!_NnMai%CC4@', display_name='Наина Тимофеевна Фомичева', biography='Design deal...3NGIiLCJpc3MiOiJyZWFsdGltZS1jaGF0IiwianRpIjoiMTI0MTg1ODc1MzQyOTE4NTM2MiJ9.B7fkxHJdY4Vgu8QK7zuUNrgZ4lhpa5yb8SYK1FHf4OQ')
+2: 
+2:     async def test_poll_messages_success(service_client, registered_user):
+2:         """Успешный polling сообщений с валидным токеном"""
+2: >       response = await poll_messages(service_client, registered_user.token)
+2: 
+2: ../tests/messages/test_poll.py:11: 
+2: _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2: ../tests/helpers/endpoints.py:49: in poll_messages
+2:     return await service_client.post(
+2: /usr/lib/cmake/userver/testsuite/pytest_plugins/pytest_userver/client.py:127: in post
+2:     response = await self._client.post(
+2: venv-testsuite-chat_service/lib/python3.10/site-packages/testsuite/daemons/service_client.py:120: in post
+2:     return await self._request(
+2: /usr/lib/cmake/userver/testsuite/pytest_plugins/pytest_userver/client.py:1089: in _request
+2:     response = await super()._request(
+2: venv-testsuite-chat_service/lib/python3.10/site-packages/testsuite/daemons/service_client.py:265: in _request
+2:     return await self._aiohttp_request(
+2: venv-testsuite-chat_service/lib/python3.10/site-packages/testsuite/daemons/service_client.py:73: in _aiohttp_request
+2:     response = await self._session.request(
+2: venv-testsuite-chat_service/lib/python3.10/site-packages/aiohttp/client.py:779: in _request
+2:     resp = await handler(req)
+2: venv-testsuite-chat_service/lib/python3.10/site-packages/aiohttp/client.py:757: in _connect_and_send_request
+2:     await resp.start(conn)
+2: venv-testsuite-chat_service/lib/python3.10/site-packages/aiohttp/client_reqrep.py:539: in start
+2:     message, payload = await protocol.read()  # type: ignore[union-attr]
+2: _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+2: 
+2: self = <aiohttp.client_proto.ResponseHandler object at 0x7967d0c2a320>
+2: 
+2:     async def read(self) -> _T:
+2:         if not self._buffer and not self._eof:
+2:             assert not self._waiter
+2:             self._waiter = self._loop.create_future()
+2:             try:
+2: >               await self._waiter
+2: E               aiohttp.client_exceptions.ServerDisconnectedError: Server disconnected
+2: 
+2: venv-testsuite-chat_service/lib/python3.10/site-packages/aiohttp/streams.py:680: ServerDisconnectedError
+2: ---------------------------- Captured stderr setup -----------------------------
+2: ==112413==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
+2: ------------------------------ Captured log setup ------------------------------
+2: DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+2: INFO     testsuite.plugins.servicelogs:servicelogs.py:68 Watching service log file: /workspaces/chat-service/build-debug/Testing/Temporary/service.log
+2: DEBUG    testsuite.databases.pgsql.discover:discover.py:102 Looking up for PostgreSQL schemas at /workspaces/chat-service/postgresql/schemas
+2: DEBUG    pytest_userver.plugins.config:config.py:241 userver fixture "service_config_path_temp" writes the patched static config vars to "/workspaces/chat-service/build-debug/Testing/Temporary/chat_service/config_vars.yaml":
+2: database: postgres
+2: is-testing: true
+2: limiter-registry-type: None
+2: logger-level: debug
+2: logger_level: debug
+2: mailbox-queue-type: Vyukov
+2: mailbox-registry-type: ShardedMap
+2: monitoring-port: 8081
+2: pg-connection: postgresql://testsuite@localhost:15433/chat_service
+2: registry-shards-amount: 256
+2: server-port: 8080
+2: testsuite-enabled: true
+2: token_expiry_hours: 1
+2: userver-dumps-periodic: false
+2: userver-dumps-root: /workspaces/chat-service/build-debug/Testing/Temporary/userver-cache-dumps
+2: worker-fs-threads: 2
+2: worker-threads: 2
+2: 
+2: DEBUG    pytest_userver.plugins.config:config.py:249 userver fixture "service_config_path_temp" writes the patched static config to "/workspaces/chat-service/build-debug/Testing/Temporary/chat_service/config.yaml" equivalent to:
+2: components_manager:
+2:   components:
+2:     chat-postgres-database:
+2:       blocking_task_processor: fs-task-processor
+2:       connlimit_mode: manual
+2:       dbconnection: postgresql:///chat_service_chat_db?host=localhost&port=15433&user=testsuite
+2:       dbconnection#env: DB_CONNECTION
+2:       dns_resolver: async
+2:       sync-start: true
+2:     congestion-control:
+2:       fake-mode: true
+2:     default-server-middleware-pipeline-builder:
+2:       append:
+2:       - testsuite-exceptions-handling-middleware
+2:     dns-client:
+2:       fs-task-processor: fs-task-processor
+2:     dynamic-config:
+2:       defaults:
+2:         HTTP_CLIENT_CONNECTION_POOL_SIZE: 1000
+2:         POSTGRES_DEFAULT_COMMAND_CONTROL:
+2:           network_timeout_ms: 750
+2:           statement_timeout_ms: 500
+2:     handler-delete-by-username:
+2:       auth:
+2:         required: true
+2:         types:
+2:         - bearer
+2:       method: DELETE
+2:       path: /v1/users/{username}
+2:       task_processor: main-task-processor
+2:     handler-get-by-username:
+2:       auth:
+2:         required: true
+2:         types:
+2:         - bearer
+2:       method: GET
+2:       path: /v1/users/{username}
+2:       task_processor: main-task-processor
+2:     handler-ping:
+2:       method: GET
+2:       path: /ping
+2:       task_processor: main-task-processor
+2:       throttling_enabled: false
+2:       url_trailing_slash: strict-match
+2:     handler-poll-messages:
+2:       auth:
+2:         required: true
+2:         types:
+2:         - bearer
+2:       method: POST
+2:       path: /v1/messages/poll
+2:       task_processor: main-task-processor
+2:     handler-send-message:
+2:       auth:
+2:         required: true
+2:         types:
+2:         - bearer
+2:       method: POST
+2:       path: /v1/messages/send
+2:       task_processor: main-task-processor
+2:     handler-server-monitor:
+2:       method: GET
+2:       path: /service/monitor
+2:       task_processor: monitor-task-processor
+2:     handler-update-by-username:
+2:       auth:
+2:         required: true
+2:         types:
+2:         - bearer
+2:       method: PATCH
+2:       path: /v1/users/{username}
+2:       task_processor: main-task-processor
+2:     handler-user-login:
+2:       method: POST
+2:       path: /v1/users/login
+2:       task_processor: main-task-processor
+2:     handler-user-register:
+2:       method: POST
+2:       path: /v1/users/register
+2:       task_processor: main-task-processor
+2:     http-client:
+2:       fs-task-processor: fs-task-processor
+2:       load-enabled: null
+2:       testsuite-allowed-url-prefixes:
+2:       - http://localhost:45889/
+2:       testsuite-enabled: true
+2:       testsuite-timeout: 10s
+2:     logging:
+2:       fs-task-processor: fs-task-processor
+2:       loggers:
+2:         default:
+2:           file_path: /workspaces/chat-service/build-debug/Testing/Temporary/service.log
+2:           format: tskv
+2:           level: debug
+2:           overflow_behavior: discard
+2:           testsuite-capture:
+2:             host: 127.0.0.1
+2:             port: 40525
+2:     messaging-service-component:
+2:       limiter-type: None
+2:       load-enabled: true
+2:       queue-type: Vyukov
+2:       registry-type: ShardedMap
+2:       shards-amount: 256
+2:     profile-pg-cache:
+2:       chunk-size: 0
+2:       pgcomponent: chat-postgres-database
+2:       update-interval: 10s
+2:     server:
+2:       listener:
+2:         port: 43417
+2:         task_processor: main-task-processor
+2:       listener-monitor:
+2:         port: 43789
+2:         task_processor: monitor-task-processor
+2:     tests-control:
+2:       load-enabled: true
+2:       method: POST
+2:       path: /tests/{action}
+2:       skip-unregistered-testpoints: true
+2:       task_processor: main-task-processor
+2:       testpoint-url: http://localhost:45889/testpoint
+2:     testsuite-support:
+2:       testsuite-grpc-is-tls-enabled: false
+2:       testsuite-increased-timeout: 30s
+2:       testsuite-periodic-dumps-enabled: false
+2:       testsuite-periodic-update-enabled: false
+2:       testsuite-pg-execute-timeout: 35s
+2:       testsuite-pg-readonly-master-expected: true
+2:       testsuite-pg-statement-timeout: 30s
+2:       testsuite-redis-timeout-all: 30s
+2:       testsuite-redis-timeout-connect: 40s
+2:       testsuite-redis-timeout-single: 30s
+2:       testsuite-tasks-enabled: true
+2:     user-repository-component:
+2:       postgres-component: chat-postgres-database
+2:       storage-type: postgres
+2:       ydb-component: chat-ydb-database
+2:     user-service-component:
+2:       load-enabled: true
+2:       token-expiry-hours: 1
+2:   default_task_processor: main-task-processor
+2:   task_processors:
+2:     fs-task-processor:
+2:       worker_threads: 2
+2:     main-task-processor:
+2:       worker_threads: 2
+2:     monitor-task-processor:
+2:       thread_name: mon-worker
+2:       worker_threads: 2
+2: 
+2: DEBUG    pytest_userver.plugins.service:service.py:125 userver fixture "service_daemon_scope" would check for "HealthChecks(tcp=[HostPort(host='localhost', port=43789), HostPort(host='localhost', port=43417)])"
+2: INFO     testsuite.environment.service:service.py:62 Starting postgresql service...
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: Postgresql data directory: /tmp/.yasuite-user/services/postgresql/data
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: Postgresql version: PostgreSQL 14.20 (Ubuntu 14.20-0ubuntu0.22.04.1)
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: The files belonging to this database system will be owned by user "user".
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: This user must also own the server process.
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: The database cluster will be initialized with locales
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]:   COLLATE:  C
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]:   CTYPE:    C
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]:   MESSAGES: en_US.UTF-8
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]:   MONETARY: en_US.UTF-8
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]:   NUMERIC:  en_US.UTF-8
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]:   TIME:     en_US.UTF-8
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: The default text search configuration will be set to "english".
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: Data page checksums are disabled.
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: fixing permissions on existing directory /tmp/.yasuite-user/services/postgresql/data ... ok
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: creating subdirectories ... ok
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: selecting dynamic shared memory implementation ... posix
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: selecting default max_connections ... 100
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: selecting default shared_buffers ... 128MB
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: selecting default time zone ... Etc/UTC
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: creating configuration files ... ok
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: running bootstrap script ... ok
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: performing post-bootstrap initialization ... ok
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: syncing data to disk ... ok
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: initdb: warning: enabling "trust" authentication for local connections
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: You can change this by editing pg_hba.conf or using the option -A, or
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: --auth-local and --auth-host, the next time you run initdb.
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: Success. You can now start the database server using:
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]:     /usr/lib/postgresql/14/bin/pg_ctl -D /tmp/.yasuite-user/services/postgresql/data -l logfile start
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 2025-12-22 19:27:11 MSK [112395-1] LOG:  redirecting log output to logging collector process
+2: INFO     testsuite.environment.shell:shell.py:46 env/postgresql/start[112362]: 2025-12-22 19:27:11 MSK [112395-2] HINT:  Future log output will appear in directory "/tmp/.yasuite-user/services/postgresql/logs".
+2: INFO     testsuite.environment.service:service.py:69 Service postgresql started.
+2: DEBUG    testsuite.databases.pgsql.control:control.py:259 Initializing database chat_db for service chat_service...
+2: DEBUG    testsuite.databases.pgsql.control:control.py:268 Initializing shard chat_service_chat_db
+2: DEBUG    testsuite.databases.pgsql.control:control.py:289 Creating database chat_service_chat_db
+2: DEBUG    testsuite.databases.pgsql.control:control.py:312 Running sql script /workspaces/chat-service/postgresql/schemas/chat_db.sql against database chat_service_chat_db
+2: INFO     testsuite.environment.shell:shell.py:46 psql[112407]: psql:/workspaces/chat-service/postgresql/schemas/chat_db.sql:1: NOTICE:  schema "chat" does not exist, skipping
+2: DEBUG    pytest_userver.plugins.service:service.py:225 userver fixture "auto_client_deps" resolved dependencies ['pgsql']
+2: DEBUG    testsuite.daemons.spawn:spawn.py:97 Starting process with args ('/workspaces/chat-service/build-debug/chat_service', '--config', '/workspaces/chat-service/build-debug/Testing/Temporary/chat_service/config.yaml')
+2: DEBUG    root:spawn.py:102 [112413] Process startedUnclosed client session
+2: client_session: <aiohttp.client.ClientSession object at 0x7967d0c48e20>
+2: Unclosed connector
+2: connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x7967d0c2ab60>, 17226.524644554)])']
+2: connector: <aiohttp.connector.TCPConnector object at 0x7967d0c49150>
+2: 
+2: ----------------------------- Captured stderr call -----------------------------
+2: chat_service: userver/third_party/rapidjson/include/rapidjson/writer.h:484: void rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>>>::Prefix(Type) [OutputStream = rapidjson::GenericStringBuffer<rapidjson::UTF8<char>>, SourceEncoding = rapidjson::UTF8<char>, TargetEncoding = rapidjson::UTF8<char>, StackAllocator = rapidjson::CrtAllocator, writeFlags = 0]: Assertion `type == kStringType' failed.
+2: -------------------------- Captured userver/log call ---------------------------
+2: DEBUG    [d3f8ca0f057284a7a8ce62219ed49eeb] Component 'manager-controller' is in kOk state
+2: DEBUG    [d3f8ca0f057284a7a8ce62219ed49eeb] Component 'default-handler-middleware-pipeline-builder' is in kOk state
+2: DEBUG    [d3f8ca0f057284a7a8ce62219ed49eeb] Component 'os-signal-processor' is in kOk state
+2: DEBUG    [d3f8ca0f057284a7a8ce62219ed49eeb] Component 'congestion-control' is in kOk state
+2: DEBUG    [d3f8ca0f057284a7a8ce62219ed49eeb] Component 'userver-tracing-middleware' is in kOk state
+2: DEBUG    [d3f8ca0f057284a7a8ce62219ed49eeb] Component 'chat-postgres-database' is in kOk state
+2: DEBUG    [d3f8ca0f057284a7a8ce62219ed49eeb] Component 'auth-checker-settings' is in kOk state
+2: INFO     [d3f8ca0f057284a7a8ce62219ed49eeb] Response finished meta_code=200
+2: DEBUG    <userver> Accepted connection #2/32768
+2: DEBUG    <userver> Incoming connection from ::1, fd 51
+2: INFO     [POST /tests/get_dynamic_config_defaults] start handling POST /tests/get_dynamic_config_defaults request_body={}
+2: INFO     [POST /tests/get_dynamic_config_defaults] Response finished meta_code=200 response_body={"USERVER_TASK_PROCESSOR_PROFILER_DEBUG":{"main-task-processor":{"enabled":false,"execution-slice-threshold-us":2000},"fs-task-processor":{"enabled":false,"execution-slice-threshold-us":1000000}},"POSTGRES_DEFAULT_COMMAND_CONTROL":{"network_timeout_ms":750,"statement_timeout_ms":500},"USERVER_RPS_CCONTROL_CUSTOM_STATUS":{},"USERVER_RPS_CCONTROL":{"min-limit":10,"up-rate-percent":2,"down-rate-percent":2,"overload-on-seconds":3,"overload-off-seconds":3,"up-level":2,"down-level":1,"no-limit-seconds":1000},"POS...(truncated, total 544 bytes)
+2: INFO     [POST /tests/control] start handling POST /tests/control request_body={
+2:   "invalidate_caches": {
+2:     "exclude_names": [],
+2:     "force_incremental_names": [
+2:       "dynamic-config-client-updater"
+2:     ],
+2:     "update_type": "full"
+2:   },
+2:   "mock_now": "2025-12-22T16:27:10.714975+0000",
+2:   "testpoints": [
+2:     "sql_statement",
+2:     "yql_statement"
+2:   ]
+2: }
+2: INFO     [POST /tests/control] Waiting for cache updates
+2: INFO     [8650d70f6bee792da2257049610f7f21] Updating cache update_type=full name=profile-pg-cache
+2: WARNING  [8650d70f6bee792da2257049610f7f21] There is no pool for slave, falling back to master
+2: DEBUG    [8650d70f6bee792da2257049610f7f21] Result checked
+2: DEBUG    [8650d70f6bee792da2257049610f7f21] Prepare successfully sent
+2: DEBUG    [8650d70f6bee792da2257049610f7f21] Result checked
+2: DEBUG    [8650d70f6bee792da2257049610f7f21] Result checked
+2: INFO     [8650d70f6bee792da2257049610f7f21] Updated cache update_type=full name=profile-pg-cache
+2: INFO     [POST /tests/control] Response finished meta_code=200 response_body=null
+2: INFO     [POST /v1/users/register] start handling POST /v1/users/register request_body={
+2:   "user": {
+2:     "biography": "Design deal next. Material I accept different south pattern both.",
+2:     "display_name": "Наина Тимофеевна Фомичева",
+2:     "password": "!_NnMai%CC4@",
+2:     "username": "jacksonlisa"
+2:   }
+2: }
+2: WARNING  [POST /v1/users/register] There is no pool for slave, falling back to master
+2: INFO     [POST /v1/users/register] Running testpoint sql_statement: {"name":"find_user_by_username"}
+2: DEBUG    [POST /v1/users/register] Result checked
+2: DEBUG    [POST /v1/users/register] Prepare successfully sent
+2: DEBUG    [POST /v1/users/register] Result checked
+2: DEBUG    [POST /v1/users/register] Result checked
+2: INFO     [POST /v1/users/register] Running testpoint sql_statement: {"name":"insert_new_user"}
+2: DEBUG    [POST /v1/users/register] Result checked
+2: DEBUG    [POST /v1/users/register] Prepare successfully sent
+2: DEBUG    [POST /v1/users/register] Result checked
+2: DEBUG    [POST /v1/users/register] Result checked
+2: INFO     [POST /v1/users/register] Response finished meta_code=200 response_body={
+2:   "user": {
+2:     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NjY0MjQ0MzIsImlhdCI6MTc2NjQyMDgzMiwiaWQiOiI4NmM3MTA0Yi1jMzViLTQ5YTMtYWY5MS0yMGY4MDcyNjE3NGIiLCJpc3MiOiJyZWFsdGltZS1jaGF0IiwianRpIjoiMTI0MTg1ODc1MzQyOTE4NTM2MiJ9.B7fkxHJdY4Vgu8QK7zuUNrgZ4lhpa5yb8SYK1FHf4OQ",
+2:     "username": "jacksonlisa"
+2:   }
+2: }
+2: WARNING  [8b695e51a1e4d1e524dbaf18e12058be] There is no pool for slave, falling back to master
+2: INFO     [8b695e51a1e4d1e524dbaf18e12058be] Running testpoint sql_statement: {"name":"get_profile_by_id"}
+2: DEBUG    [8b695e51a1e4d1e524dbaf18e12058be] Result checked
+2: DEBUG    [8b695e51a1e4d1e524dbaf18e12058be] Prepare successfully sent
+2: DEBUG    [8b695e51a1e4d1e524dbaf18e12058be] Result checked
+2: DEBUG    [8b695e51a1e4d1e524dbaf18e12058be] Result checked
+2: DEBUG    [8b695e51a1e4d1e524dbaf18e12058be] authentication succeeded: OK
+2: INFO     [POST /v1/messages/poll] start handling POST /v1/messages/poll
+2: =============================== warnings summary ===============================
+2: ../../../usr/lib/cmake/userver/testsuite/include_tests/sql_coverage/test_sql_coverage.py:4
+2:   /usr/lib/cmake/userver/testsuite/include_tests/sql_coverage/test_sql_coverage.py:4: PytestUnknownMarkWarning: Unknown pytest.mark.includetest - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+2:     @pytest.mark.includetest
+2: 
+2: -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+2: =========================== short test summary info ============================
+2: FAILED ../tests/messages/test_poll.py::test_poll_messages_success - aiohttp.client_exceptions.ServerDisconnectedError: Server disconnected
+2: =================== 1 failed, 67 passed, 1 warning in 15.84s ===================
+2/2 Test #2: testsuite-chat_service ...........***Failed   16.53 sec
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =  22.29 sec
+
+The following tests FAILED:
+	  1 - chat_service_unittest (Subprocess aborted)
+	  2 - testsuite-chat_service (Failed)

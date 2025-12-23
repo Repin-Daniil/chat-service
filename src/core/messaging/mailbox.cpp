@@ -2,7 +2,7 @@
 
 namespace NChat::NCore {
 
-TUserMailbox::TUserMailbox(NDomain::TUserId consumer_id, QueuePtr queue, TimePoint now)
+TUserMailbox::TUserMailbox(NDomain::TUserId consumer_id, TQueuePtr queue, TTimePoint now)
     : ConsumerId_(consumer_id), MessageBus_(std::move(queue)), LastConsumerActivity_(now) {
   if (!MessageBus_ || (*ConsumerId_).empty()) {
     throw std::invalid_argument("TUserMailbox: empty consumer id or null message bus");
@@ -23,10 +23,11 @@ bool TUserMailbox::SendMessage(NDomain::TMessage&& message, int max_try_amount) 
   return false;
 }
 
-TMessages TUserMailbox::PollMessages(TimePoint now, std::size_t max_size, std::chrono::seconds timeout) {
-  LastConsumerActivity_ = now;
+TMessages TUserMailbox::PollMessages(std::function<TTimePoint()> now, std::size_t max_size,
+                                     std::chrono::seconds timeout) {
+  LastConsumerActivity_ = now();
   auto result = MessageBus_->PopBatch(max_size, timeout);
-  LastConsumerActivity_ = now;  // We could sleep in PopBatch
+  LastConsumerActivity_ = now();  // We could sleep in PopBatch
 
   if (MissedMessages_) {
     MissedMessages_ = false;
@@ -36,7 +37,7 @@ TMessages TUserMailbox::PollMessages(TimePoint now, std::size_t max_size, std::c
   return {result};
 }
 
-bool TUserMailbox::HasNoConsumer(TimePoint now, std::chrono::seconds idle_threshold) const {
+bool TUserMailbox::HasNoConsumer(TTimePoint now, std::chrono::seconds idle_threshold) const {
   return (now - LastConsumerActivity_.load()) > idle_threshold;
 }
 

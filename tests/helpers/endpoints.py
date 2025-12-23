@@ -46,5 +46,7 @@ async def send_message(service_client, message, token):
 
 
 async def poll_messages(service_client, token):
-    # todo
-    pass
+    return await service_client.post(
+        Routes.POLL_MESSAGES,
+        headers={'Authorization': token or ""},
+    )

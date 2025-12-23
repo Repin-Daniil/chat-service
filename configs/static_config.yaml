@@ -150,6 +150,15 @@ components_manager:
                 types:
                   - bearer
                 required: true
+        
+        handler-poll-messages:
+            path: /v1/messages/poll
+            method: POST
+            task_processor: main-task-processor
+            auth:
+                types:
+                  - bearer
+                required: true
                 
         # PostgreSQL
         chat-postgres-database:

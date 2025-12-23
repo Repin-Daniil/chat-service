@@ -11,6 +11,9 @@ namespace NChat::NApp::NDto {
 
 struct TPollMessagesRequest {
   NCore::NDomain::TUserId ConsumerId;
+};
+
+struct TPollMessagesSettings {
   std::size_t MaxSize;
   std::chrono::seconds PollTime;
 };

@@ -25,8 +25,6 @@ class TUserMailbox {
   NDomain::TUserId GetConsumerId() const;
   std::size_t GetSizeApproximate() const;
 
-  void ResyncRequired();
-
  private:
   NDomain::TUserId ConsumerId_;
   TQueuePtr MessageBus_;

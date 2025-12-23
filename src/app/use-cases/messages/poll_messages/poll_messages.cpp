@@ -5,11 +5,11 @@ namespace NChat::NApp {
 TPollMessagesUseCase::TPollMessagesUseCase(NCore::IMailboxRegistry& registry, NCore::IUserRepository& user_repo)
     : Registry_(registry), UserRepo_(user_repo) {}
 
-NDto::TPollMessagesResult TPollMessagesUseCase::Execute(NDto::TPollMessagesRequest request) {
+NDto::TPollMessagesResult TPollMessagesUseCase::Execute(const NDto::TPollMessagesRequest& request, const NDto::TPollMessagesSettings& settings) {
   auto mailbox = Registry_.CreateOrGetMailbox(request.ConsumerId);
 
   std::function<TTimePoint()> now = []() -> TTimePoint { return std::chrono::steady_clock::now(); };
-  auto messages = mailbox->PollMessages(now, request.MaxSize, request.PollTime);
+  auto messages = mailbox->PollMessages(now, settings.MaxSize, settings.PollTime);
 
   NDto::TPollMessagesResult result;
   result.ResyncRequired = messages.ResyncRequired;
@@ -18,17 +18,18 @@ NDto::TPollMessagesResult TPollMessagesUseCase::Execute(NDto::TPollMessagesReque
     try {
       profile = UserRepo_.GetProfileById(message.Payload->Sender);
     } catch (const std::exception& e) {
-      mailbox->ResyncRequired();
-      throw TPollingTemporaryUnavailable(
-          fmt::format("Failed to get username of sender with id: {}", *message.Payload->Sender));
+      LOG_ERROR() << fmt::format("Failed to get username of sender with id: {}", *message.Payload->Sender);
+      result.ResyncRequired = true;
+      continue;
     }
     if (!profile.has_value()) {
       LOG_WARNING() << fmt::format("Dropping message: no user with id {}", *message.Payload->Sender);
+      result.ResyncRequired = true;
       continue;
     }
 
     result.Messages.emplace_back(NCore::NDomain::TUsername(profile->Username), std::move(message.Payload->Text),
-                                 std::move(message.Context));
+                                 message.Context);
   }
 
   return result;

@@ -9,10 +9,6 @@
 
 namespace NChat::NApp {
 
-class TPollingTemporaryUnavailable : public TApplicationException {
-  using TApplicationException::TApplicationException;
-};
-
 class TPollMessagesUseCase final {
  public:
   using TMessage = NCore::NDomain::TMessage;
@@ -22,7 +18,7 @@ class TPollMessagesUseCase final {
 
   TPollMessagesUseCase(NCore::IMailboxRegistry& registry, NCore::IUserRepository& user_repo);
 
-  NDto::TPollMessagesResult Execute(const NDto::TPollMessagesRequest request);
+  NDto::TPollMessagesResult Execute(const NDto::TPollMessagesRequest& request, const NDto::TPollMessagesSettings& settings);
 
  private:
   NCore::IMailboxRegistry& Registry_;

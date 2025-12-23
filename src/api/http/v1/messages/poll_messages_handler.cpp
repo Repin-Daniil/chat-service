@@ -11,6 +11,7 @@
 #include <userver/components/component_context.hpp>
 
 using NChat::NApp::NDto::TPollMessagesRequest;
+using NChat::NApp::NDto::TPollMessagesSettings;
 using NChat::NCore::NDomain::TUserId;
 
 namespace NChat::NInfra::NHandlers {
@@ -29,17 +30,15 @@ userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
 
   TPollMessagesRequest request_dto{
       .ConsumerId = consumer_id,
-      .MaxSize = max_size,
-      .PollTime = poll_time,
+  };
+
+  TPollMessagesSettings request_settings{
+    .MaxSize = max_size,
+    .PollTime = poll_time,
   };
 
   TPollMessagesResult result;
-  try {
-    result = MessageService_.PollMessages(request_dto);
-  } catch (const NApp::TPollingTemporaryUnavailable& ex) {
-    LOG_ERROR() << "Message polling unavailable: " << ex.what();
-    throw TServerException("Message polling temporary unavailable");
-  }
+  result = MessageService_.PollMessages(request_dto, request_settings);
 
   userver::formats::json::StringBuilder sb;
   NInfra::WriteToStream(result, sb);

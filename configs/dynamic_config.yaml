@@ -1,4 +1,4 @@
-COLLECTOR_TASK_CONFIG:
+OVERSEER_TASK_CONFIG:
     is_enabled: true,
     period_seconds: 10,
     inter_shard_pause_ms: 100

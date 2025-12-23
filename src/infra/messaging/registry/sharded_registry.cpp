@@ -16,7 +16,7 @@ TShardedRegistry::TShardedRegistry(std::size_t shard_amount, userver::dynamic_co
 NCore::TMailboxPtr TShardedRegistry::GetMailbox(const TUserId& user_id) const { return Registry_.Get(user_id); }
 
 NCore::TMailboxPtr TShardedRegistry::CreateOrGetMailbox(const TUserId& user_id) {
-  auto snapshot = ConfigSource_.GetSnapshot();
+  const auto snapshot = ConfigSource_.GetSnapshot();
   auto config = snapshot[kRegistryConfig];
   std::size_t max_queue_size = config.MaxQueueSize;
 
@@ -41,7 +41,7 @@ void TShardedRegistry::RemoveMailbox(const TUserId& user_id) {
 std::int64_t TShardedRegistry::GetOnlineAmount() const { return OnlineCounter_.load(std::memory_order_relaxed); }
 
 void TShardedRegistry::TraverseRegistry(std::chrono::milliseconds inter_pause) {
-  auto snapshot = ConfigSource_.GetSnapshot();
+  const auto snapshot = ConfigSource_.GetSnapshot();
   auto config = snapshot[kRegistryConfig];
   const auto idle_timeout = config.IdleTimeout;
 

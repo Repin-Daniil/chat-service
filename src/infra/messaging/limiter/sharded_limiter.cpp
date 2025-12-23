@@ -30,7 +30,7 @@ TSendLimiter::TSendLimiter(std::size_t shard_amount, userver::dynamic_config::So
 }
 
 bool TSendLimiter::TryAcquire(const TUserId& user_id) {
-  auto snapshot = ConfigSource_.GetSnapshot();
+  const auto snapshot = ConfigSource_.GetSnapshot();
   auto config = snapshot[kLimiterConfig];
   const auto is_enabled = config.IsEnabled;
 
@@ -54,7 +54,7 @@ bool TSendLimiter::TryAcquire(const TUserId& user_id) {
 }
 
 void TSendLimiter::TraverseLimiters() {
-  auto snapshot = ConfigSource_.GetSnapshot();
+  const auto snapshot = ConfigSource_.GetSnapshot();
   auto config = snapshot[kLimiterConfig];
   const auto idle_timeout = config.IdleTimeout;
 

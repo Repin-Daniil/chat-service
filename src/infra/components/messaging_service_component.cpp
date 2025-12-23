@@ -14,18 +14,19 @@
 #include <userver/yaml_config/merge_schemas.hpp>
 
 namespace NChat::NInfra::NComponents {
-struct TCollectorSettings {
+
+struct TOverseerSettings {
   bool IsEnabled = false;
   std::chrono::seconds Period{10};
   std::chrono::milliseconds InternalPause{10};
 };
 
-TCollectorSettings Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TCollectorSettings>) {
-  return TCollectorSettings{value["is_enabled"].As<bool>(), std::chrono::seconds{value["period_seconds"].As<int>()},
+TOverseerSettings Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TOverseerSettings>) {
+  return TOverseerSettings{value["is_enabled"].As<bool>(), std::chrono::seconds{value["period_seconds"].As<int>()},
                             std::chrono::milliseconds{value["inter_shard_pause_ms"].As<int>()}};
 }
 
-const userver::dynamic_config::Key<TCollectorSettings> kCollectorConfig{"COLLECTOR_TASK_CONFIG",
+const userver::dynamic_config::Key<TOverseerSettings> kOverseerConfig{"OVERSEER_TASK_CONFIG",
                                                                         userver::dynamic_config::DefaultAsJsonString{R"(
   {
     "is_enabled": true,
@@ -79,26 +80,26 @@ void TMessagingServiceComponent::StartPeriodicTraverse() {
   userver::utils::PeriodicTask::Settings settings(std::chrono::seconds(10));
   settings.flags = userver::utils::PeriodicTask::Flags::kChaotic;
 
-  Task_.Start("collector-background-job", settings, [this] { Traverse(); });
+  Task_.Start("overseer-background-job", settings, [this] { Traverse(); });
 }
 
 void TMessagingServiceComponent::Traverse() {
-  auto snapshot = ConfigSource_.GetSnapshot();
-  const auto task_config = snapshot[kCollectorConfig];
+  const auto snapshot = ConfigSource_.GetSnapshot();
+  const auto task_config = snapshot[kOverseerConfig];
 
   if (Task_.GetCurrentSettings().period != task_config.Period) {
     userver::utils::PeriodicTask::Settings new_settings(task_config.Period);
     new_settings.distribution = task_config.Period / 10;  // jitter
     Task_.SetSettings(new_settings);
 
-    LOG_INFO() << "Collector task period updated to " << task_config.Period << " seconds";
+    LOG_INFO() << "Overseer task period updated to " << task_config.Period << " seconds";
   }
 
   if (!task_config.IsEnabled) {
-    LOG_WARNING() << "Collector task skipped due to configuration: metrics not collected, garbage not removed";
+    LOG_WARNING() << "Overseer task skipped due to configuration: metrics not collected, garbage not removed";
     return;
   }
-  LOG_DEBUG() << "Обхол коллектора";
+
   Registry_->TraverseRegistry(task_config.InternalPause);
   Limiter_->TraverseLimiters();
 }

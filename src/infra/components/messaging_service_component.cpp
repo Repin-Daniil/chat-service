@@ -63,8 +63,9 @@ TObjectFactory<NCore::IMailboxRegistry> TMessagingServiceComponent::GetRegistryF
 TObjectFactory<NCore::ISendLimiter> TMessagingServiceComponent::GetLimiterFactory() {
   TObjectFactory<NCore::ISendLimiter> limiter_factory;
 
-  limiter_factory.Register("ShardedMap", [](const auto& config, const auto& /* context */) {
+  limiter_factory.Register("ShardedMap", [](const auto& config, const auto& context) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
+    auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
     return std::make_unique<TSendLimiter>(shards_amount, config_source);
   });
 

@@ -1,5 +1,7 @@
 worker-threads: 4
 worker-fs-threads: 2
+worker-mon-threads: 1
+
 logger-level: info
 
 is-testing: false
@@ -14,5 +16,8 @@ registry-shards-amount: 256
 mailbox-queue-type: Vyukov
 mailbox-registry-type: ShardedMap
 limiter-registry-type: ShardedMap
+
+config-cache: cache/
+config-server-url: http://158.160.218.250:8083
 
 pg-connection: 'postgresql://chat-user:password@service-postgres:5432/chat_service'

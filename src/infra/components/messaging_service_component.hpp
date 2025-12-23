@@ -20,15 +20,23 @@ class TMessagingServiceComponent final : public userver::components::LoggableCom
 
   static userver::yaml_config::Schema GetStaticConfigSchema();
 
+  ~TMessagingServiceComponent();
  private:
   TObjectFactory<NCore::IMailboxRegistry> GetRegistryFactory();
   TObjectFactory<NCore::ISendLimiter> GetLimiterFactory();
+
+  void StartPeriodicTraverse();
+  void Traverse();
 
  private:
   std::unique_ptr<NCore::IMailboxRegistry> Registry_;
   std::unique_ptr<NCore::ISendLimiter> Limiter_;
 
   std::unique_ptr<NApp::NServices::TMessagingService> MessageService_;
+
+  // For period traverse
+  userver::dynamic_config::Source ConfigSource_;
+  userver::utils::PeriodicTask Task_;
 };
 
 }  // namespace NChat::NInfra::NComponents

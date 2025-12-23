@@ -3,6 +3,7 @@
 #include <core/common/ids.hpp>
 
 #include <gtest/gtest.h>
+#include <userver/dynamic_config/test_helpers.hpp>
 #include <userver/engine/async.hpp>
 #include <userver/utest/utest.hpp>
 #include <userver/utils/datetime.hpp>
@@ -14,12 +15,12 @@ using namespace NChat::NCore::NDomain;
 
 // Базовые тесты функциональности
 UTEST(ShardedRegistryTest, InitialStateEmpty) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   EXPECT_EQ(registry.GetOnlineAmount(), 0);
 }
 
 UTEST(ShardedRegistryTest, GetNonExistentMailbox) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id{"42"};
 
   auto mailbox = registry.GetMailbox(user_id);
@@ -27,7 +28,7 @@ UTEST(ShardedRegistryTest, GetNonExistentMailbox) {
 }
 
 UTEST(ShardedRegistryTest, CreateMailboxIncreasesCounter) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id{"42"};
 
   auto mailbox = registry.CreateOrGetMailbox(user_id);
@@ -36,7 +37,7 @@ UTEST(ShardedRegistryTest, CreateMailboxIncreasesCounter) {
 }
 
 UTEST(ShardedRegistryTest, CreateOrGetMailboxIdempotent) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id{"42"};
 
   auto mailbox1 = registry.CreateOrGetMailbox(user_id);
@@ -47,7 +48,7 @@ UTEST(ShardedRegistryTest, CreateOrGetMailboxIdempotent) {
 }
 
 UTEST(ShardedRegistryTest, GetMailboxAfterCreate) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id{"42"};
 
   auto created_mailbox = registry.CreateOrGetMailbox(user_id);
@@ -57,7 +58,7 @@ UTEST(ShardedRegistryTest, GetMailboxAfterCreate) {
 }
 
 UTEST(ShardedRegistryTest, RemoveMailboxDecreasesCounter) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id{"42"};
 
   registry.CreateOrGetMailbox(user_id);
@@ -68,7 +69,7 @@ UTEST(ShardedRegistryTest, RemoveMailboxDecreasesCounter) {
 }
 
 UTEST(ShardedRegistryTest, RemoveMailboxMakesItInaccessible) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id{"42"};
 
   registry.CreateOrGetMailbox(user_id);
@@ -79,7 +80,7 @@ UTEST(ShardedRegistryTest, RemoveMailboxMakesItInaccessible) {
 }
 
 UTEST(ShardedRegistryTest, MultipleMailboxes) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
 
   for (int i = 0; i < 10; ++i) {
     TUserId user_id{std::to_string(i)};
@@ -96,7 +97,7 @@ UTEST(ShardedRegistryTest, MultipleMailboxes) {
 }
 
 UTEST(ShardedRegistryTest, TraverseRegistryRemovesExpiredMailboxes) {
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
   TUserId user_id{"42"};
 
@@ -105,7 +106,7 @@ UTEST(ShardedRegistryTest, TraverseRegistryRemovesExpiredMailboxes) {
 
   // Ждем больше чем kIdleThreshold (60 секунд)
   userver::utils::datetime::MockSleep(std::chrono::seconds{61});
-  registry.TraverseRegistry();
+  registry.TraverseRegistry(std::chrono::milliseconds(10));
 
   // После траверса expired mailbox'ы должны быть удалены
   EXPECT_EQ(registry.GetOnlineAmount(), 0);
@@ -114,7 +115,7 @@ UTEST(ShardedRegistryTest, TraverseRegistryRemovesExpiredMailboxes) {
 // Многопоточные тесты
 UTEST_MT(ShardedRegistryTest, ConcurrentCreateDifferentUsers, 4) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
 
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
@@ -141,7 +142,7 @@ UTEST_MT(ShardedRegistryTest, ConcurrentCreateDifferentUsers, 4) {
 
 UTEST_MT(ShardedRegistryTest, ConcurrentCreateSameUser, 4) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
   TUserId user_id{"42"};
 
   std::vector<userver::engine::Task> tasks;
@@ -168,7 +169,7 @@ UTEST_MT(ShardedRegistryTest, ConcurrentCreateSameUser, 4) {
 
 UTEST_MT(ShardedRegistryTest, ConcurrentCreateAndGet, 4) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
 
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
@@ -202,7 +203,7 @@ UTEST_MT(ShardedRegistryTest, ConcurrentCreateAndGet, 4) {
 
 UTEST_MT(ShardedRegistryTest, ConcurrentCreateAndRemove, 4) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
 
   // Сначала создаем пользователей
   constexpr std::size_t kTotalUsers = 200;
@@ -238,7 +239,7 @@ UTEST_MT(ShardedRegistryTest, ConcurrentCreateAndRemove, 4) {
 
 UTEST_MT(ShardedRegistryTest, HighContentionMixedOperations, 8) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedRegistry registry(256);
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
 
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
@@ -284,7 +285,7 @@ UTEST_MT(ShardedRegistryTest, HighContentionMixedOperations, 8) {
 UTEST(ShardedRegistryTest, DifferentShardCounts) {
   // Проверяем, что работает с разным количеством шардов
   for (std::size_t shard_count : {1, 4, 16, 64, 256, 1024}) {
-    TShardedRegistry registry(shard_count);
+    TShardedRegistry registry(shard_count, userver::dynamic_config::GetDefaultSource());
 
     TUserId user_id{"42"};
     auto mailbox = registry.CreateOrGetMailbox(user_id);

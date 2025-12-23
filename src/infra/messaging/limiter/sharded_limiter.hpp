@@ -4,6 +4,7 @@
 
 #include <infra/concurrency/sharded_map/sharded_map.hpp>
 
+#include <userver/dynamic_config/source.hpp>
 #include <userver/utils/datetime.hpp>
 #include <userver/utils/token_bucket.hpp>
 
@@ -38,7 +39,7 @@ class TSendLimiter : public NCore::ISendLimiter {
   using TUserId = NCore::NDomain::TUserId;
   using TShardedMap = NConcurrency::TShardedMap<TUserId, TLimiterWrapper, NUtils::TaggedHasher<TUserId>>;
 
-  explicit TSendLimiter(std::size_t shard_amount);
+  explicit TSendLimiter(std::size_t shard_amount, userver::dynamic_config::Source config_source);
   bool TryAcquire(const TUserId& user_id) override;
   void TraverseLimiters() override;
   std::int64_t GetTotalLimiters() const override;
@@ -46,6 +47,7 @@ class TSendLimiter : public NCore::ISendLimiter {
  private:
   TShardedMap Limiters_;
   std::atomic<int64_t> LimiterCounter_{0};
+  userver::dynamic_config::Source ConfigSource_;
 };
 
 }  // namespace NChat::NInfra

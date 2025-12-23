@@ -54,6 +54,11 @@ target_link_libraries(${PROJECT_NAME}_objs PUBLIC ${PROJECT_NAME}_sql)
 # Unit Tests
 add_executable(${PROJECT_NAME}_unittest ${UNIT_TEST_SOURCES})
 target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver::utest)
+target_compile_definitions(
+    ${PROJECT_NAME}_unittest
+    PRIVATE
+    DEFAULT_DYNAMIC_CONFIG_FILENAME="${CMAKE_CURRENT_SOURCE_DIR}/configs/dynamic_config.yaml"
+)
 add_google_tests(${PROJECT_NAME}_unittest)
 
 # Benchmarks

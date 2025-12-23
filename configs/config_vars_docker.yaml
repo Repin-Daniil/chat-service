@@ -17,7 +17,7 @@ mailbox-queue-type: Vyukov
 mailbox-registry-type: ShardedMap
 limiter-registry-type: ShardedMap
 
-config-cache: cache/
-config-server-url: http://158.160.218.250:8083
+config-cache: ~/cache/
+config-server-url: http://localhost:8083
 
 pg-connection: 'postgresql://chat-user:password@service-postgres:5432/chat_service'

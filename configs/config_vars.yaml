@@ -18,7 +18,6 @@ mailbox-registry-type: ShardedMap
 limiter-registry-type: ShardedMap
 
 config-cache: ~/cache/
-config-server-url: http://158.160.218.250:8083
+config-server-url: http://localhost:8083
 
-# change to URI of your postgres database
 pg-connection: postgresql://testsuite@localhost:15433/chat_service

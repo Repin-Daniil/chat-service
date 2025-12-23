@@ -65,7 +65,7 @@ TObjectFactory<NCore::ISendLimiter> TMessagingServiceComponent::GetLimiterFactor
 
   limiter_factory.Register("ShardedMap", [](const auto& config, const auto& /* context */) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
-    return std::make_unique<TSendLimiter>(shards_amount);
+    return std::make_unique<TSendLimiter>(shards_amount, config_source);
   });
 
   limiter_factory.Register(

@@ -1,8 +1,10 @@
 #include "update_user.hpp"
 
-#include <app/use-cases/mocks/user_repo_mock.hpp>
 #include <app/use-cases/mocks/auth_service_mock.hpp>
+#include <app/use-cases/mocks/user_repo_mock.hpp>
+
 #include <infra/auth/auth_service_impl.hpp>
+
 #include <utils/uuid/uuid_generator.hpp>
 
 #include <gtest/gtest.h>

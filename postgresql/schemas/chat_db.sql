@@ -21,6 +21,20 @@ CREATE TYPE chat.member_role AS ENUM (
 );
 
 -- ===========================
+--  FUNCTIONS
+-- ===========================
+
+CREATE OR REPLACE FUNCTION chat.set_updated_at()
+RETURNS trigger AS $$
+BEGIN
+    IF NEW IS DISTINCT FROM OLD THEN
+        NEW.updated_at = now();
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ===========================
 --  USERS
 -- ===========================
 
@@ -93,3 +107,18 @@ CREATE TYPE chat.user AS (
     salt TEXT,
     biography TEXT
 );
+
+
+-- ===========================
+--  UPDATE TRIGGERS
+-- ===========================
+
+CREATE TRIGGER users_set_updated_at
+BEFORE UPDATE ON chat.users
+FOR EACH ROW
+EXECUTE FUNCTION chat.set_updated_at();
+
+CREATE TRIGGER chats_set_updated_at
+BEFORE UPDATE ON chat.chats
+FOR EACH ROW
+EXECUTE FUNCTION chat.set_updated_at();

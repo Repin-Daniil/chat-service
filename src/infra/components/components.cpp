@@ -3,7 +3,8 @@
 #include <infra/components/messaging_service_component.hpp>
 #include <infra/components/user_repository_component.hpp>
 #include <infra/components/user_service_component.hpp>
-#include <infra/db/postgres_profile_cache.hpp>
+#include <infra/db/postgres_profile_by_user_id_cache.hpp>
+#include <infra/db/postgres_profile_by_username_cache.hpp>
 
 #include <api/http/middlewares/auth_bearer.hpp>
 #include <api/http/v1/messages/poll_messages_handler.hpp>
@@ -47,7 +48,10 @@ void RegisterPostrgesComponent(userver::components::ComponentList& list) {
 }
 
 // Caches
-void RegisterCacheComponent(userver::components::ComponentList& list) { list.Append<TProfileCache>(); }
+void RegisterCacheComponent(userver::components::ComponentList& list) {
+  list.Append<TProfileByUserIdCache>();
+  list.Append<TProfileByUsernameCache>();
+}
 
 // Handlers
 void RegisterUserHandlers(userver::components::ComponentList& list) {

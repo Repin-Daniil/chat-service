@@ -8,8 +8,9 @@ components_manager:
             worker_threads: $worker-fs-threads
 
         monitor-task-processor:       # Make a separate task processor for administrative tasks.
-            worker_threads: 2
             thread_name: mon-worker
+            worker_threads: $worker-mon-threads
+            worker_threads#fallback: 1
 
     default_task_processor: main-task-processor
 
@@ -30,15 +31,23 @@ components_manager:
                     level: $logger-level
                     overflow_behavior: discard  # Drop logs if the system is too busy to write them down.
 
-        # Dynamic config options. Cache is disabled, updates are disabled.
         dynamic-config:
-            # For most of userver dynamic configs, defaults are used, some are overridden here.
-            # See userver "dynamic config" docs for what configs exist.
-            defaults:
-                HTTP_CLIENT_CONNECTION_POOL_SIZE: 1000
-                POSTGRES_DEFAULT_COMMAND_CONTROL:
-                    network_timeout_ms: 750
-                    statement_timeout_ms: 500
+            updates-enabled: true
+            fs-cache-path: $config-cache
+            fs-task-processor: fs-task-processor
+        
+        dynamic-config-client:
+            config-url: $config-server-url
+            http-retries: 5
+            http-timeout: 20s
+            service-name: chat
+
+        dynamic-config-client-updater:
+            config-settings: false
+            first-update-fail-ok: true
+            full-update-interval: 1m
+            update-interval: 5s
+
 
         testsuite-support: {}
 
@@ -136,6 +145,7 @@ components_manager:
             path: /v1/messages/send
             method: POST
             task_processor: main-task-processor
+            max_request_size: 16000 #bytes
             auth:
                 types:
                   - bearer

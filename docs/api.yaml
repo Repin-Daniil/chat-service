@@ -417,6 +417,10 @@ paths:
           description: Получатель не найден
         "409":
           description: Пользователь офлайн
+        "413":
+          description: "Слишком большой payload"
+
+
   /messages/poll:
     post:
       tags:

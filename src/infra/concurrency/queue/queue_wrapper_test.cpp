@@ -306,7 +306,7 @@ UTEST_MT(VyukovMessageQueue, ConcurrentPushPop, 3) {
 
   // Consumer
   auto consumer_task = userver::utils::Async("consumer", [&] {
-    while (true) {
+    while (popped.load() < kMessages) {
       auto batch = queue.PopBatch(10, std::chrono::milliseconds(100));
       popped.fetch_add(batch.size());
 

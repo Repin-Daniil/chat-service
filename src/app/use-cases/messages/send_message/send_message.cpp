@@ -24,7 +24,6 @@ void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
 
   auto message = ConstructMessage(*recipient_id, request.SenderId, std::move(text), request.SentAt);
 
-  // todo dynamic config нужно передавать количество попыток
   const bool is_success = mailbox->SendMessage(std::move(message));
 
   if (!is_success) {

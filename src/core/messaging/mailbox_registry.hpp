@@ -18,7 +18,7 @@ class IMailboxRegistry {
   virtual int64_t GetOnlineAmount() const = 0;
 
   // Offline API for metrics and periodic cleaning
-  virtual void TraverseRegistry() = 0;
+  virtual void TraverseRegistry(std::chrono::milliseconds inter_pause) = 0;
 
   virtual ~IMailboxRegistry() = default;
 };

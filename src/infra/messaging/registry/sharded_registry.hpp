@@ -4,6 +4,8 @@
 
 #include <infra/concurrency/sharded_map/sharded_map.hpp>
 
+#include <userver/dynamic_config/source.hpp>
+
 namespace NChat::NInfra {
 
 class TShardedRegistry : public NCore::IMailboxRegistry {
@@ -11,7 +13,7 @@ class TShardedRegistry : public NCore::IMailboxRegistry {
   using TUserId = NCore::NDomain::TUserId;
   using TShardedMap = NConcurrency::TShardedMap<TUserId, NCore::TUserMailbox, NUtils::TaggedHasher<TUserId>>;
 
-  explicit TShardedRegistry(std::size_t shard_amount);
+  TShardedRegistry(std::size_t shard_amount, userver::dynamic_config::Source config_source);
 
   // Hot path
   NCore::TMailboxPtr GetMailbox(const TUserId& user_id) const override;
@@ -20,12 +22,12 @@ class TShardedRegistry : public NCore::IMailboxRegistry {
   std::int64_t GetOnlineAmount() const override;
 
   // Offline API for metrics and periodic cleaning
-  void TraverseRegistry() override;
-  // todo Сделать конфигурацию через динамический конфиг
+  void TraverseRegistry(std::chrono::milliseconds inter_pause) override;
   // todo Нужна метрика сбалансированности шардов
  private:
   TShardedMap Registry_;
   std::atomic<int64_t> OnlineCounter_{0};
+  userver::dynamic_config::Source ConfigSource_;
 };
 
 }  // namespace NChat::NInfra

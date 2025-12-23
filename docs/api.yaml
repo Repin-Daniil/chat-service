@@ -168,15 +168,15 @@ components:
           - recipient
           - payload
 
-  Message:
+    Message:
       type: object
       required:
-        - sender_id
+        - sender
         - text
       properties:
-        sender_id:
+        sender:
           type: string
-          description: ID пользователя-отправителя
+          description: Username пользователя-отправителя
           example: "user123"
         text:
           type: string
@@ -184,12 +184,12 @@ components:
           example: "Hello, World!"
       description: Сообщение
 
-  PollMessagesResult:
+    PolledMessages:
       type: object
       required:
-        - resunc_required
+        - resync_required
       properties:
-        resunc_required:
+        resync_required:
           type: boolean
           description: Флаг необходимости ресинхронизации сообщений
           example: false
@@ -199,9 +199,9 @@ components:
           items:
             $ref: '#/components/schemas/Message'
           example:
-            - sender_id: "alice"
+            - sender: "alice"
               text: "First message"
-            - sender_id: "bob"
+            - sender: "bob"
               text: "Second message"
       description: Новые сообщения
 

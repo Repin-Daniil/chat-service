@@ -43,7 +43,7 @@ def generate_string(min_length: int, max_length: int, generator: callable, fill_
         value = value[:max_length]
     if len(value) < min_length:
         value = value.ljust(min_length, fill_char)
-    return value
+    return value.strip()
 
 
 def username_generator():

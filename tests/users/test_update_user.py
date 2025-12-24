@@ -12,8 +12,8 @@ async def test_update_user_username(service_client, registered_user):
     new_username = f"{registered_user.username}_updated"
     user_fields = {"user": {"username": new_username}}
     response = await update_user_by_name(
-        service_client, 
-        registered_user.username, 
+        service_client,
+        registered_user.username,
         registered_user.token,
         user_fields
     )
@@ -26,8 +26,8 @@ async def test_update_user_nothing(service_client, registered_user):
     """Проверяет обновление, где ничего не меняется"""
     user_fields = {"user": {}}
     response = await update_user_by_name(
-        service_client, 
-        registered_user.username, 
+        service_client,
+        registered_user.username,
         registered_user.token,
         user_fields
     )
@@ -86,7 +86,7 @@ async def test_update_user_multiple_fields(service_client, registered_user):
     new_username = f"{registered_user.username}_new"
     new_display_name = "Updated Name"
     new_biography = "Updated bio"
-    
+
     user_fields = {
         "user": {
             "username": new_username,
@@ -229,7 +229,7 @@ async def test_update_user_invalid_display_name(service_client, registered_user,
 async def test_update_user_duplicate_username(service_client, multiple_users):
     """Проверяет ошибку при попытке обновить username на уже существующий."""
     user_a, user_b = multiple_users
-    
+
     user_fields = {"user": {"username": user_b.username}}
     response = await update_user_by_name(
         service_client,

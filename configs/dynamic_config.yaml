@@ -12,3 +12,7 @@ SEND_LIMITER_CONFIG:
   token_refill_amount: 1,
   max_rps_per_user: 5,
   idle_timeout_sec: 5
+
+POLLING_CONFIG:
+  max_size: 100,
+  polling_time_sec: 10

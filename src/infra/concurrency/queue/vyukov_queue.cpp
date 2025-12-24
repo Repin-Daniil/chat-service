@@ -25,7 +25,7 @@ std::vector<TMessage> TVyukovMessageQueue::PopBatch(std::size_t max_batch_size, 
   message.Context.Dequeued = GetNowTimePoint();
 
   std::vector<TMessage> message_batch;
-  message_batch.reserve(std::max<std::size_t>(1, Queue_->GetSizeApproximate()));
+  message_batch.reserve(std::max<std::size_t>(1, std::min(max_batch_size, Queue_->GetSizeApproximate())));
   message_batch.emplace_back(std::move(message));
 
   while (message_batch.size() < max_batch_size && Consumer_.PopNoblock(message)) {

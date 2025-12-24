@@ -15,7 +15,7 @@ token_expiry_hours: 1
 registry-shards-amount: 256
 mailbox-queue-type: Vyukov
 mailbox-registry-type: ShardedMap
-limiter-registry-type: None # for testind switch off limiter
+limiter-registry-type: None # for testing switch off limiter
 
 
 config-cache: ~/cache/

@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <optional>
 #include <string>
 
@@ -8,6 +9,7 @@ struct TUserDetails {
   std::string UserId;
   std::string Username;
   std::string DisplayName;
+  std::chrono::system_clock::time_point Timepoint{};
 };
 
 struct TCheckTokenResult {

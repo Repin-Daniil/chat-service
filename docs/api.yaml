@@ -157,16 +157,17 @@ components:
       properties:
         message:
           type: object
-          recipient:
-            type: string
-            description: Username пользователя, которому отправляется сообщение
-          payload:
-            type: string
-            description: Текст сообщения
-            example: "Hello, World!"
-        required:
-          - recipient
-          - payload
+          properties:
+            recipient:
+              type: string
+              description: Username пользователя, которому отправляется сообщение
+            payload:
+              type: string
+              description: Текст сообщения
+              example: "Hello, World!"
+          required:
+            - recipient
+            - payload
 
     Message:
       type: object

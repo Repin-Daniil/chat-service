@@ -34,7 +34,8 @@ class TSendMessageUseCase final {
   void Execute(NDto::TSendMessageRequest request);
 
  private:
-  TMessage ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id, TMessageText text, TTimePoint sent_at);
+  TMessage ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id, TMessageText text,
+                            TTimePoint sent_at);
 
  private:
   NCore::IMailboxRegistry& Registry_;

@@ -21,6 +21,7 @@ class TMessagingServiceComponent final : public userver::components::LoggableCom
   static userver::yaml_config::Schema GetStaticConfigSchema();
 
   ~TMessagingServiceComponent();
+
  private:
   TObjectFactory<NCore::IMailboxRegistry> GetRegistryFactory();
   TObjectFactory<NCore::ISendLimiter> GetLimiterFactory();

@@ -5,7 +5,8 @@ namespace NChat::NApp {
 TPollMessagesUseCase::TPollMessagesUseCase(NCore::IMailboxRegistry& registry, NCore::IUserRepository& user_repo)
     : Registry_(registry), UserRepo_(user_repo) {}
 
-NDto::TPollMessagesResult TPollMessagesUseCase::Execute(const NDto::TPollMessagesRequest& request, const NDto::TPollMessagesSettings& settings) {
+NDto::TPollMessagesResult TPollMessagesUseCase::Execute(const NDto::TPollMessagesRequest& request,
+                                                        const NDto::TPollMessagesSettings& settings) {
   auto mailbox = Registry_.CreateOrGetMailbox(request.ConsumerId);
 
   std::function<TTimePoint()> now = []() -> TTimePoint { return std::chrono::steady_clock::now(); };

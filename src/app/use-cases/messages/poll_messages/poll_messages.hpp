@@ -18,7 +18,8 @@ class TPollMessagesUseCase final {
 
   TPollMessagesUseCase(NCore::IMailboxRegistry& registry, NCore::IUserRepository& user_repo);
 
-  NDto::TPollMessagesResult Execute(const NDto::TPollMessagesRequest& request, const NDto::TPollMessagesSettings& settings);
+  NDto::TPollMessagesResult Execute(const NDto::TPollMessagesRequest& request,
+                                    const NDto::TPollMessagesSettings& settings);
 
  private:
   NCore::IMailboxRegistry& Registry_;

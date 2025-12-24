@@ -1,5 +1,5 @@
 # --- Stage 1: Builder ---
-FROM ghcr.io/userver-framework/ubuntu-22.04-userver-pg:v2.13 AS builder
+FROM ghcr.io/userver-framework/ubuntu-22.04-userver-pg:v2.14 AS builder
 
 WORKDIR /app
 

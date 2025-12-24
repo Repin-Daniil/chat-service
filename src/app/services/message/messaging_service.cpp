@@ -9,7 +9,8 @@ void TMessagingService::SendMessage(NDto::TSendMessageRequest request) {
   SendMessageUseCase_.Execute(std::move(request));
 }
 
-NDto::TPollMessagesResult TMessagingService::PollMessages(const NDto::TPollMessagesRequest& request, const NDto::TPollMessagesSettings& settings) {
+NDto::TPollMessagesResult TMessagingService::PollMessages(const NDto::TPollMessagesRequest& request,
+                                                          const NDto::TPollMessagesSettings& settings) {
   return PollMessagesUseCase_.Execute(request, settings);
 }
 

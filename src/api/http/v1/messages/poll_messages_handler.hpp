@@ -17,6 +17,7 @@ class TPollMessageHandler : public userver::server::handlers::HttpHandlerJsonBas
 
  private:
   NApp::NServices::TMessagingService& MessageService_;
+  userver::dynamic_config::Source ConfigSource_;
 };
 
 }  // namespace NChat::NInfra::NHandlers

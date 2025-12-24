@@ -53,8 +53,9 @@ async def test_empty_payload(service_client, multiple_users):
 
     assert response.status == HTTPStatus.BAD_REQUEST
 
+
 async def test_too_large_payload(service_client, registered_user):
-    message = Message(payload= "A" * 4097, recipient=registered_user.username)
+    message = Message(payload="A" * 4097, recipient=registered_user.username)
     response = await send_message(service_client, message, registered_user.token)
 
     assert response.status == HTTPStatus.BAD_REQUEST

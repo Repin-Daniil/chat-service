@@ -92,7 +92,7 @@ std::optional<TUserTinyProfile> TPostgresUserRepository::GetProfileById(const TU
 
   auto it = snapshot->find(*id);
   if (it != snapshot->end()) {
-    const auto [_, username, display_name] = it->second;
+    const auto [_, username, display_name, timepoint] = it->second;
     return {{.Id = id, .Username = username, .DisplayName = display_name}};
   }
 

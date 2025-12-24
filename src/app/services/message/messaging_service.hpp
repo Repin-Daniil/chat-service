@@ -17,7 +17,8 @@ class TMessagingService {
 
   void SendMessage(NDto::TSendMessageRequest request);
 
-  NDto::TPollMessagesResult PollMessages(const NDto::TPollMessagesRequest& request, const NDto::TPollMessagesSettings& settings);
+  NDto::TPollMessagesResult PollMessages(const NDto::TPollMessagesRequest& request,
+                                         const NDto::TPollMessagesSettings& settings);
 
  private:
   TSendMessageUseCase SendMessageUseCase_;

@@ -11,6 +11,7 @@
 #include <userver/dynamic_config/source.hpp>
 #include <userver/dynamic_config/storage/component.hpp>
 #include <userver/dynamic_config/value.hpp>
+#include <userver/testsuite/testsuite_support.hpp>
 #include <userver/yaml_config/merge_schemas.hpp>
 
 namespace NChat::NInfra::NComponents {
@@ -23,11 +24,11 @@ struct TOverseerSettings {
 
 TOverseerSettings Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TOverseerSettings>) {
   return TOverseerSettings{value["is_enabled"].As<bool>(), std::chrono::seconds{value["period_seconds"].As<int>()},
-                            std::chrono::milliseconds{value["inter_shard_pause_ms"].As<int>()}};
+                           std::chrono::milliseconds{value["inter_shard_pause_ms"].As<int>()}};
 }
 
 const userver::dynamic_config::Key<TOverseerSettings> kOverseerConfig{"OVERSEER_TASK_CONFIG",
-                                                                        userver::dynamic_config::DefaultAsJsonString{R"(
+                                                                      userver::dynamic_config::DefaultAsJsonString{R"(
   {
     "is_enabled": true,
     "period_seconds": 10,
@@ -47,6 +48,7 @@ TMessagingServiceComponent::TMessagingServiceComponent(const userver::components
   MessageService_ = std::make_unique<NApp::NServices::TMessagingService>(*Registry_, *Limiter_, user_repo);
 
   StartPeriodicTraverse();
+  Task_.RegisterInTestsuite(context.FindComponent<userver::components::TestsuiteSupport>().GetPeriodicTaskControl());
 }
 
 TObjectFactory<NCore::IMailboxRegistry> TMessagingServiceComponent::GetRegistryFactory() {

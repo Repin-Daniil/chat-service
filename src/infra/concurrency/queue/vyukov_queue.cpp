@@ -1,5 +1,6 @@
 #include "vyukov_queue.hpp"
 
+#include <userver/utils/scope_guard.hpp>
 #include <userver/utils/datetime_light.hpp>
 
 namespace {
@@ -18,10 +19,19 @@ bool TVyukovMessageQueue::Push(TMessage&& message) {
 
 std::vector<TMessage> TVyukovMessageQueue::PopBatch(std::size_t max_batch_size, std::chrono::milliseconds timeout) {
   TMessage message;
+  if (HasConsumer_.exchange(true)) {
+      throw std::runtime_error("Queue already has a consumer. Multi-consumer access is not allowed.");
+  }
+  {
+  userver::utils::ScopeGuard guard([this] {
+    HasConsumer_.store(false);
+  });
+
   // Здесь как раз и сидит Long Polling
   if (!Consumer_.Pop(message, userver::engine::Deadline::FromDuration(timeout))) {
     return {};
   }
+}
   message.Context.Dequeued = GetNowTimePoint();
 
   std::vector<TMessage> message_batch;

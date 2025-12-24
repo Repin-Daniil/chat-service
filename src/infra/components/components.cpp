@@ -37,9 +37,7 @@ void RegisterUserverComponents(userver::components::ComponentList& list) {
       .Append<userver::clients::dns::Component>()
       .Append<userver::server::handlers::ServerMonitor>()
       .Append<userver::server::handlers::TestsControl>()
-      .Append<userver::congestion_control::Component>()
-      .Append<userver::components::DynamicConfigClientUpdater>()
-      .Append<userver::components::DynamicConfigClient>();
+      .Append<userver::congestion_control::Component>();
 }
 
 void RegisterAuthCheckerFactory() {

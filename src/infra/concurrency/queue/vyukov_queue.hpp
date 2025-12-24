@@ -27,6 +27,7 @@ class TVyukovMessageQueue : public NCore::IMessageQueue {
   std::shared_ptr<TQueue> Queue_;
   TQueue::MultiProducer Producer_;
   TQueue::Consumer Consumer_;
+  std::atomic_bool HasConsumer_;
 };
 
 }  // namespace NChat::NInfra

@@ -30,6 +30,16 @@ components_manager:
                     file_path: '@stderr'
                     level: $logger-level
                     overflow_behavior: discard  # Drop logs if the system is too busy to write them down.
+   
+        default-server-middleware-pipeline-builder:
+            append:
+              - cors-middleware
+        cors-middleware:
+            allowed-methods:
+              - GET, POST, PATCH
+            allowed-origins:
+              - localhost:8080
+            allow-credentials: true
 
         dynamic-config:
             updates-enabled: true
@@ -55,12 +65,11 @@ components_manager:
 
         http-client:
             load-enabled: $is_testing
-            fs-task-processor: fs-task-processor
 
-        # New version
-        # Change v2.13 in dev-container, CMakeLists and Makefile
-        # http-client-core:
-        #     fs-task-processor: fs-task-processor
+        
+        http-client-core:
+            load-enabled: $is_testing
+            fs-task-processor: fs-task-processor
 
         dns-client:
             fs-task-processor: fs-task-processor

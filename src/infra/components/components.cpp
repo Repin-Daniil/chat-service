@@ -32,8 +32,9 @@ namespace NChat::NInfra {
 
 void RegisterUserverComponents(userver::components::ComponentList& list) {
   list.Append<userver::server::handlers::Ping>()
+      .AppendComponentList(userver::clients::http::ComponentList())
+      .AppendComponentList(userver::dynamic_config::updater::ComponentList())
       .Append<userver::components::TestsuiteSupport>()
-      .Append<userver::components::HttpClient>()
       .Append<userver::clients::dns::Component>()
       .Append<userver::server::handlers::ServerMonitor>()
       .Append<userver::server::handlers::TestsControl>()

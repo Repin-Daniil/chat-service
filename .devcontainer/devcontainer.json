@@ -1,5 +1,5 @@
 {
-    "image": "ghcr.io/userver-framework/ubuntu-22.04-userver-pg-dev:v2.13",
+    "image": "ghcr.io/userver-framework/ubuntu-22.04-userver-pg-dev:v2.14",
     "remoteUser": "user",
     "workspaceMount": "source=${localWorkspaceFolder},target=/home/user/chat_service,type=bind",
     "workspaceFolder": "/home/user/chat_service",

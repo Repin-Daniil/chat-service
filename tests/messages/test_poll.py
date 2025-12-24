@@ -321,4 +321,3 @@ async def test_garbage_collection(
     assert 'messages' in data
     assert isinstance(data['messages'], list)
     assert len(data['messages']) == 0
-    assert False

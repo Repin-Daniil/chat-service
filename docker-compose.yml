@@ -1,4 +1,4 @@
-version: "3.8" # Рекомендую поднять версию
+version: "3.8"
 
 services:
   nginx:

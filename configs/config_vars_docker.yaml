@@ -18,6 +18,6 @@ mailbox-registry-type: ShardedMap
 limiter-registry-type: ShardedMap
 
 config-cache: cache/cache.json
-config-server-url: http://158.160.173.209:8083
+config-server-url: http://localhost:8083
 
 pg-connection: 'postgresql://chat-user:password@service-postgres:5432/chat_service'

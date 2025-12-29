@@ -21,12 +21,15 @@ namespace {
 // ============================================================================
 
 TMessage CreateTestMessage(std::size_t text_size = 100) {
+  constexpr std::size_t kMaxMessageSize = 4096;
+  text_size = std::min(text_size, kMaxMessageSize);
+
   static const std::vector<std::string> kPools = []() {
     std::vector<std::string> pools;
     std::mt19937 gen(std::random_device{}());
     std::uniform_int_distribution<> dis(0, 25);
 
-    for (int p = 0; p < 4; ++p) {  // 4 разных пула
+    for (int p = 0; p < 4; ++p) {
       std::string s;
       s.reserve(100000);
       for (int i = 0; i < 100000; ++i) {
@@ -39,15 +42,23 @@ TMessage CreateTestMessage(std::size_t text_size = 100) {
 
   static thread_local std::mt19937 gen(std::random_device{}());
   std::uniform_int_distribution<std::size_t> pool_dis(0, kPools.size() - 1);
-  std::uniform_int_distribution<std::size_t> offset_dis(0, 100000 - text_size);
 
   const auto& pool = kPools[pool_dis(gen)];
+  const std::size_t max_offset = pool.size() - text_size;
+  std::uniform_int_distribution<std::size_t> offset_dis(0, max_offset);
+
   std::string text = pool.substr(offset_dis(gen), text_size);
 
-  return TMessage{.Payload = std::make_shared<TMessagePaylod>(TUserId("user1"), std::move(text)),
-                  .RecipientId = TUserId("user2"),
-                  .Context = {}};
+  return TMessage{
+      .Payload = std::make_shared<TMessagePaylod>(
+          TUserId("user1"),
+          NDomain::TMessageText(std::move(text))
+      ),
+      .RecipientId = TUserId("user2"),
+      .Context = {}
+  };
 }
+
 
 // ============================================================================
 // ФАБРИКА ДЛЯ СОЗДАНИЯ ОЧЕРЕДЕЙ РАЗНЫХ ТИПОВ

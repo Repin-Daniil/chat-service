@@ -425,7 +425,7 @@ BENCHMARK(BM_ShardedMap_CleanupWithDelay)->Arg(0)->Arg(1)->Arg(5)->Arg(10);
 // GetOrCreate benchmarks
 // ============================================================================
 
-void BM_GetOrCreateNew(benchmark::State& state) {
+void BM_ShardedMap_GetOrCreateNew(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
     std::size_t i = 0;
@@ -441,9 +441,9 @@ void BM_GetOrCreateNew(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
   });
 }
-BENCHMARK(BM_GetOrCreateNew);
+BENCHMARK(BM_ShardedMap_GetOrCreateNew);
 
-void BM_GetOrCreateExisting(benchmark::State& state) {
+void BM_ShardedMap_GetOrCreateExisting(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
 
@@ -464,9 +464,9 @@ void BM_GetOrCreateExisting(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
   });
 }
-BENCHMARK(BM_GetOrCreateExisting);
+BENCHMARK(BM_ShardedMap_GetOrCreateExisting);
 
-void BM_GetOrCreateMixed(benchmark::State& state) {
+void BM_ShardedMap_GetOrCreateMixed(benchmark::State& state) {
   const auto hit_rate = state.range(0);  // 0-100
 
   userver::engine::RunStandalone([&]() {
@@ -492,13 +492,13 @@ void BM_GetOrCreateMixed(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
   });
 }
-BENCHMARK(BM_GetOrCreateMixed)
+BENCHMARK(BM_ShardedMap_GetOrCreateMixed)
     ->Arg(0)    // 0% hit rate (all new)
     ->Arg(50)   // 50% hit rate
     ->Arg(90)   // 90% hit rate
     ->Arg(99);  // 99% hit rate
 
-void BM_ConcurrentGetOrCreate(benchmark::State& state) {
+void BM_ShardedMap_ConcurrentGetOrCreate(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     const auto thread_count = state.range(0);
     std::atomic<std::size_t> total_ops{0};
@@ -530,9 +530,9 @@ void BM_ConcurrentGetOrCreate(benchmark::State& state) {
     state.SetItemsProcessed(total_ops.load());
   });
 }
-BENCHMARK(BM_ConcurrentGetOrCreate)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
+BENCHMARK(BM_ShardedMap_ConcurrentGetOrCreate)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
 
-void BM_ConcurrentGetOrCreateDistinct(benchmark::State& state) {
+void BM_ShardedMap_ConcurrentGetOrCreateDistinct(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     const auto thread_count = state.range(0);
     std::atomic<std::size_t> total_ops{0};
@@ -565,9 +565,9 @@ void BM_ConcurrentGetOrCreateDistinct(benchmark::State& state) {
     state.SetItemsProcessed(total_ops.load());
   });
 }
-BENCHMARK(BM_ConcurrentGetOrCreateDistinct)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
+BENCHMARK(BM_ShardedMap_ConcurrentGetOrCreateDistinct)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
 
-void BM_GetOrCreateVsPutGet(benchmark::State& state) {
+void BM_ShardedMap_GetOrCreateVsPutGet(benchmark::State& state) {
   const auto use_get_or_create = state.range(0);
 
   userver::engine::RunStandalone([&]() {
@@ -598,6 +598,6 @@ void BM_GetOrCreateVsPutGet(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations());
   });
 }
-BENCHMARK(BM_GetOrCreateVsPutGet)
+BENCHMARK(BM_ShardedMap_GetOrCreateVsPutGet)
     ->Arg(0)   // Get + Put
     ->Arg(1);  // GetOrCreate

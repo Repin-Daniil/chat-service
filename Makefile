@@ -3,6 +3,8 @@ NPROCS ?= $(shell nproc)
 CLANG_FORMAT ?= clang-format
 DOCKER_IMAGE ?= ghcr.io/userver-framework/ubuntu-24.04-userver:v2.14
 CMAKE_OPTS ?= 
+CMAKE_OPTS += -DCOVERAGE_ENABLED=$(COVERAGE_ENABLED)
+
 # If we're under TTY, pass "-it" to "docker run"
 DOCKER_ARGS = $(shell /bin/test -t 0 && /bin/echo -it || echo)
 PRESETS ?= debug release debug-custom release-custom

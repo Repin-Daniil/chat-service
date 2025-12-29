@@ -24,11 +24,12 @@
                 "ms-vscode.cmake-tools",
                 "ms-vscode.makefile-tools",
                 "vadimcn.vscode-lldb",
-                "ms-azuretools.vscode-docker"
+                "ms-azuretools.vscode-docker",
+                "ryanluker.vscode-coverage-gutters"
             ],
             "settings": {
                 "cmake.automaticReconfigure": false,
-                "cmake.configureOnEdit":  false,
+                "cmake.configureOnEdit": false,
                 "cmake.configureOnOpen": false,
                 "cmake.copyCompileCommands": "${workspaceFolder}/.vscode/compile_commands.json",
                 "clangd.path": "/usr/bin/clangd",
@@ -38,7 +39,12 @@
                     "--clang-tidy",
                     "--completion-style=detailed",
                     "--header-insertion=never"
-                ]
+                ],
+                "coverage-gutters.coverageFileNames": [
+                    "coverage.info"
+                ],
+                "coverage-gutters.showLineCoverage": true,
+                "coverage-gutters.showGutterCoverage": true
             }
         }
     },

@@ -24,7 +24,7 @@ services:
       POSTGRES_USER: chat-user
       POSTGRES_PASSWORD: password
     ports:
-      - "5432"
+      - "5432:5432"
     volumes:
       - ./postgresql/schemas:/docker-entrypoint-initdb.d
       - ./.pgdata:/var/lib/postgresql/data
@@ -34,9 +34,9 @@ services:
   chat-server:
     container_name: chat-server
     build: .
-    expose:
-      - "8080"
-      - "8081"
+    ports:
+      - "8080:8080"
+      - "8081:8081"
     volumes:
       - ./configs/config_vars_docker.yaml:/app/configs/config_vars.yaml
       - ./configs/dynamic_config.yaml:/app/configs/dynamic_config.yaml

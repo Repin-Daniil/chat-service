@@ -62,15 +62,23 @@ target_compile_definitions(
 add_google_tests(${PROJECT_NAME}_unittest)
 
 # Benchmarks
-# add_executable(${PROJECT_NAME}_benchmark ${BENCHMARK_SOURCES})
-# target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_objs userver::ubench)
-# add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
+add_executable(${PROJECT_NAME}_benchmark ${BENCHMARK_SOURCES})
+target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_objs userver::ubench)
+add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
 
 # Functional testing
 userver_testsuite_add_simple(
     REQUIREMENTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/requirements.txt
     SQL_LIBRARY ${PROJECT_NAME}_sql
 )
+
+# Coverage
+option(COVERAGE_ENABLED "Enable coverage" OFF)
+if(COVERAGE_ENABLED)
+    include(coverage)
+endif()
+
+
 
 # Install
 include(GNUInstallDirs)

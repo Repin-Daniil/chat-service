@@ -440,7 +440,13 @@ async def test_polling_anothers_session(service_client, communication):
     assert response.status == HTTPStatus.GONE
 
 
-async def test_polling_rubbis_session_id(service_client, single_consumer):
+async def test_polling_rubbish_session_id(service_client, single_consumer):
     single_consumer.session_id = "random text"
+    response = await poll_messages(service_client, single_consumer)
+    assert response.status == HTTPStatus.GONE
+
+
+async def test_polling_empty_session_id(service_client, single_consumer):
+    single_consumer.session_id = ""
     response = await poll_messages(service_client, single_consumer)
     assert response.status == HTTPStatus.GONE

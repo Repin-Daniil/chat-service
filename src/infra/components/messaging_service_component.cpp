@@ -20,18 +20,18 @@
 
 namespace NChat::NInfra::NComponents {
 
-struct TGcSettings {
+struct TGCSettings {
   bool IsEnabled = false;
   std::chrono::seconds Period{10};
   std::chrono::milliseconds InternalPause{10};
 };
 
-TGcSettings Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TGcSettings>) {
-  return TGcSettings{value["is_enabled"].As<bool>(), std::chrono::seconds{value["period_seconds"].As<int>()},
+TGCSettings Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TGCSettings>) {
+  return TGCSettings{value["is_enabled"].As<bool>(), std::chrono::seconds{value["period_seconds"].As<int>()},
                      std::chrono::milliseconds{value["inter_shard_pause_ms"].As<int>()}};
 }
 
-const userver::dynamic_config::Key<TGcSettings> kGarbageCollectorConfig{"GC_TASK_CONFIG",
+const userver::dynamic_config::Key<TGCSettings> kGarbageCollectorConfig{"GC_TASK_CONFIG",
                                                                         userver::dynamic_config::DefaultAsJsonString{R"(
   {
     "is_enabled": true,

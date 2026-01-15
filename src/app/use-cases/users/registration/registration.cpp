@@ -24,6 +24,7 @@ std::optional<NCore::NDomain::TUserId> InsertUser(const NCore::IUserRepository& 
   // retry loop for uuid collision
   int attempts = 0;
   constexpr int kMaxAttempts = 5;
+  // todo Перевезти в динконфиг
   NUtils::NId::UuidGenerator generator;
 
   while (attempts < kMaxAttempts) {

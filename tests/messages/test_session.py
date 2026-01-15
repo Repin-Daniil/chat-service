@@ -30,3 +30,10 @@ async def test_session_limit(service_client, registered_user, sessions_config):
 
     assert response_1.status == HTTPStatus.OK
     assert response_2.status == HTTPStatus.TOO_MANY_REQUESTS
+
+
+@pytest.mark.parametrize('registry_config', [(0)], indirect=True)
+async def test_users_limit(service_client, registered_user, registry_config):
+    response = await start_session(service_client, registered_user.token)
+
+    assert response.status == HTTPStatus.SERVICE_UNAVAILABLE

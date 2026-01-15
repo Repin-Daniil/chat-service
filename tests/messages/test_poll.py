@@ -2,8 +2,8 @@ from http import HTTPStatus
 
 import pytest
 
-from endpoints import poll_messages, send_message
-from utils import username_generator
+from endpoints import poll_messages, send_message, start_session
+from utils import username_generator, get_session_id
 from models import Message, User
 from collections import Counter
 from validators import validate_messages
@@ -218,6 +218,24 @@ async def test_poll_messages_resync_required_false(service_client, single_consum
 
     data = response.json()
     assert data['resync_required'] is False
+
+
+@pytest.mark.parametrize('queue_config', [1], indirect=True)
+@pytest.mark.usefixtures("short_polling")
+async def test_poll_messages_resync_required_true(service_client, queue_config, communication):
+    """Проверка, что resync_required = true при переполнении очереди"""
+    sender, recipient, message = communication
+
+    response_1 = await send_message(service_client, message, sender.token)
+    assert response_1.status == HTTPStatus.ACCEPTED
+    response_2 = await send_message(service_client, message, sender.token)
+    assert response_2.status == HTTPStatus.SERVICE_UNAVAILABLE
+
+    response = await poll_messages(service_client, recipient)
+    assert response.status == HTTPStatus.OK
+
+    data = response.json()
+    assert data['resync_required'] is True
 
 
 @pytest.mark.usefixtures("short_polling")

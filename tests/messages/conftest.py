@@ -73,6 +73,7 @@ def sessions_config(dynamic_config, request):
 @pytest.fixture()
 def queue_config(dynamic_config, request):
     """Динамический конфиг queue factory"""
+    # Должен предшествовать созданию сессий!
     param = getattr(request, "param", ())
 
     if isinstance(param, int):

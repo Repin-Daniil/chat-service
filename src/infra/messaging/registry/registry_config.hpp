@@ -9,8 +9,7 @@
 namespace NChat::NInfra {
 
 struct TRegistryConfig {
-  std::size_t MaxQueueSize{1000};
-  std::chrono::seconds IdleTimeout{60};
+  std::size_t MaxUsersAmount{10000};
 };
 
 TRegistryConfig Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TRegistryConfig>);
@@ -18,8 +17,7 @@ TRegistryConfig Parse(const userver::formats::json::Value& value, userver::forma
 const userver::dynamic_config::Key<TRegistryConfig> kRegistryConfig{"REGISTRY_CONFIG",
                                                                     userver::dynamic_config::DefaultAsJsonString{R"(
   {
-    "max_queue_size": 1000,
-    "idle_timeout_sec": 60
+    "max_users_amount": 10000
   }
 )"}};
 

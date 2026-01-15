@@ -2,9 +2,9 @@
 
 namespace NChat::NApp {
 
-TSendMessageUseCase::TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCore::ISendLimiter& limiter,
+TSendMessageUseCase::TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter,
                                          NCore::IUserRepository& user_repo)
-    : Registry_(registry), Limiter_(limiter), UserRepo_(user_repo) {}
+    : Registry_(registry), UserRepo_(user_repo), Limiter_(limiter) {}
 
 void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
   if (!Limiter_.TryAcquire(request.SenderId)) {
@@ -20,7 +20,11 @@ void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
     throw TRecipientNotFound("Recipient Not Found");
   }
 
-  auto mailbox = Registry_.CreateOrGetMailbox(*recipient_id);
+  auto mailbox = Registry_.GetMailbox(*recipient_id);
+
+  if (!mailbox) {
+    throw TRecipientOffline(fmt::format("User {} is offline", recipient_username.Value()));
+  }
 
   auto message = ConstructMessage(*recipient_id, request.SenderId, std::move(text), request.SentAt);
 
@@ -34,7 +38,7 @@ void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
 
 NCore::NDomain::TMessage TSendMessageUseCase::ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id,
                                                                TMessageText text, TTimePoint sent_at) {
-  auto payload = std::make_shared<NCore::NDomain::TMessagePaylod>(sender_id, std::move(text));
+  auto payload = std::make_shared<NCore::NDomain::TMessagePayload>(sender_id, std::move(text));
 
   NCore::NDomain::TDeliveryContext context{.Get = sent_at};
   return {.Payload = std::move(payload), .RecipientId = recipient_id, .Context = context};

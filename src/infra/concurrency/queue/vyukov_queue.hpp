@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/messaging/message_queue.hpp>
+#include <core/messaging/queue/message_queue.hpp>
 
 #include <userver/concurrent/mpsc_queue.hpp>
 

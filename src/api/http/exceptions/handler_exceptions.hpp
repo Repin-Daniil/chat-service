@@ -48,6 +48,7 @@ class TConflictException
     : public userver::server::handlers::ExceptionWithCode<userver::server::handlers::HandlerErrorCode::kConflictState> {
  public:
   TConflictException(std::string_view field, std::string_view msg) : BaseType(MakeError(field, msg)) {}
+  TConflictException(std::string_view msg) : BaseType(MakeError(msg)) {}
 
   explicit TConflictException(userver::formats::json::Value&& json) : BaseType(std::move(json)) {}
 };

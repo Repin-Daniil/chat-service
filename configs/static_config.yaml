@@ -149,10 +149,19 @@ components_manager:
                 types:
                   - bearer
                 required: true
-        
-        handler-poll-messages:
-            path: /v1/messages/poll
+
+        handler-start-session:
+            path: /v1/messages/poll/start
             method: POST
+            task_processor: main-task-processor
+            auth:
+                types:
+                  - bearer
+                required: true
+
+        handler-poll-messages:
+            path: /v1/messages/poll/{session_id}
+            method: GET
             task_processor: main-task-processor
             auth:
                 types:

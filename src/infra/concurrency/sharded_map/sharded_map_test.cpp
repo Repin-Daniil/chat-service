@@ -151,6 +151,36 @@ UTEST(ShardedMap, RemoveAlreadyRemoved) {
 }
 
 // ============================================================================
+// Clear Tests
+// ============================================================================
+UTEST(ShardedMap, ClearExisting) {
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TUserId user_id{"231"};
+
+  map.Put(user_id, std::make_shared<TDummyQueue>(false, 123));
+  ASSERT_TRUE(map.Get(user_id));
+
+  map.Clear();
+  ASSERT_FALSE(map.Get(user_id));
+}
+
+UTEST(ShardedMap, ClearEmpty) {
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+
+  ASSERT_NO_THROW(map.Clear());
+}
+
+UTEST(ShardedMap, ClearOneShard) {
+  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(1);
+  TUserId user_id{"231"};
+
+  map.Put(user_id, std::make_shared<TDummyQueue>(false, 123));
+  ASSERT_TRUE(map.Get(user_id));
+
+  ASSERT_NO_THROW(map.Clear());
+}
+
+// ============================================================================
 // CleanupAndCount Tests
 // ============================================================================
 

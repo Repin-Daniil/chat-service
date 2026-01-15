@@ -1,5 +1,5 @@
-from helpers.utils import get_user_token
-from helpers.endpoints import register_user
+from helpers.utils import get_user_token, get_session_id
+from helpers.endpoints import register_user, start_session
 from helpers.models import User, Message
 from http import HTTPStatus
 import os
@@ -19,7 +19,7 @@ pytest_plugins = [
 
 @pytest.fixture
 async def registered_user(service_client):
-    """Создаёт и регистрирует пользователя, возвращает (user, token)."""
+    """Registered user with token"""
     user = User()
     response = await register_user(service_client, user)
     assert response.status == HTTPStatus.OK, "Регистрация пользователя не удалась"
@@ -30,8 +30,17 @@ async def registered_user(service_client):
 
 @pytest.fixture
 async def multiple_users(service_client, request):
-    """Создаёт и регистрирует несколько пользователей."""
-    users_amount = getattr(request, "param", 2)
+    """Multiple registered users, by default 2 with opened sessions"""
+    users_amount = 2
+    start_session_enabled = True
+
+    if hasattr(request, "param"):
+        param = request.param
+        if isinstance(param, int):
+            users_amount = param
+        elif isinstance(param, (tuple, list)):
+            users_amount = param[0] if len(param) > 0 else 2
+            start_session_enabled = param[1] if len(param) > 1 else True
 
     users_data = []
 
@@ -41,15 +50,27 @@ async def multiple_users(service_client, request):
         assert response.status == HTTPStatus.OK
 
         user.token = get_user_token(response)
+        if start_session_enabled:
+            response = await start_session(service_client, user.token)
+            user.session_id = get_session_id(response)
+
         users_data.append(user)
 
     return users_data
 
 
 @pytest.fixture
-async def communication(multiple_users):
+async def single_consumer(service_client, registered_user):
+    """Registered user with opened session"""
+    registered_user.session_id = get_session_id(await start_session(service_client, registered_user.token))
+    return registered_user
+
+
+@pytest.fixture
+async def communication(service_client, multiple_users):
+    """Two users with opened sessions and dummy message"""
     sender, recipient = multiple_users
-    message = Message(recipient=recipient.username)
+    message = Message(recipient=recipient.username, sender=sender.username)
     return sender, recipient, message
 
 

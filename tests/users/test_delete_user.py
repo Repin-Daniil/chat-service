@@ -24,7 +24,7 @@ async def test_delete_user_multiple_times(service_client, registered_user):
     assert response.json().get('message', {}) == "Invalid user auth"
 
 
-@pytest.mark.parametrize('multiple_users', [3], indirect=True)
+@pytest.mark.parametrize('multiple_users', [(3, False)], indirect=True)
 async def test_delete_multiple_users(service_client, multiple_users):
     """Проверяет удаление нескольких пользователей."""
     for user in multiple_users:
@@ -52,7 +52,7 @@ async def test_delete_user_empty_username(service_client, registered_user):
     assert 'errors' in response.json().get('details', {})
 
 
-@pytest.mark.parametrize('multiple_users', [2], indirect=True)
+@pytest.mark.parametrize('multiple_users', [(2, False)], indirect=True)
 async def test_delete_user_forbidden(service_client, multiple_users):
     """Проверяет ошибку при попытке удалить чужого пользователя."""
     user_a, user_b = multiple_users

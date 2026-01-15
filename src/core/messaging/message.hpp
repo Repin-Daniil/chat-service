@@ -8,7 +8,7 @@
 
 namespace NChat::NCore::NDomain {
 
-struct TMessagePaylod {
+struct TMessagePayload {
   TUserId Sender;
   TMessageText Text;
 };
@@ -21,7 +21,7 @@ struct TDeliveryContext {
 };
 
 struct TMessage {
-  std::shared_ptr<const TMessagePaylod> Payload;
+  std::shared_ptr<const TMessagePayload> Payload;
   TUserId RecipientId;
   TDeliveryContext Context;
   // TMessageId Id;

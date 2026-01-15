@@ -4,6 +4,7 @@
 #include <infra/concurrency/queue/vyukov_queue.hpp>
 #include <infra/messaging/limiter/dummy_limiter.hpp>
 #include <infra/messaging/limiter/sharded_limiter.hpp>
+#include <infra/messaging/queue/vyukov_queue_factory.hpp>
 #include <infra/messaging/registry/sharded_registry.hpp>
 
 #include <userver/components/component.hpp>
@@ -11,24 +12,27 @@
 #include <userver/dynamic_config/source.hpp>
 #include <userver/dynamic_config/storage/component.hpp>
 #include <userver/dynamic_config/value.hpp>
+#include <userver/formats/json/value_builder.hpp>
+#include <userver/testsuite/tasks.hpp>
+#include <userver/testsuite/testpoint.hpp>
 #include <userver/testsuite/testsuite_support.hpp>
 #include <userver/yaml_config/merge_schemas.hpp>
 
 namespace NChat::NInfra::NComponents {
 
-struct TOverseerSettings {
+struct TGCSettings {
   bool IsEnabled = false;
   std::chrono::seconds Period{10};
   std::chrono::milliseconds InternalPause{10};
 };
 
-TOverseerSettings Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TOverseerSettings>) {
-  return TOverseerSettings{value["is_enabled"].As<bool>(), std::chrono::seconds{value["period_seconds"].As<int>()},
-                           std::chrono::milliseconds{value["inter_shard_pause_ms"].As<int>()}};
+TGCSettings Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TGCSettings>) {
+  return TGCSettings{value["is_enabled"].As<bool>(), std::chrono::seconds{value["period_seconds"].As<int>()},
+                     std::chrono::milliseconds{value["inter_shard_pause_ms"].As<int>()}};
 }
 
-const userver::dynamic_config::Key<TOverseerSettings> kOverseerConfig{"OVERSEER_TASK_CONFIG",
-                                                                      userver::dynamic_config::DefaultAsJsonString{R"(
+const userver::dynamic_config::Key<TGCSettings> kGarbageCollectorConfig{"GC_TASK_CONFIG",
+                                                                        userver::dynamic_config::DefaultAsJsonString{R"(
   {
     "is_enabled": true,
     "period_seconds": 10,
@@ -41,30 +45,41 @@ TMessagingServiceComponent::TMessagingServiceComponent(const userver::components
                                                        const userver::components::ComponentContext& context)
     : LoggableComponentBase(config, context),
       ConfigSource_(context.FindComponent<userver::components::DynamicConfig>().GetSource()) {
+  QueueFactory_ = GetQueueFactory().Create(config, context, "queue-type");
   Registry_ = GetRegistryFactory().Create(config, context, "registry-type");
-  // todo Нужно сделать фабрику очередей
   Limiter_ = GetLimiterFactory().Create(config, context, "limiter-type");
   auto& user_repo = context.FindComponent<NComponents::TUserRepoComponent>().GetRepository();
+
   MessageService_ = std::make_unique<NApp::NServices::TMessagingService>(*Registry_, *Limiter_, user_repo);
 
-  StartPeriodicTraverse();
-  Task_.RegisterInTestsuite(context.FindComponent<userver::components::TestsuiteSupport>().GetPeriodicTaskControl());
+  SetupTestsuite(context);
 }
 
 TObjectFactory<NCore::IMailboxRegistry> TMessagingServiceComponent::GetRegistryFactory() {
   TObjectFactory<NCore::IMailboxRegistry> registry_factory;
 
-  registry_factory.Register("ShardedMap", [](const auto& config, const auto& context) {
+  registry_factory.Register("ShardedMap", [this](const auto& config, const auto& context) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
     auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
-    return std::make_unique<TShardedRegistry>(shards_amount, config_source);
+    return std::make_unique<TShardedRegistry>(shards_amount, config_source, *QueueFactory_);
   });
 
   return registry_factory;
 }
 
-TObjectFactory<NCore::ISendLimiter> TMessagingServiceComponent::GetLimiterFactory() {
-  TObjectFactory<NCore::ISendLimiter> limiter_factory;
+TObjectFactory<NCore::IMessageQueueFactory> TMessagingServiceComponent::GetQueueFactory() {
+  TObjectFactory<NCore::IMessageQueueFactory> queue_factory;
+
+  queue_factory.Register("Vyukov", [](const auto& /*config*/, const auto& context) {
+    auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
+    return std::make_unique<TVyukovQueueFactory>(config_source);
+  });
+
+  return queue_factory;
+}
+
+TObjectFactory<NApp::ISendLimiter> TMessagingServiceComponent::GetLimiterFactory() {
+  TObjectFactory<NApp::ISendLimiter> limiter_factory;
 
   limiter_factory.Register("ShardedMap", [](const auto& config, const auto& context) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
@@ -78,32 +93,51 @@ TObjectFactory<NCore::ISendLimiter> TMessagingServiceComponent::GetLimiterFactor
   return limiter_factory;
 }
 
-void TMessagingServiceComponent::StartPeriodicTraverse() {
-  userver::utils::PeriodicTask::Settings settings(std::chrono::seconds(10));
-  settings.flags = userver::utils::PeriodicTask::Flags::kChaotic;
-
-  Task_.Start("overseer-background-job", settings, [this] { Traverse(); });
-}
-
 void TMessagingServiceComponent::Traverse() {
   const auto snapshot = ConfigSource_.GetSnapshot();
-  const auto task_config = snapshot[kOverseerConfig];
+  const auto task_config = snapshot[kGarbageCollectorConfig];
 
   if (Task_.GetCurrentSettings().period != task_config.Period) {
     userver::utils::PeriodicTask::Settings new_settings(task_config.Period);
     new_settings.distribution = task_config.Period / 10;  // jitter
     Task_.SetSettings(new_settings);
 
-    LOG_INFO() << "Overseer task period updated to " << task_config.Period << " seconds";
+    LOG_INFO() << "Garbage Collector task period updated to " << task_config.Period << " seconds";
   }
 
   if (!task_config.IsEnabled) {
-    LOG_WARNING() << "Overseer task skipped due to configuration: metrics not collected, garbage not removed";
+    LOG_WARNING() << "Garbage Collector task skipped due to configuration: metrics not collected, garbage not removed";
     return;
   }
 
   Registry_->TraverseRegistry(task_config.InternalPause);
   Limiter_->TraverseLimiters();
+}
+
+void TMessagingServiceComponent::SetupTestsuite(const userver::components::ComponentContext& context) {
+  StartPeriodicTraverse();
+  Task_.RegisterInTestsuite(context.FindComponent<userver::components::TestsuiteSupport>().GetPeriodicTaskControl());
+
+  auto& testsuite_tasks = userver::testsuite::GetTestsuiteTasks(context);
+
+  auto clear_cb = std::function<void()>([this] { Registry_->Clear(); });
+  if (testsuite_tasks.IsEnabled()) {
+    testsuite_tasks.RegisterTask("reset-task", [clear_cb] {
+      TESTPOINT("reset-task/action", [clear_cb] {
+        clear_cb();
+        LOG_INFO() << "Testsuite clean mailbox registry";
+        userver::formats::json::ValueBuilder builder;
+        return builder.ExtractValue();
+      }());
+    });
+  }
+}
+
+void TMessagingServiceComponent::StartPeriodicTraverse() {
+  userver::utils::PeriodicTask::Settings settings(std::chrono::seconds(10));
+  settings.flags = userver::utils::PeriodicTask::Flags::kChaotic;
+
+  Task_.Start("gc-background-job", settings, [this] { Traverse(); });
 }
 
 TMessagingServiceComponent::~TMessagingServiceComponent() { Task_.Stop(); }

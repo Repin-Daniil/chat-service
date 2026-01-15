@@ -105,7 +105,7 @@ async def test_update_user_multiple_fields(service_client, registered_user):
     assert response.json().get('username') == new_username
 
 
-@pytest.mark.parametrize('multiple_users', [3], indirect=True)
+@pytest.mark.parametrize('multiple_users', [(3, False)], indirect=True)
 async def test_update_multiple_users(service_client, multiple_users):
     """Проверяет обновление нескольких пользователей."""
     for user in multiple_users:
@@ -152,7 +152,7 @@ async def test_update_nontexistent_user(service_client, registered_user):
     assert response.status == HTTPStatus.FORBIDDEN
 
 
-@pytest.mark.parametrize('multiple_users', [2], indirect=True)
+@pytest.mark.parametrize('multiple_users', [(2, False)], indirect=True)
 async def test_update_user_forbidden(service_client, multiple_users):
     """Проверяет ошибку при попытке обновить чужого пользователя."""
     user_a, user_b = multiple_users
@@ -225,7 +225,7 @@ async def test_update_user_invalid_display_name(service_client, registered_user,
     assert any(err == expected_error_field for err in errors)
 
 
-@pytest.mark.parametrize('multiple_users', [2], indirect=True)
+@pytest.mark.parametrize('multiple_users', [(2, False)], indirect=True)
 async def test_update_user_duplicate_username(service_client, multiple_users):
     """Проверяет ошибку при попытке обновить username на уже существующий."""
     user_a, user_b = multiple_users

@@ -17,8 +17,9 @@ class Routes(str, Enum):
     USER_BY_NAME = '/v1/users/{username}'
 
     # messages
+    START_SESSION = '/v1/messages/poll/start'
     SEND_MESSAGE = '/v1/messages/send'
-    POLL_MESSAGES = '/v1/messages/poll'
+    POLL_MESSAGES = '/v1/messages/poll/{session_id}'
 
     def __str__(self) -> str:
         return self.value
@@ -35,6 +36,10 @@ def model_dump(model, **kwargs):
 
 def get_user_token(response):
     return 'Bearer {token}'.format(token=response.json()['user']['token'])
+
+
+def get_session_id(response):
+    return response.json()['session_id']
 
 
 def generate_string(min_length: int, max_length: int, generator: callable, fill_char: str = "x") -> str:

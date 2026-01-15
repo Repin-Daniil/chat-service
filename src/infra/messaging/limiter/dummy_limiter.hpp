@@ -1,10 +1,10 @@
 #pragma once
 
-#include <core/messaging/send_limiter.hpp>
+#include <app/services/message/send_limiter.hpp>
 
 namespace NChat::NInfra {
 
-class TDummyLimiter : public NCore::ISendLimiter {
+class TDummyLimiter : public NApp::ISendLimiter {
  public:
   using TUserId = NCore::NDomain::TUserId;
 

@@ -7,15 +7,20 @@ TPollMessagesUseCase::TPollMessagesUseCase(NCore::IMailboxRegistry& registry, NC
 
 NDto::TPollMessagesResult TPollMessagesUseCase::Execute(const NDto::TPollMessagesRequest& request,
                                                         const NDto::TPollMessagesSettings& settings) {
-  auto mailbox = Registry_.CreateOrGetMailbox(request.ConsumerId);
+  auto mailbox = Registry_.GetMailbox(request.ConsumerId);
 
-  std::function<TTimePoint()> now = []() -> TTimePoint { return std::chrono::steady_clock::now(); };
-  auto messages = mailbox->PollMessages(now, settings.MaxSize, settings.PollTime);
+  if (!mailbox) {
+    throw TMailboxNotFound(fmt::format("Session for your user not found"));
+  }
+
+  auto messages = mailbox->PollMessages(request.SessionId, settings.MaxSize, settings.PollTime);
 
   NDto::TPollMessagesResult result;
   result.ResyncRequired = messages.ResyncRequired;
+
   for (auto& message : messages.Messages) {
     std::optional<NCore::NDomain::TUserTinyProfile> profile;
+
     try {
       profile = UserRepo_.GetProfileById(message.Payload->Sender);
     } catch (const std::exception& e) {
@@ -23,6 +28,7 @@ NDto::TPollMessagesResult TPollMessagesUseCase::Execute(const NDto::TPollMessage
       result.ResyncRequired = true;
       continue;
     }
+
     if (!profile.has_value()) {
       LOG_WARNING() << fmt::format("Dropping message: no user with id {}", *message.Payload->Sender);
       result.ResyncRequired = true;

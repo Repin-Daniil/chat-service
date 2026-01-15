@@ -211,6 +211,17 @@ components:
               text: "Second message"
       description: Новые сообщения
 
+    SessionParams:
+      type: object
+      required:
+        - session_id
+      properties:
+        session_id:
+          type: string
+          description: ID сессии {gateway_id}-{sessiond_id}
+          example: 2531-3847323
+      description: Созданная сессия
+      
 paths:
   # Users
   /users/register:
@@ -427,8 +438,8 @@ paths:
           description: "Слишком большой payload"
 
 
-  /messages/poll:
-    post:
+  /messages/poll/{session_id}:
+    get:
       tags:
         - Messages
       summary: Получить сообщения пользователя
@@ -444,3 +455,27 @@ paths:
                 $ref: "#/components/schemas/PolledMessages"
         "401":
           description: Не авторизован
+        "410":
+          description: Сессия неактивна
+
+  /messages/poll/start:
+    post:
+      tags:
+        - Messages
+      summary: Открыть сессию поллинга
+      operationId: startPolling
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: ID сессии
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionParams"
+        "401":
+          description: Не авторизован
+        "429":
+          description: Уже открыто максимальное количество сессий
+        "503":
+          description: Сервис временно недоступен

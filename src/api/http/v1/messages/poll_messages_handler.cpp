@@ -14,6 +14,7 @@
 
 using NChat::NApp::NDto::TPollMessagesRequest;
 using NChat::NApp::NDto::TPollMessagesSettings;
+using NChat::NCore::NDomain::TSessionId;
 using NChat::NCore::NDomain::TUserId;
 
 namespace NChat::NInfra::NHandlers {
@@ -44,9 +45,10 @@ TPollMessageHandler::TPollMessageHandler(const userver::components::ComponentCon
       ConfigSource_(context.FindComponent<userver::components::DynamicConfig>().GetSource()) {}
 
 userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
-    const userver::server::http::HttpRequest& /*request*/, const userver::formats::json::Value& /*request_json*/,
+    const userver::server::http::HttpRequest& request, const userver::formats::json::Value& /*request_json*/,
     userver::server::request::RequestContext& request_context) const {
   TUserId consumer_id{request_context.GetData<std::string>(ToString(EContextKey::UserId))};
+  TSessionId session_id{request.GetPathArg("session_id")};
 
   const auto snapshot = ConfigSource_.GetSnapshot();
   const auto polling_config = snapshot[kPollingConfig];
@@ -54,9 +56,7 @@ userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
   std::size_t max_size = polling_config.MaxSize;
   std::chrono::seconds poll_time = polling_config.PollTime;
 
-  TPollMessagesRequest request_dto{
-      .ConsumerId = consumer_id,
-  };
+  TPollMessagesRequest request_dto{.ConsumerId = consumer_id, .SessionId = session_id};
 
   TPollMessagesSettings request_settings{
       .MaxSize = max_size,
@@ -64,7 +64,18 @@ userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
   };
 
   TPollMessagesResult result;
-  result = MessageService_.PollMessages(request_dto, request_settings);
+
+  try {
+    result = MessageService_.PollMessages(request_dto, request_settings);
+  } catch (const NApp::TMailboxNotFound& ex) {
+    auto& response = request.GetHttpResponse();
+    response.SetStatus(userver::server::http::HttpStatus::kGone);
+    return MakeError(ex.what());
+  } catch (const NCore::TSessionDoesNotExists& ex) {
+    auto& response = request.GetHttpResponse();
+    response.SetStatus(userver::server::http::HttpStatus::kGone);
+    return MakeError(ex.what());
+  }
 
   userver::formats::json::StringBuilder sb;
   NInfra::WriteToStream(result, sb);

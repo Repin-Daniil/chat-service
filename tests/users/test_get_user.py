@@ -26,7 +26,7 @@ async def test_get_user_multiple_times(service_client, registered_user):
         assert validate_profile(registered_user, response)
 
 
-@pytest.mark.parametrize('multiple_users', [3], indirect=True)
+@pytest.mark.parametrize('multiple_users', [(3, False)], indirect=True)
 async def test_get_multiple_users(service_client, multiple_users):
     """Проверяет получение профилей нескольких пользователей."""
     for user in multiple_users:

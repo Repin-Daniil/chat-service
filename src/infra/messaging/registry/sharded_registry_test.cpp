@@ -2,6 +2,8 @@
 
 #include <core/common/ids.hpp>
 
+#include <infra/messaging/registry/registry_config.hpp>
+
 #include <gtest/gtest.h>
 #include <userver/dynamic_config/test_helpers.hpp>
 #include <userver/engine/async.hpp>
@@ -74,6 +76,17 @@ UTEST(ShardedRegistryTest, RemoveMailboxMakesItInaccessible) {
 
   registry.CreateOrGetMailbox(user_id);
   registry.RemoveMailbox(user_id);
+
+  auto mailbox = registry.GetMailbox(user_id);
+  EXPECT_EQ(mailbox, nullptr);
+}
+
+UTEST(ShardedRegistryTest, ClearRegistry) {
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource());
+  TUserId user_id{"42"};
+
+  registry.CreateOrGetMailbox(user_id);
+  registry.Clear();
 
   auto mailbox = registry.GetMailbox(user_id);
   EXPECT_EQ(mailbox, nullptr);

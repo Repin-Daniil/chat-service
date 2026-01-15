@@ -1,11 +1,11 @@
 #pragma once
 
-#include <core/messaging/mailbox_registry.hpp>
-#include <core/messaging/send_limiter.hpp>
+#include <core/messaging/mailbox/mailbox_registry.hpp>
 #include <core/users/user_repo.hpp>
 
 #include <app/dto/messages/send_message_dto.hpp>
 #include <app/exceptions.hpp>
+#include <app/services/message/send_limiter.hpp>
 
 namespace NChat::NApp {
 
@@ -21,6 +21,10 @@ class TRecipientNotFound : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
 
+class TRecipientOffline : public TApplicationException {
+  using TApplicationException::TApplicationException;
+};
+
 class TSendMessageUseCase final {
  public:
   using TMessage = NCore::NDomain::TMessage;
@@ -28,8 +32,7 @@ class TSendMessageUseCase final {
   using TUserId = NCore::NDomain::TUserId;
   using TMessageText = NCore::NDomain::TMessageText;
 
-  TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCore::ISendLimiter& limiter,
-                      NCore::IUserRepository& user_repo);
+  TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter, NCore::IUserRepository& user_repo);
 
   void Execute(NDto::TSendMessageRequest request);
 
@@ -39,8 +42,8 @@ class TSendMessageUseCase final {
 
  private:
   NCore::IMailboxRegistry& Registry_;
-  NCore::ISendLimiter& Limiter_;
   NCore::IUserRepository& UserRepo_;
+  ISendLimiter& Limiter_;
 };
 
 }  // namespace NChat::NApp

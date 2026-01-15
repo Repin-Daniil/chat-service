@@ -1,0 +1,36 @@
+from http import HTTPStatus
+
+import pytest
+
+from endpoints import start_session
+from collections import Counter
+from validators import validate_session
+import asyncio
+
+
+async def test_start_session_basic(service_client, registered_user):
+    response = await start_session(service_client, registered_user.token)
+
+    assert response.status == HTTPStatus.OK
+    assert validate_session(response)
+
+async def test_multiple_sessions(service_client, registered_user):
+    response = await start_session(service_client, registered_user.token)
+
+    assert response.status == HTTPStatus.OK
+    assert validate_session(response)
+
+
+@pytest.mark.parametrize('sessions_config', [(1, 1)], indirect=True)
+async def test_session_limit(service_client, registered_user, sessions_config):
+    response_1 = await start_session(service_client, registered_user.token)
+    response_2 = await start_session(service_client, registered_user.token)
+
+    assert response_1.status == HTTPStatus.OK
+    assert response_2.status == HTTPStatus.TOO_MANY_REQUESTS
+
+
+async def test_five_sessions(service_client, registered_user, sessions_config):
+    for i in range(5):
+        response_1 = await start_session(service_client, registered_user.token)
+        assert response_1.status == HTTPStatus.OK

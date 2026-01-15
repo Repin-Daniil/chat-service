@@ -22,7 +22,7 @@ class TStrongTypedef {
   auto operator<=>(const TStrongTypedef<Value, Tag>&) const = default;
 
  private:
-  Value value_;
+  Value value_{};
 };
 
 template <typename TaggedValue>

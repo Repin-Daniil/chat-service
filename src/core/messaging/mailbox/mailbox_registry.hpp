@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/common/ids.hpp>
-#include <core/messaging/mailbox.hpp>
+#include <core/messaging/mailbox/mailbox.hpp>
 
 #include <memory>
 
@@ -19,6 +19,9 @@ class IMailboxRegistry {
 
   // Offline API for metrics and periodic cleaning
   virtual void TraverseRegistry(std::chrono::milliseconds inter_pause) = 0;
+
+  // For reset in tests
+  virtual void Clear() = 0;
 
   virtual ~IMailboxRegistry() = default;
 };

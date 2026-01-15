@@ -25,7 +25,7 @@ include(jwt)
 file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.[hc]pp)
 file(GLOB_RECURSE UNIT_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*_test.cpp)
 file(GLOB_RECURSE BENCHMARK_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*_benchmark.cpp)
-file(GLOB_RECURSE LIBUBENCH_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmarks/main.cpp)
+file(GLOB_RECURSE LIBUBENCH_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/benchmarks_main.cpp)
 list(REMOVE_ITEM SOURCES ${BENCH_SOURCES} ${LIBUBENCH_SOURCES})
 list(REMOVE_ITEM SOURCES ${UNIT_TEST_SOURCES} ${BENCHMARK_SOURCES} ${LIBUBENCH_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
@@ -54,11 +54,6 @@ target_link_libraries(${PROJECT_NAME}_objs PUBLIC ${PROJECT_NAME}_sql)
 # Unit Tests
 add_executable(${PROJECT_NAME}_unittest ${UNIT_TEST_SOURCES})
 target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver::utest)
-target_compile_definitions(
-    ${PROJECT_NAME}_unittest
-    PRIVATE
-    DEFAULT_DYNAMIC_CONFIG_FILENAME="${CMAKE_CURRENT_SOURCE_DIR}/configs/dynamic_config.yaml"
-)
 add_google_tests(${PROJECT_NAME}_unittest)
 
 # Benchmarks

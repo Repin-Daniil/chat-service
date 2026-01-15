@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/messaging/mailbox_registry.hpp>
+#include <core/messaging/mailbox/mailbox_registry.hpp>
 
 #include <infra/concurrency/sharded_map/sharded_map.hpp>
 
@@ -23,6 +23,10 @@ class TShardedRegistry : public NCore::IMailboxRegistry {
 
   // Offline API for metrics and periodic cleaning
   void TraverseRegistry(std::chrono::milliseconds inter_pause) override;
+
+  // For reset in tests
+  void Clear() override;
+
   // todo Нужна метрика сбалансированности шардов
  private:
   TShardedMap Registry_;

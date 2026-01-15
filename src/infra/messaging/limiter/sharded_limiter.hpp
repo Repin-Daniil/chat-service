@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/messaging/send_limiter.hpp>
+#include <app/services/message/send_limiter.hpp>
 
 #include <infra/concurrency/sharded_map/sharded_map.hpp>
 
@@ -34,7 +34,7 @@ class TLimiterWrapper {
 
 using TLimiterPtr = std::shared_ptr<TLimiterWrapper>;
 
-class TSendLimiter : public NCore::ISendLimiter {
+class TSendLimiter : public NApp::ISendLimiter {
  public:
   using TUserId = NCore::NDomain::TUserId;
   using TShardedMap = NConcurrency::TShardedMap<TUserId, TLimiterWrapper, NUtils::TaggedHasher<TUserId>>;

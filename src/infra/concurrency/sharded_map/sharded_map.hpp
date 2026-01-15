@@ -62,6 +62,13 @@ class TShardedMap {
     shard.Map.erase(key);
   }
 
+  void Clear() {
+    for (auto& shard : Shards_) {
+      std::unique_lock lock(shard.Mutex);
+      shard.Map.clear();
+    }
+  }
+
   template <typename Predicate, typename MetricsCallback>
   std::size_t CleanupAndCount(Predicate should_remove_pred, MetricsCallback metrics_cb,
                               std::chrono::milliseconds shard_delay = std::chrono::milliseconds{0}) {

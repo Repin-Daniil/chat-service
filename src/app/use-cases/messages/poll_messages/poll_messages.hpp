@@ -1,13 +1,17 @@
 #pragma once
 
-#include <core/messaging/mailbox_registry.hpp>
-#include <core/messaging/send_limiter.hpp>
+#include <core/messaging/mailbox/mailbox_registry.hpp>
 #include <core/users/user_repo.hpp>
 
 #include <app/dto/messages/poll_messages_dto.hpp>
 #include <app/exceptions.hpp>
+#include <app/services/message/send_limiter.hpp>
 
 namespace NChat::NApp {
+
+class TMailboxNotFound : public TApplicationException {
+  using TApplicationException::TApplicationException;
+};
 
 class TPollMessagesUseCase final {
  public:

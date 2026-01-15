@@ -24,15 +24,16 @@ class TMessagingServiceComponent final : public userver::components::LoggableCom
 
  private:
   TObjectFactory<NCore::IMailboxRegistry> GetRegistryFactory();
-  TObjectFactory<NCore::ISendLimiter> GetLimiterFactory();
+  TObjectFactory<NApp::ISendLimiter> GetLimiterFactory();
 
   void StartPeriodicTraverse();
   void Traverse();
+  void SetupTestsuite(const userver::components::ComponentContext& context);
 
  private:
   std::unique_ptr<NCore::IMailboxRegistry> Registry_;
-  std::unique_ptr<NCore::ISendLimiter> Limiter_;
 
+  std::unique_ptr<NApp::ISendLimiter> Limiter_;
   std::unique_ptr<NApp::NServices::TMessagingService> MessageService_;
 
   // For period traverse

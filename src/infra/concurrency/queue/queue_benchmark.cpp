@@ -50,15 +50,10 @@ TMessage CreateTestMessage(std::size_t text_size = 100) {
   std::string text = pool.substr(offset_dis(gen), text_size);
 
   return TMessage{
-      .Payload = std::make_shared<TMessagePaylod>(
-          TUserId("user1"),
-          NDomain::TMessageText(std::move(text))
-      ),
+      .Payload = std::make_shared<TMessagePayload>(TUserId("user1"), NDomain::TMessageText(std::move(text))),
       .RecipientId = TUserId("user2"),
-      .Context = {}
-  };
+      .Context = {}};
 }
-
 
 // ============================================================================
 // ФАБРИКА ДЛЯ СОЗДАНИЯ ОЧЕРЕДЕЙ РАЗНЫХ ТИПОВ

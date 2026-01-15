@@ -1,7 +1,7 @@
 #pragma once
 
 #include <core/common/ids.hpp>
-#include <core/messaging/mailbox.hpp>
+#include <core/messaging/mailbox/mailbox.hpp>
 #include <core/messaging/value/message_text.hpp>
 #include <core/users/user.hpp>
 
@@ -11,6 +11,7 @@ namespace NChat::NApp::NDto {
 
 struct TPollMessagesRequest {
   NCore::NDomain::TUserId ConsumerId;
+  NCore::NDomain::TSessionId SessionId;
 };
 
 struct TPollMessagesSettings {

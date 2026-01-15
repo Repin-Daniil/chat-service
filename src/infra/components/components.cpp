@@ -9,6 +9,7 @@
 #include <api/http/middlewares/auth_bearer.hpp>
 #include <api/http/v1/messages/poll_messages_handler.hpp>
 #include <api/http/v1/messages/send_message_handler.hpp>
+#include <api/http/v1/messages/start_session_handler.hpp>
 #include <api/http/v1/users/delete_by_username_handler.hpp>
 #include <api/http/v1/users/get_by_username_handler.hpp>
 #include <api/http/v1/users/update_by_username_handler.hpp>
@@ -67,6 +68,7 @@ void RegisterUserHandlers(userver::components::ComponentList& list) {
 void RegisterMessagesHandlers(userver::components::ComponentList& list) {
   list.Append<NHandlers::TSendMessageHandler>();
   list.Append<NHandlers::TPollMessageHandler>();
+  list.Append<NHandlers::TStartSessionHandler>();
 }
 
 // Components

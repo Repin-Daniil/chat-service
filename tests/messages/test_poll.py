@@ -4,8 +4,9 @@ import pytest
 
 from endpoints import poll_messages, send_message
 from utils import username_generator
-from models import Message
+from models import Message, User
 from collections import Counter
+from validators import validate_messages
 import asyncio
 
 
@@ -15,19 +16,88 @@ async def test_poll_messages_with_pending_messages(service_client, communication
 
     await send_message(service_client, message, sender.token)
 
-    response = await poll_messages(service_client, recipient.token)
+    response = await poll_messages(service_client, recipient)
     assert response.status == HTTPStatus.OK
-
-    data = response.json()
-    assert 'resync_required' in data
-    assert 'messages' in data
-    assert isinstance(data['messages'], list)
-    assert len(data['messages']) > 0
+    validate_messages(response, [message])
 
 
-async def test_poll_messages_empty_queue(service_client, registered_user, short_polling):
+async def test_poll_messages_with_multiple_messages(service_client, communication, short_polling):
+    sender, recipient, _ = communication
+    messages = []
+
+    for i in range(3):
+        messages.append(
+            Message(recipient=recipient.username, sender=sender.username))
+        await send_message(service_client, messages[-1], sender.token)
+
+    response = await poll_messages(service_client, recipient)
+    assert response.status == HTTPStatus.OK
+    validate_messages(response, messages)
+
+
+async def test_multiple_polling(service_client, communication, short_polling):
+    """Двойной поллинг"""
+    sender, recipient, dummy_message = communication
+    await send_message(service_client, dummy_message, sender.token)
+
+    response = await poll_messages(service_client, recipient)
+    assert response.status == HTTPStatus.OK
+    validate_messages(response, [dummy_message])
+
+    # Second part
+    messages = []
+
+    for i in range(3):
+        messages.append(
+            Message(recipient=recipient.username, sender=sender.username))
+        await send_message(service_client, messages[-1], sender.token)
+
+    response = await poll_messages(service_client, recipient)
+    assert response.status == HTTPStatus.OK
+    validate_messages(response, messages)
+
+
+async def test_messaging_dialog_flow(service_client, communication):
+    """
+    Тест сценария диалога:
+    1. A -> B (B получает)
+    2. B -> A (A получает)
+    3. A -> B (B получает второй раз)
+    """
+
+    user_a, user_b, _ = communication
+
+    # --- Step 1 ---
+    msg_hello = Message(
+        sender=user_a.username,
+        recipient=user_b.username,
+        text="Hello, world!"
+    )
+    await send_message(service_client, msg_hello, user_a.token)
+
+    # --- Step 2 ---
+    response_b1 = await poll_messages(service_client, user_b)
+
+    assert response_b1.status == HTTPStatus.OK
+    validate_messages(response_b1, [msg_hello])
+
+    # --- Step 3 ---
+    msg_reply = Message(
+        sender=user_b.username,
+        recipient=user_a.username,
+        text="World is here"
+    )
+    await send_message(service_client, msg_reply, user_b.token)
+
+    response_a = await poll_messages(service_client, user_a)
+
+    assert response_a.status == HTTPStatus.OK
+    validate_messages(response_a, [msg_reply])
+
+
+async def test_poll_messages_empty_queue(service_client, single_consumer, short_polling):
     """Polling когда нет новых сообщений"""
-    response = await poll_messages(service_client, registered_user.token)
+    response = await poll_messages(service_client, single_consumer)
     assert response.status == HTTPStatus.OK
 
     data = response.json()
@@ -35,6 +105,12 @@ async def test_poll_messages_empty_queue(service_client, registered_user, short_
     assert 'messages' in data
     assert isinstance(data['messages'], list)
     assert len(data['messages']) == 0
+
+
+async def test_poll_messages_without_session(service_client, registered_user, short_polling):
+    """Polling без сессии"""
+    response = await poll_messages(service_client, registered_user)
+    assert response.status == HTTPStatus.GONE
 
 
 @pytest.mark.parametrize('token', [
@@ -45,21 +121,22 @@ async def test_poll_messages_empty_queue(service_client, registered_user, short_
 ])
 async def test_poll_messages_wrong_token(service_client, token):
     """Polling с неправильным токеном должен возвращать 401"""
-    response = await poll_messages(service_client, token)
+    fake_user = User(token="token", session_id="123")
+    response = await poll_messages(service_client, fake_user)
     assert response.status == HTTPStatus.UNAUTHORIZED
 
 
-async def test_poll_messages_multiple_users(service_client, multiple_users, short_polling):
+async def test_poll_messages_multiple_users(service_client, communication, short_polling):
     """Проверка, что каждый пользователь получает только свои сообщения"""
-    sender, recipient = multiple_users
+    sender, recipient, _ = communication
 
     message = Message(recipient=recipient.username, payload="Test message")
     await send_message(service_client, message, sender.token)
 
-    sender_response = await poll_messages(service_client, sender.token)
+    sender_response = await poll_messages(service_client, sender)
     sender_data = sender_response.json()
 
-    recipient_response = await poll_messages(service_client, recipient.token)
+    recipient_response = await poll_messages(service_client, recipient)
     recipient_data = recipient_response.json()
 
     assert sender_response.status == HTTPStatus.OK
@@ -73,12 +150,12 @@ async def test_poll_messages_multiple_users(service_client, multiple_users, shor
 
 
 @pytest.mark.parametrize("custom_polling", [(3)], indirect=True)
-async def test_poll_messages_long_polling(service_client, registered_user, custom_polling):
+async def test_poll_messages_long_polling(service_client, single_consumer, custom_polling):
     """Проверка работы long polling (должен вернуться в течение poll_time)"""
     import time
 
     start_time = time.time()
-    response = await poll_messages(service_client, registered_user.token)
+    response = await poll_messages(service_client, single_consumer)
     elapsed_time = time.time() - start_time
 
     assert response.status == HTTPStatus.OK
@@ -100,7 +177,7 @@ async def test_poll_messages_max_size_limit(service_client, communication):
         )
         await send_message(service_client, message, sender.token)
 
-    response = await poll_messages(service_client, recipient.token)
+    response = await poll_messages(service_client, recipient)
     data = response.json()
 
     assert response.status == HTTPStatus.OK
@@ -121,7 +198,7 @@ async def test_poll_messages_ordering(service_client, communication):
         await send_message(service_client, message, sender.token)
         messages_sent.append(message.payload)
 
-    response = await poll_messages(service_client, recipient.token)
+    response = await poll_messages(service_client, recipient)
     data = response.json()
 
     assert response.status == HTTPStatus.OK
@@ -134,9 +211,9 @@ async def test_poll_messages_ordering(service_client, communication):
 
 
 @pytest.mark.usefixtures("short_polling")
-async def test_poll_messages_resync_required_false(service_client, registered_user):
+async def test_poll_messages_resync_required_false(service_client, single_consumer):
     """Проверка, что resync_required = false в нормальных условиях"""
-    response = await poll_messages(service_client, registered_user.token)
+    response = await poll_messages(service_client, single_consumer)
     assert response.status == HTTPStatus.OK
 
     data = response.json()
@@ -150,7 +227,7 @@ async def test_poll_messages_structure(service_client, communication):
 
     await send_message(service_client, message, sender.token)
 
-    response = await poll_messages(service_client, recipient.token)
+    response = await poll_messages(service_client, recipient)
     data = response.json()
 
     assert response.status == HTTPStatus.OK
@@ -186,7 +263,7 @@ async def test_poll_messages_multiple_senders_concurrent(service_client, multipl
         send_messages_from_sender(senders[2])
     )
 
-    response = await poll_messages(service_client, recipient.token)
+    response = await poll_messages(service_client, recipient)
     data = response.json()
 
     assert response.status == HTTPStatus.OK
@@ -216,7 +293,7 @@ async def test_poll_messages_immediate_delivery(
         assert resp.status == HTTPStatus.ACCEPTED
 
     poll_task = asyncio.create_task(
-        poll_messages(service_client, recipient.token)
+        poll_messages(service_client, recipient)
     )
 
     send_task = asyncio.create_task(delayed_send())
@@ -261,8 +338,8 @@ async def test_poll_messages_multiple_recipients_one_sender(service_client, mult
     await asyncio.gather(*send_tasks)
 
     response1, response2 = await asyncio.gather(
-        poll_messages(service_client, recipient1.token),
-        poll_messages(service_client, recipient2.token)
+        poll_messages(service_client, recipient1),
+        poll_messages(service_client, recipient2)
     )
 
     data1 = response1.json()
@@ -298,14 +375,14 @@ async def test_poll_messages_multiple_recipients_one_sender(service_client, mult
 
 @pytest.mark.enable_gc
 @pytest.mark.parametrize(
-    ("overseer_config", "registry_config"),
+    ("gc_config", "sessions_config"),
     [
         ([True, 1800, 0], 1),
     ],
     indirect=True,
 )
 async def test_garbage_collection(
-    service_client, communication, overseer_config, registry_config, mocked_time, short_polling
+    service_client, communication, gc_config, sessions_config, mocked_time, short_polling
 ):
     sender, recipient, message = communication
 
@@ -313,11 +390,39 @@ async def test_garbage_collection(
 
     mocked_time.sleep(2)
 
-    await service_client.run_periodic_task('overseer-background-job')
+    await service_client.run_periodic_task('gc-background-job')
 
-    response = await poll_messages(service_client, recipient.token)
-    data = response.json()
-    assert 'resync_required' in data
-    assert 'messages' in data
-    assert isinstance(data['messages'], list)
-    assert len(data['messages']) == 0
+    response = await poll_messages(service_client, recipient)
+    assert response.status == HTTPStatus.GONE
+
+
+async def test_list_tasks(service_client):
+    tasks = await service_client.list_tasks()
+    assert 'reset-task' in tasks
+
+
+async def test_reset(service_client, single_consumer, short_polling, testpoint):
+    response = await poll_messages(service_client, single_consumer)
+    assert response.status == HTTPStatus.OK
+
+    @testpoint('reset-task/action')
+    def task_action(data):
+        pass
+
+    await service_client.run_task('reset-task')
+    response = await poll_messages(service_client, single_consumer)
+    assert response.status == HTTPStatus.GONE
+
+
+async def test_polling_anothers_session(service_client, communication):
+    sender, recipient, _ = communication
+    sender.session_id = recipient.session_id
+
+    response = await poll_messages(service_client, sender)
+    assert response.status == HTTPStatus.GONE
+
+
+async def test_polling_rubbis_session_id(service_client, single_consumer):
+    single_consumer.session_id = "random text"
+    response = await poll_messages(service_client, single_consumer)
+    assert response.status == HTTPStatus.GONE

@@ -37,6 +37,13 @@ async def login_user(service_client, user):
     )
 
 
+async def start_session(service_client, token):
+    return await service_client.post(
+        Routes.START_SESSION,
+        headers={'Authorization': token or ""},
+    )
+
+
 async def send_message(service_client, message, token):
     return await service_client.post(
         Routes.SEND_MESSAGE,
@@ -45,8 +52,8 @@ async def send_message(service_client, message, token):
     )
 
 
-async def poll_messages(service_client, token):
-    return await service_client.post(
-        Routes.POLL_MESSAGES,
-        headers={'Authorization': token or ""},
+async def poll_messages(service_client, user):
+    return await service_client.get(
+        Routes.POLL_MESSAGES.format(session_id=(user.session_id or "")),
+        headers={'Authorization': user.token or ""},
     )

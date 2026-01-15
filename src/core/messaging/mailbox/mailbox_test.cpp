@@ -37,7 +37,7 @@ TEST_F(TUserMailboxTest, ConstructorSuccess) {
 
   EXPECT_NO_THROW({
     TUserMailbox mailbox(user_id_, std::move(sessions));
-    EXPECT_EQ(*mailbox.GetUserId(), *user_id_);
+    EXPECT_EQ(mailbox.GetUserId(), user_id_);
   });
 }
 
@@ -105,5 +105,5 @@ TEST_F(TUserMailboxTest, GetUserId) {
   auto sessions = std::make_unique<NiceMock<MockSessionsRegistry>>();
   TUserMailbox mailbox(user_id_, std::move(sessions));
 
-  EXPECT_EQ(*mailbox.GetUserId(), *user_id_);
+  EXPECT_EQ(mailbox.GetUserId(), user_id_);
 }

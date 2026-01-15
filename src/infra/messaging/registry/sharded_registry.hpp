@@ -12,7 +12,7 @@ namespace NChat::NInfra {
 class TShardedRegistry : public NCore::IMailboxRegistry {
  public:
   using TUserId = NCore::NDomain::TUserId;
-  using TShardedMap = NConcurrency::TShardedMap<TUserId, NCore::TUserMailbox, NUtils::TaggedHasher<TUserId>>;
+  using TShardedMap = NConcurrency::TShardedMap<TUserId, NCore::TUserMailbox>;
 
   TShardedRegistry(std::size_t shard_amount, userver::dynamic_config::Source config_source,
                    NCore::IMessageQueueFactory& queue_factory);

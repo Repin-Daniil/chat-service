@@ -1,34 +1,10 @@
 #pragma once
 
-#include <functional>
-#include <utility>
+#include <userver/utils/strong_typedef.hpp>
 
 namespace NUtils {
+template <class Tag, class T, userver::utils::StrongTypedefOps Ops>
+using TStrongTypedef = userver::utils::StrongTypedef<Tag, T, Ops>;
+using EStrongTypedefOps = userver::utils::StrongTypedefOps;
 
-// fixme Требует улучшения
-template <typename Value, typename Tag>
-class TStrongTypedef {
- public:
-  using ValueType = Value;
-  using TagType = Tag;
-
-  TStrongTypedef() = default;
-  explicit TStrongTypedef(Value&& v) : value_(std::move(v)) {}
-  explicit TStrongTypedef(const Value& v) : value_(v) {}
-
-  const Value& operator*() const { return value_; }
-  Value& operator*() { return value_; }
-
-  auto operator<=>(const TStrongTypedef<Value, Tag>&) const = default;
-
- private:
-  Value value_{};
-};
-
-template <typename TaggedValue>
-struct TaggedHasher {
-  std::size_t operator()(const TaggedValue& value) const {
-    return std::hash<typename TaggedValue::ValueType>{}(*value);
-  }
-};
 }  // namespace NUtils

@@ -114,7 +114,7 @@ TEST_F(CheckTokenUseCaseIntegrationTest, ValidTokenAndUserExists_ReturnsUserId) 
 
   EXPECT_FALSE(result.Error.has_value());
   ASSERT_TRUE(result.User.has_value());
-  EXPECT_EQ(result.User.value().UserId, *user.Id);
+  EXPECT_EQ(result.User.value().UserId, user.Id.GetUnderlying());
   EXPECT_EQ(result.User.value().Username, user.Username);
   EXPECT_EQ(result.User.value().DisplayName, user.DisplayName);
 }

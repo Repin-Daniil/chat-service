@@ -4,7 +4,7 @@ namespace NChat::NCore {
 
 TUserMailbox::TUserMailbox(NDomain::TUserId user_id, TSessions sessions)
     : UserId_(std::move(user_id)), Sessions_(std::move(sessions)) {
-  if ((*UserId_).empty() || !Sessions_) {
+  if (UserId_.empty() || !Sessions_) {
     throw std::invalid_argument("TUserMailbox: user id or Sessions_ is null");
   }
 }
@@ -16,7 +16,7 @@ TMessages TUserMailbox::PollMessages(NDomain::TSessionId session_id, std::size_t
   auto session = Sessions_->GetSession(session_id);
 
   if (!session) {
-    throw TSessionDoesNotExists(fmt::format("Session with id {} doesn't exist", *session_id));
+    throw TSessionDoesNotExists(fmt::format("Session with id {} doesn't exist", session_id));
   }
 
   return session->GetMessages(max_size, timeout);

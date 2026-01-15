@@ -22,7 +22,7 @@ TPostgresUserRepository::TPostgresUserRepository(userver::storages::postgres::Cl
 
 void TPostgresUserRepository::InsertNewUser(const TUser& user) const {
   try {
-    const auto id = *user.GetId();
+    const auto id = user.GetId().GetUnderlying();
     const auto password_hash_hex = userver::utils::encoding::ToHex(user.GetPasswordHash());
     const auto password_salt_hex = userver::utils::encoding::ToHex(user.GetPasswordSalt());
 
@@ -90,13 +90,13 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
 std::optional<TUserTinyProfile> TPostgresUserRepository::GetProfileById(const TUserId& id) const {
   const auto snapshot = ProfileByUserIdCache_.Get();
 
-  auto it = snapshot->find(*id);
+  auto it = snapshot->find(id.GetUnderlying());
   if (it != snapshot->end()) {
     const auto [_, username, display_name, timepoint] = it->second;
     return {{.Id = id, .Username = username, .DisplayName = display_name}};
   }
 
-  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetProfileById, *id);
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetProfileById, id.GetUnderlying());
 
   if (result.IsEmpty()) {
     return std::nullopt;

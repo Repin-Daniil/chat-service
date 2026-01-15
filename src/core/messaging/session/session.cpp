@@ -4,7 +4,7 @@ namespace NChat::NCore {
 
 TUserSession::TUserSession(NDomain::TSessionId session_id, TQueuePtr queue, std::function<TTimePoint()> now)
     : SessionId_(session_id), MessageBus_(std::move(queue)), GetNow_(now) {
-  if (!MessageBus_ || (*SessionId_).empty() || !GetNow_) {
+  if (!MessageBus_ || SessionId_.empty() || !GetNow_) {
     throw std::invalid_argument("TUserSession: session_id, GetNow or message bus is null");
   }
 

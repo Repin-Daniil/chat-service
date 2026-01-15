@@ -37,7 +37,7 @@ NDto::TCheckTokenResult TCheckTokenUseCase::Execute(const std::string& token, bo
     return {.User = {}, .Error = NAuthErrors::InvalidUser};
   }
 
-  return {.User = {{*profile->Id, profile->Username, profile->DisplayName}}, .Error = {}};
+  return {.User = {{profile->Id.GetUnderlying(), profile->Username, profile->DisplayName}}, .Error = {}};
 }
 
 }  // namespace NChat::NApp

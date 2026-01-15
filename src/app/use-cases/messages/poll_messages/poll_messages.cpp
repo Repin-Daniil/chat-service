@@ -24,13 +24,13 @@ NDto::TPollMessagesResult TPollMessagesUseCase::Execute(const NDto::TPollMessage
     try {
       profile = UserRepo_.GetProfileById(message.Payload->Sender);
     } catch (const std::exception& e) {
-      LOG_ERROR() << fmt::format("Failed to get username of sender with id: {}", *message.Payload->Sender);
+      LOG_ERROR() << fmt::format("Failed to get username of sender with id: {}", message.Payload->Sender);
       result.ResyncRequired = true;
       continue;
     }
 
     if (!profile.has_value()) {
-      LOG_WARNING() << fmt::format("Dropping message: no user with id {}", *message.Payload->Sender);
+      LOG_WARNING() << fmt::format("Dropping message: no user with id {}", message.Payload->Sender);
       result.ResyncRequired = true;
       continue;
     }

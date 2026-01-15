@@ -27,18 +27,18 @@ using namespace NChat::NCore::NDomain;
 // ============================================================================
 
 UTEST(ShardedMap, ConstructionPowerOfTwo) {
-  ASSERT_NO_THROW((TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>>(128)));
-  ASSERT_NO_THROW((TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>>(256)));
-  ASSERT_NO_THROW((TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>>(2)));
-  ASSERT_NO_THROW((TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>>(1024)));
+  ASSERT_NO_THROW((TShardedMap<TUserId, TDummyQueue>(128)));
+  ASSERT_NO_THROW((TShardedMap<TUserId, TDummyQueue>(256)));
+  ASSERT_NO_THROW((TShardedMap<TUserId, TDummyQueue>(2)));
+  ASSERT_NO_THROW((TShardedMap<TUserId, TDummyQueue>(1024)));
 }
 
 UTEST(ShardedMap, ConstructionNotPowerOfTwo) {
-  ASSERT_THROW((TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>>(100)), std::invalid_argument);
+  ASSERT_THROW((TShardedMap<TUserId, TDummyQueue>(100)), std::invalid_argument);
 }
 
 UTEST(ShardedMap, ConstructionZero) {
-  ASSERT_THROW((TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>>(0)), std::invalid_argument);
+  ASSERT_THROW((TShardedMap<TUserId, TDummyQueue>(0)), std::invalid_argument);
 }
 
 // ============================================================================
@@ -46,7 +46,7 @@ UTEST(ShardedMap, ConstructionZero) {
 // ============================================================================
 
 UTEST(ShardedMap, PutValid) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   auto queue = std::make_shared<TDummyQueue>(false, 123);
@@ -58,7 +58,7 @@ UTEST(ShardedMap, PutValid) {
 }
 
 UTEST(ShardedMap, PutSameKeyMultipleTimes) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   auto queue1 = std::make_shared<TDummyQueue>(false, 100);
@@ -81,14 +81,14 @@ UTEST(ShardedMap, PutSameKeyMultipleTimes) {
 // ============================================================================
 
 UTEST(ShardedMap, GetNonExistent) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"non_existent"};
 
   ASSERT_FALSE(map.Get(user_id));
 }
 
 UTEST(ShardedMap, GetAfterPut) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   auto queue = std::make_shared<TDummyQueue>(false, 456);
@@ -101,7 +101,7 @@ UTEST(ShardedMap, GetAfterPut) {
 }
 
 UTEST(ShardedMap, GetMultipleKeys) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
 
   for (int i = 0; i < 100; ++i) {
     TUserId user_id{std::to_string(i)};
@@ -121,7 +121,7 @@ UTEST(ShardedMap, GetMultipleKeys) {
 // ============================================================================
 
 UTEST(ShardedMap, RemoveExisting) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   map.Put(user_id, std::make_shared<TDummyQueue>(false, 123));
@@ -132,14 +132,14 @@ UTEST(ShardedMap, RemoveExisting) {
 }
 
 UTEST(ShardedMap, RemoveNonExistent) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"non_existent"};
 
   ASSERT_NO_THROW(map.Remove(user_id));
 }
 
 UTEST(ShardedMap, RemoveAlreadyRemoved) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   map.Put(user_id, std::make_shared<TDummyQueue>(false, 123));
@@ -154,7 +154,7 @@ UTEST(ShardedMap, RemoveAlreadyRemoved) {
 // Clear Tests
 // ============================================================================
 UTEST(ShardedMap, ClearExisting) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   map.Put(user_id, std::make_shared<TDummyQueue>(false, 123));
@@ -165,13 +165,13 @@ UTEST(ShardedMap, ClearExisting) {
 }
 
 UTEST(ShardedMap, ClearEmpty) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
 
   ASSERT_NO_THROW(map.Clear());
 }
 
 UTEST(ShardedMap, ClearOneShard) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(1);
+  TShardedMap<TUserId, TDummyQueue> map(1);
   TUserId user_id{"231"};
 
   map.Put(user_id, std::make_shared<TDummyQueue>(false, 123));
@@ -185,7 +185,7 @@ UTEST(ShardedMap, ClearOneShard) {
 // ============================================================================
 
 UTEST(ShardedMap, CleanupBasic) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
 
   map.Put(TUserId{"1"}, std::make_shared<TDummyQueue>(true, 100));
   map.Put(TUserId{"2"}, std::make_shared<TDummyQueue>(false, 200));
@@ -203,7 +203,7 @@ UTEST(ShardedMap, CleanupBasic) {
 }
 
 UTEST(ShardedMap, CleanupWithMetrics) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
 
   map.Put(TUserId{"1"}, std::make_shared<TDummyQueue>(false, 100));
   map.Put(TUserId{"2"}, std::make_shared<TDummyQueue>(false, 200));
@@ -219,7 +219,7 @@ UTEST(ShardedMap, CleanupWithMetrics) {
 }
 
 UTEST(ShardedMap, CleanupEmpty) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
 
   auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
   auto metrics = [](const TQueuePtr&) {};
@@ -229,7 +229,7 @@ UTEST(ShardedMap, CleanupEmpty) {
 }
 
 UTEST(ShardedMap, CleanupWithDelay) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(4);
+  TShardedMap<TUserId, TDummyQueue> map(4);
 
   map.Put(TUserId{"1"}, std::make_shared<TDummyQueue>(true, 100));
 
@@ -249,7 +249,7 @@ UTEST(ShardedMap, CleanupWithDelay) {
 // ============================================================================
 
 UTEST(ShardedMap, GetOrCreateNew) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   auto factory = []() { return std::make_shared<TDummyQueue>(false, 100); };
@@ -266,7 +266,7 @@ UTEST(ShardedMap, GetOrCreateNew) {
 }
 
 UTEST(ShardedMap, GetOrCreateExisting) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   // Put initial value
@@ -286,7 +286,7 @@ UTEST(ShardedMap, GetOrCreateExisting) {
 }
 
 UTEST(ShardedMap, GetOrCreateFactoryCalledOnce) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
   TUserId user_id{"231"};
 
   std::atomic<int> factory_called{0};
@@ -302,7 +302,7 @@ UTEST(ShardedMap, GetOrCreateFactoryCalledOnce) {
 }
 
 UTEST(ShardedMap, GetOrCreateMultipleKeys) {
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
 
   for (int i = 0; i < 100; ++i) {
     TUserId user_id{std::to_string(i)};
@@ -330,7 +330,7 @@ UTEST(ShardedMap, GetOrCreateMultipleKeys) {
 
 UTEST_MT(ShardedMap, ConcurrentGets, 8) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
 
   // Prepare data
   for (int i = 0; i < 1000; ++i) {
@@ -359,7 +359,7 @@ UTEST_MT(ShardedMap, ConcurrentGets, 8) {
 
 UTEST_MT(ShardedMap, ConcurrentPutsAndGets, 8) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+  TShardedMap<TUserId, TDummyQueue> map(256);
 
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
@@ -392,7 +392,7 @@ UTEST_MT(ShardedMap, ConcurrentPutsAndGets, 8) {
 
 UTEST_MT(ShardedMap, ConcurrentPutsRemovesGets, 8) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+  TShardedMap<TUserId, TDummyQueue> map(256);
 
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);
@@ -425,7 +425,7 @@ UTEST_MT(ShardedMap, ConcurrentPutsRemovesGets, 8) {
 
 UTEST_MT(ShardedMap, RealisticWorkload, 8) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+  TShardedMap<TUserId, TDummyQueue> map(256);
 
   // Prepare initial data
   for (int i = 0; i < 500; ++i) {
@@ -485,7 +485,7 @@ UTEST_MT(ShardedMap, RealisticWorkload, 8) {
 
 UTEST_MT(ShardedMap, CleanupDuringReads, 8) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(128);
+  TShardedMap<TUserId, TDummyQueue> map(128);
 
   // Prepare data: half expired, half not
   for (int i = 0; i < 1000; ++i) {
@@ -535,7 +535,7 @@ UTEST_MT(ShardedMap, CleanupDuringReads, 8) {
 
 UTEST_MT(ShardedMap, StressTest, 16) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+  TShardedMap<TUserId, TDummyQueue> map(256);
 
   std::atomic<int> operation_count{0};
   std::vector<userver::engine::Task> tasks;
@@ -574,7 +574,7 @@ UTEST_MT(ShardedMap, StressTest, 16) {
 
 UTEST_MT(ShardedMap, GetOrCreateConcurrent, 8) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+  TShardedMap<TUserId, TDummyQueue> map(256);
 
   std::atomic<int> total_created{0};
   std::atomic<int> total_found{0};
@@ -615,7 +615,7 @@ UTEST_MT(ShardedMap, GetOrCreateConcurrent, 8) {
 
 UTEST_MT(ShardedMap, GetOrCreateRaceCondition, 16) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+  TShardedMap<TUserId, TDummyQueue> map(256);
 
   // Single key, many threads trying to create it
   TUserId user_id{"race_key"};
@@ -652,7 +652,7 @@ UTEST_MT(ShardedMap, GetOrCreateRaceCondition, 16) {
 
 UTEST_MT(ShardedMap, GetOrCreateWithGetAndPut, 8) {
   const auto concurrent_jobs = GetThreadCount();
-  TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+  TShardedMap<TUserId, TDummyQueue> map(256);
 
   std::vector<userver::engine::Task> tasks;
   tasks.reserve(concurrent_jobs);

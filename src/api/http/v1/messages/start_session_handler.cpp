@@ -17,7 +17,7 @@ userver::formats::json::Value Serialize(const TStartSessionResult& result,
                                         userver::formats::serialize::To<userver::formats::json::Value>) {
   userver::formats::json::ValueBuilder item;
 
-  item = *result.SessionId;
+  item = result.SessionId.GetUnderlying();
 
   return item.ExtractValue();
 }

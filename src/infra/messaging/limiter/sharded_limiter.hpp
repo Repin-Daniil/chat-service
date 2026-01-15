@@ -37,7 +37,7 @@ using TLimiterPtr = std::shared_ptr<TLimiterWrapper>;
 class TSendLimiter : public NApp::ISendLimiter {
  public:
   using TUserId = NCore::NDomain::TUserId;
-  using TShardedMap = NConcurrency::TShardedMap<TUserId, TLimiterWrapper, NUtils::TaggedHasher<TUserId>>;
+  using TShardedMap = NConcurrency::TShardedMap<TUserId, TLimiterWrapper>;
 
   explicit TSendLimiter(std::size_t shard_amount, userver::dynamic_config::Source config_source);
   bool TryAcquire(const TUserId& user_id) override;

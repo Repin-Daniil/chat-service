@@ -53,7 +53,7 @@ TEST_F(SessionTest, ValidConstruction) {
 
   EXPECT_NO_THROW({
     TUserSession session(session_id, std::move(queue), now_func);
-    EXPECT_EQ(*session.GetSessionId(), "user123");
+    EXPECT_EQ(session.GetSessionId().GetUnderlying(), "user123");
   });
 }
 
@@ -348,13 +348,13 @@ TEST_F(SessionTest, GetSizeMultipleCalls) {
 // Тесты GetSessionId
 // ============================================================================
 
-TEST_F(SessionTest, GetSessionIdReturnsCorrectId) { EXPECT_EQ(*Session_->GetSessionId(), "user123session"); }
+TEST_F(SessionTest, GetSessionIdReturnsCorrectId) { EXPECT_EQ(Session_->GetSessionId().GetUnderlying(), "user123session"); }
 
 TEST_F(SessionTest, GetSessionIdConsistency) {
   auto id1 = Session_->GetSessionId();
   auto id2 = Session_->GetSessionId();
 
-  EXPECT_EQ(*id1, *id2);
+  EXPECT_EQ(id1, id2);
 }
 
 // ============================================================================
@@ -492,7 +492,7 @@ TEST(SessionUServerIntegrationTest, UServerTimeUsage) {
 
   EXPECT_NO_THROW({
     TUserSession session(session_id, std::move(queue), now_func);
-    EXPECT_EQ(*session.GetSessionId(), "user123");
+    EXPECT_EQ(session.GetSessionId().GetUnderlying(), "user123");
   });
 }
 

@@ -10,7 +10,7 @@ namespace NChat::NCore::NDomain {
 struct TUserIdTag {};
 struct TSessionIdTag {};
 
-using TUserId = NUtils::TStrongTypedef<std::string, TUserIdTag>;
-using TSessionId = NUtils::TStrongTypedef<std::string, TSessionIdTag>;
+using TUserId = NUtils::TStrongTypedef<TUserIdTag, std::string, NUtils::EStrongTypedefOps::kCompareStrong>;
+using TSessionId = NUtils::TStrongTypedef<TSessionIdTag, std::string, NUtils::EStrongTypedefOps::kCompareStrong>;
 
 }  // namespace NChat::NCore::NDomain

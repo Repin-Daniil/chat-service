@@ -14,6 +14,7 @@ async def test_start_session_basic(service_client, registered_user):
     assert response.status == HTTPStatus.OK
     assert validate_session(response)
 
+
 async def test_multiple_sessions(service_client, registered_user):
     response = await start_session(service_client, registered_user.token)
 

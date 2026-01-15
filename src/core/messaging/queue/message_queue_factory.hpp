@@ -5,7 +5,7 @@ namespace NChat::NCore {
 
 class IMessageQueueFactory {
  public:
-  virtual std::unique_ptr<IMessageQueue> Create() = 0;
+  virtual std::unique_ptr<IMessageQueue> Create() const = 0;
 
   virtual ~IMessageQueueFactory() = default;
 };

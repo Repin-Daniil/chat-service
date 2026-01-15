@@ -18,7 +18,7 @@ class TRcuSessionsRegistry : public NCore::ISessionsRegistry {
   using TMessage = NCore::NDomain::TMessage;
   using TTimePoint = std::chrono::steady_clock::time_point;
 
-  TRcuSessionsRegistry(std::unique_ptr<NCore::IMessageQueueFactory> queue_factory, std::function<TTimePoint()> now,
+  TRcuSessionsRegistry(const NCore::IMessageQueueFactory& queue_factory, std::function<TTimePoint()> now,
                        userver::dynamic_config::Source config_source);
 
   bool FanOutMessage(TMessage message) override;
@@ -37,7 +37,7 @@ class TRcuSessionsRegistry : public NCore::ISessionsRegistry {
  private:
   userver::rcu::Variable<TRegistry> Sessions_;
 
-  std::unique_ptr<NCore::IMessageQueueFactory> QueueFactory_;
+  const NCore::IMessageQueueFactory& QueueFactory_;
   std::function<TTimePoint()> GetNow_;
   userver::dynamic_config::Source ConfigSource_;
 };

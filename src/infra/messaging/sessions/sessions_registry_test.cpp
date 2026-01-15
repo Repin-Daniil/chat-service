@@ -28,7 +28,7 @@ using ::testing::Return;
 // Helper для создания фабрики с моками
 class TestMessageQueueFactory : public IMessageQueueFactory {
  public:
-  std::unique_ptr<IMessageQueue> Create() override {
+  std::unique_ptr<IMessageQueue> Create() const override {
     auto queue = std::make_unique<NiceMock<MockMessageQueue>>();
     ON_CALL(*queue, Push(_)).WillByDefault(Return(true));
     ON_CALL(*queue, GetSizeApproximate()).WillByDefault(Return(0));
@@ -43,7 +43,7 @@ UTEST(RcuSessionsRegistryTest, InitialStateEmpty) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   EXPECT_TRUE(registry.HasNoConsumer());
   EXPECT_EQ(registry.GetOnlineAmount(), 0);
@@ -53,7 +53,7 @@ UTEST(RcuSessionsRegistryTest, CreateSessionCreatesNew) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   TSessionId session_id{"user123"};
   auto session = registry.CreateSession(session_id);
@@ -67,7 +67,7 @@ UTEST(RcuSessionsRegistryTest, CreateSessionReturnsExisting) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   TSessionId session_id{"user123"};
   auto session1 = registry.CreateSession(session_id);
@@ -82,7 +82,7 @@ UTEST(RcuSessionsRegistryTest, GetOrCreateSessionCreatesNew) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   TSessionId session_id{"user123"};
   auto session = registry.GetOrCreateSession(session_id);
@@ -96,7 +96,7 @@ UTEST(RcuSessionsRegistryTest, GetOrCreateSessionReturnsExisting) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   TSessionId session_id{"user123"};
   auto session1 = registry.GetOrCreateSession(session_id);
@@ -110,7 +110,7 @@ UTEST(RcuSessionsRegistryTest, GetSessionReturnsNullForNonExistent) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   auto session = registry.GetSession(TSessionId{"nonexistent"});
 
@@ -121,7 +121,7 @@ UTEST(RcuSessionsRegistryTest, GetSessionReturnsExisting) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   TSessionId session_id{"user123"};
   auto created = registry.GetOrCreateSession(session_id);
@@ -135,7 +135,7 @@ UTEST(RcuSessionsRegistryTest, RemoveSessionWorks) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   TSessionId session_id{"user123"};
   registry.GetOrCreateSession(session_id);
@@ -151,7 +151,7 @@ UTEST(RcuSessionsRegistryTest, SessionLimitExceeded) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   // Создаем 5 сессий (это лимит)
   for (int i = 0; i < 5; ++i) {
@@ -168,7 +168,7 @@ UTEST(RcuSessionsRegistryTest, FanOutMessageToMultipleSessions) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   // Создаем несколько сессий
   registry.GetOrCreateSession(TSessionId{"user1"});
@@ -187,7 +187,7 @@ UTEST(RcuSessionsRegistryTest, FanOutMessageToEmptyRegistry) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   TMessage msg;
   msg.Payload = std::make_shared<TMessagePayload>(TUserId{"sender"}, TMessageText{"Test"});
@@ -204,7 +204,7 @@ UTEST(RcuSessionsRegistryTest, CleanIdleRemovesInactiveSessions) {
 
   auto factory = std::make_unique<TestMessageQueueFactory>();
 
-  TRcuSessionsRegistry registry(std::move(factory), now_func, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_func, userver::dynamic_config::GetDefaultSource());
 
   // Создаем сессии
   auto session1 = registry.GetOrCreateSession(TSessionId{"user1"});
@@ -228,7 +228,7 @@ UTEST(RcuSessionsRegistryTest, CleanIdleKeepsActiveSessions) {
   auto now_fn = [&current_time]() { return current_time; };
   auto factory = std::make_unique<TestMessageQueueFactory>();
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   auto session = registry.GetOrCreateSession(TSessionId{"user1"});
 
@@ -251,7 +251,7 @@ UTEST_MT(RcuSessionsRegistryTest, ConcurrentGetOrCreateSameSession, 8) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   const auto concurrent_jobs = GetThreadCount();
   const TSessionId session_id{"shared_user"};
@@ -286,7 +286,7 @@ UTEST_MT(RcuSessionsRegistryTest, ConcurrentGetOrCreateDifferentSessions, 8) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   const auto concurrent_jobs = GetThreadCount();
   constexpr std::size_t sessions_per_thread = 5;  // Ограничиваем, чтобы не превысить лимит
@@ -324,7 +324,7 @@ UTEST_MT(RcuSessionsRegistryTest, ConcurrentReadWrite, 8) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   // Создаем начальные сессии
   for (int i = 0; i < 3; ++i) {
@@ -375,7 +375,7 @@ UTEST_MT(RcuSessionsRegistryTest, ConcurrentRemoveAndCreate, 8) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   const auto concurrent_jobs = GetThreadCount();
   std::vector<userver::engine::Task> tasks;
@@ -415,7 +415,7 @@ UTEST_MT(RcuSessionsRegistryTest, ConcurrentFanOut, 8) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   // Создаем несколько сессий
   for (int i = 0; i < 4; ++i) {
@@ -456,7 +456,7 @@ UTEST_MT(RcuSessionsRegistryTest, ConcurrentCleanIdle, 8) {
   auto now_fn = [&current_time]() { return current_time.load(); };
   auto factory = std::make_unique<TestMessageQueueFactory>();
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   // Создаем несколько сессий
   for (int i = 0; i < 4; ++i) {
@@ -498,7 +498,7 @@ UTEST_MT(RcuSessionsRegistryTest, HighContentionMixedOperations, 16) {
   auto factory = std::make_unique<TestMessageQueueFactory>();
   auto now_fn = []() { return std::chrono::steady_clock::now(); };
 
-  TRcuSessionsRegistry registry(std::move(factory), now_fn, userver::dynamic_config::GetDefaultSource());
+  TRcuSessionsRegistry registry(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
 
   const auto concurrent_jobs = GetThreadCount();
   std::vector<userver::engine::Task> tasks;

@@ -11,7 +11,8 @@ namespace NChat::NInfra {
 class TVyukovQueueFactory : public NCore::IMessageQueueFactory {
  public:
   TVyukovQueueFactory(userver::dynamic_config::Source config_source) : ConfigSource_(std::move(config_source)) {}
-  std::unique_ptr<NCore::IMessageQueue> Create() override {
+
+  std::unique_ptr<NCore::IMessageQueue> Create() const override {
     const auto snapshot = ConfigSource_.GetSnapshot();
     auto config = snapshot[kQueueConfig];
     return std::make_unique<TVyukovMessageQueue>(config.MaxQueueSize);

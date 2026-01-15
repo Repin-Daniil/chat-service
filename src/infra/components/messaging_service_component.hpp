@@ -1,5 +1,7 @@
 #pragma once
 
+#include <core/messaging/queue/message_queue_factory.hpp>
+
 #include <app/services/message/messaging_service.hpp>
 
 #include <infra/components/object_factory.hpp>
@@ -25,6 +27,7 @@ class TMessagingServiceComponent final : public userver::components::LoggableCom
  private:
   TObjectFactory<NCore::IMailboxRegistry> GetRegistryFactory();
   TObjectFactory<NApp::ISendLimiter> GetLimiterFactory();
+  TObjectFactory<NCore::IMessageQueueFactory> GetQueueFactory();
 
   void StartPeriodicTraverse();
   void Traverse();
@@ -34,6 +37,7 @@ class TMessagingServiceComponent final : public userver::components::LoggableCom
   std::unique_ptr<NCore::IMailboxRegistry> Registry_;
 
   std::unique_ptr<NApp::ISendLimiter> Limiter_;
+  std::unique_ptr<NCore::IMessageQueueFactory> QueueFactory_;
   std::unique_ptr<NApp::NServices::TMessagingService> MessageService_;
 
   // For period traverse

@@ -11,8 +11,9 @@
 
 namespace NChat::NInfra {
 
-TShardedRegistry::TShardedRegistry(std::size_t shard_amount, userver::dynamic_config::Source config_source)
-    : Registry_(shard_amount), ConfigSource_(std::move(config_source)) {
+TShardedRegistry::TShardedRegistry(std::size_t shard_amount, userver::dynamic_config::Source config_source,
+                                   NCore::IMessageQueueFactory& queue_factory)
+    : Registry_(shard_amount), ConfigSource_(std::move(config_source)), QueueFactory_(queue_factory) {
   LOG_INFO() << fmt::format("Start Registry on Sharded Map with {} shards", shard_amount);
 }
 
@@ -31,9 +32,8 @@ NCore::TMailboxPtr TShardedRegistry::CreateOrGetMailbox(const TUserId& user_id) 
   }
 
   auto mailbox_factory = [user_id, this]() {
-    auto queue_factory = std::make_unique<TVyukovQueueFactory>(ConfigSource_);
     auto sessions = std::make_unique<TRcuSessionsRegistry>(
-        std::move(queue_factory), []() { return userver::utils::datetime::SteadyNow(); }, ConfigSource_);
+        QueueFactory_, []() { return userver::utils::datetime::SteadyNow(); }, ConfigSource_);
 
     return std::make_shared<NCore::TUserMailbox>(user_id, std::move(sessions));
   };

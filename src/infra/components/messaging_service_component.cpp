@@ -4,6 +4,7 @@
 #include <infra/concurrency/queue/vyukov_queue.hpp>
 #include <infra/messaging/limiter/dummy_limiter.hpp>
 #include <infra/messaging/limiter/sharded_limiter.hpp>
+#include <infra/messaging/queue/vyukov_queue_factory.hpp>
 #include <infra/messaging/registry/sharded_registry.hpp>
 
 #include <userver/components/component.hpp>
@@ -44,9 +45,11 @@ TMessagingServiceComponent::TMessagingServiceComponent(const userver::components
                                                        const userver::components::ComponentContext& context)
     : LoggableComponentBase(config, context),
       ConfigSource_(context.FindComponent<userver::components::DynamicConfig>().GetSource()) {
+  QueueFactory_ = GetQueueFactory().Create(config, context, "queue-type");
   Registry_ = GetRegistryFactory().Create(config, context, "registry-type");
   Limiter_ = GetLimiterFactory().Create(config, context, "limiter-type");
   auto& user_repo = context.FindComponent<NComponents::TUserRepoComponent>().GetRepository();
+
   MessageService_ = std::make_unique<NApp::NServices::TMessagingService>(*Registry_, *Limiter_, user_repo);
 
   SetupTestsuite(context);
@@ -55,13 +58,24 @@ TMessagingServiceComponent::TMessagingServiceComponent(const userver::components
 TObjectFactory<NCore::IMailboxRegistry> TMessagingServiceComponent::GetRegistryFactory() {
   TObjectFactory<NCore::IMailboxRegistry> registry_factory;
 
-  registry_factory.Register("ShardedMap", [](const auto& config, const auto& context) {
+  registry_factory.Register("ShardedMap", [this](const auto& config, const auto& context) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
     auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
-    return std::make_unique<TShardedRegistry>(shards_amount, config_source);
+    return std::make_unique<TShardedRegistry>(shards_amount, config_source, *QueueFactory_);
   });
 
   return registry_factory;
+}
+
+TObjectFactory<NCore::IMessageQueueFactory> TMessagingServiceComponent::GetQueueFactory() {
+  TObjectFactory<NCore::IMessageQueueFactory> queue_factory;
+
+  queue_factory.Register("Vyukov", [](const auto& /*config*/, const auto& context) {
+    auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
+    return std::make_unique<TVyukovQueueFactory>(config_source);
+  });
+
+  return queue_factory;
 }
 
 TObjectFactory<NApp::ISendLimiter> TMessagingServiceComponent::GetLimiterFactory() {

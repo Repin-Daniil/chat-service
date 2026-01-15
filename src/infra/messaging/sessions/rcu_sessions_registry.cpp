@@ -4,10 +4,10 @@
 
 namespace NChat::NInfra {
 
-TRcuSessionsRegistry::TRcuSessionsRegistry(std::unique_ptr<NCore::IMessageQueueFactory> queue_factory,
+TRcuSessionsRegistry::TRcuSessionsRegistry(const NCore::IMessageQueueFactory& queue_factory,
                                            std::function<TTimePoint()> now,
                                            userver::dynamic_config::Source config_source)
-    : QueueFactory_(std::move(queue_factory)), GetNow_(now), ConfigSource_(std::move(config_source)) {}
+    : QueueFactory_(queue_factory), GetNow_(now), ConfigSource_(std::move(config_source)) {}
 
 bool TRcuSessionsRegistry::FanOutMessage(TMessage message) {
   auto sessions_ptr = Sessions_.Read();
@@ -66,7 +66,7 @@ TRcuSessionsRegistry::TSessionPtr TRcuSessionsRegistry::TryCreateSession(const T
     throw NCore::TSessionLimitExceeded();
   }
 
-  auto session = std::make_shared<NCore::TUserSession>(session_id, QueueFactory_->Create(), GetNow_);
+  auto session = std::make_shared<NCore::TUserSession>(session_id, QueueFactory_.Create(), GetNow_);
   sessions_ptr->emplace(session_id, session);
   sessions_ptr.Commit();
 

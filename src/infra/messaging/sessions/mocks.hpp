@@ -23,5 +23,5 @@ class MockMessageQueue : public IMessageQueue {
 // Mock фабрика для IMessageQueue
 class MockMessageQueueFactory : public IMessageQueueFactory {
  public:
-  MOCK_METHOD(std::unique_ptr<IMessageQueue>, Create, (), (override));
+  MOCK_METHOD(std::unique_ptr<IMessageQueue>, Create, (), (const, override));
 };

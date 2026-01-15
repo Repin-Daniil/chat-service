@@ -19,7 +19,7 @@ class TMockMessageQueue : public IMessageQueue {
  public:
   bool Push(TMessage&&) override { return true; }
 
-  std::vector<TMessage> PopBatch(std::size_t max_batch_size, std::chrono::milliseconds) override { return {}; }
+  std::vector<TMessage> PopBatch(std::size_t /*max_batch_size*/, std::chrono::milliseconds) override { return {}; }
 
   std::size_t GetSizeApproximate() const override { return 0; }
   void SetMaxSize(std::size_t) override {}
@@ -28,7 +28,7 @@ class TMockMessageQueue : public IMessageQueue {
 
 class TMockMessageQueueFactory : public IMessageQueueFactory {
  public:
-  std::unique_ptr<IMessageQueue> Create() override { return std::make_unique<TMockMessageQueue>(); }
+  std::unique_ptr<IMessageQueue> Create() const override { return std::make_unique<TMockMessageQueue>(); }
 };
 
 // Создание тестового сообщения
@@ -47,8 +47,9 @@ void BM_Sessions_HighContentionReads(benchmark::State& state) {
   const std::size_t num_threads = state.range(0);
 
   userver::engine::RunStandalone(num_threads, [&]() {
+    auto factory = std::make_unique<TMockMessageQueueFactory>();
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        std::make_unique<TMockMessageQueueFactory>(), []() { return userver::utils::datetime::SteadyNow(); },
+        *factory, []() { return userver::utils::datetime::SteadyNow(); },
         userver::dynamic_config::GetDefaultSource());
 
     // Создаем 5 сессий
@@ -95,8 +96,10 @@ void BM_Sessions_ReadHeavyWithWrites(benchmark::State& state) {
   const std::size_t num_writer_threads = state.range(1);
 
   userver::engine::RunStandalone(num_reader_threads + num_writer_threads + 1, [&]() {
+    auto factory = std::make_unique<TMockMessageQueueFactory>();
+
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        std::make_unique<TMockMessageQueueFactory>(), []() { return userver::utils::datetime::SteadyNow(); },
+        *factory, []() { return userver::utils::datetime::SteadyNow(); },
         userver::dynamic_config::GetDefaultSource());
 
     // Начальные сессии
@@ -167,8 +170,10 @@ void BM_Sessions_ReadWithChurn(benchmark::State& state) {
   const std::size_t num_reader_threads = state.range(0);
 
   userver::engine::RunStandalone(num_reader_threads + 2, [&]() {
+    auto factory = std::make_unique<TMockMessageQueueFactory>();
+
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        std::make_unique<TMockMessageQueueFactory>(), []() { return userver::utils::datetime::SteadyNow(); },
+        *factory, []() { return userver::utils::datetime::SteadyNow(); },
         userver::dynamic_config::GetDefaultSource());
 
     // Начальные сессии
@@ -240,9 +245,10 @@ BENCHMARK(BM_Sessions_ReadWithChurn)->Arg(8)->Arg(16)->Arg(32);
 void BM_Sessions_FanOutUnderLoad(benchmark::State& state) {
   const std::size_t num_reader_threads = state.range(0);
 
+  auto factory = std::make_unique<TMockMessageQueueFactory>();
   userver::engine::RunStandalone(num_reader_threads + 1, [&]() {
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        std::make_unique<TMockMessageQueueFactory>(), []() { return userver::utils::datetime::SteadyNow(); },
+        *factory, []() { return userver::utils::datetime::SteadyNow(); },
         userver::dynamic_config::GetDefaultSource());
 
     for (std::size_t i = 0; i < 5; ++i) {
@@ -288,8 +294,9 @@ void BM_Sessions_FullContention(benchmark::State& state) {
   const std::size_t num_threads = state.range(0);
 
   userver::engine::RunStandalone(num_threads + 1, [&]() {
+    auto factory = std::make_unique<TMockMessageQueueFactory>();
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        std::make_unique<TMockMessageQueueFactory>(), []() { return userver::utils::datetime::SteadyNow(); },
+        *factory, []() { return userver::utils::datetime::SteadyNow(); },
         userver::dynamic_config::GetDefaultSource());
 
     for (std::size_t i = 0; i < 5; ++i) {
@@ -351,8 +358,9 @@ void BM_Sessions_GetVsGetOrCreate(benchmark::State& state) {
   const std::size_t num_threads = state.range(1);
 
   userver::engine::RunStandalone(num_threads, [&]() {
+    auto factory = std::make_unique<TMockMessageQueueFactory>();
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        std::make_unique<TMockMessageQueueFactory>(), []() { return userver::utils::datetime::SteadyNow(); },
+        *factory, []() { return userver::utils::datetime::SteadyNow(); },
         userver::dynamic_config::GetDefaultSource());
 
     for (std::size_t i = 0; i < 5; ++i) {

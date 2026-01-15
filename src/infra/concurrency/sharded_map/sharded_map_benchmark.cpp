@@ -27,7 +27,7 @@ using namespace NChat::NCore::NDomain;
 
 void BM_ShardedMap_Put(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
     std::size_t i = 0;
 
     for ([[maybe_unused]] auto _ : state) {
@@ -43,7 +43,7 @@ BENCHMARK(BM_ShardedMap_Put);
 
 void BM_ShardedMap_Get(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
 
     // Prepare data
     for (int i = 0; i < 10000; ++i) {
@@ -68,7 +68,7 @@ void BM_ShardedMap_Remove(benchmark::State& state) {
 
     for ([[maybe_unused]] auto _ : state) {
       state.PauseTiming();
-      TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+      TShardedMap<TUserId, TDummyQueue> map(256);
       TUserId user_id{std::to_string(i++)};
       map.Put(user_id, std::make_shared<TDummyQueue>(false, i));
       state.ResumeTiming();
@@ -84,7 +84,7 @@ BENCHMARK(BM_ShardedMap_Remove);
 
 void BM_ShardedMap_PutOverwrite(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
     TUserId user_id{"constant_key"};
 
     std::size_t i = 0;
@@ -105,7 +105,7 @@ void BM_ShardedMap_Cleanup(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
     for ([[maybe_unused]] auto _ : state) {
       state.PauseTiming();
-      TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+      TShardedMap<TUserId, TDummyQueue> map(256);
 
       for (int i = 0; i < map_size; ++i) {
         bool expired = (i * 100 / map_size) < expired_ratio;
@@ -137,7 +137,7 @@ BENCHMARK(BM_ShardedMap_Cleanup)
 
 void BM_ShardedMap_ConcurrentGet(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
 
     // Prepare data
     for (int i = 0; i < 10000; ++i) {
@@ -181,7 +181,7 @@ void BM_ShardedMap_ConcurrentPut(benchmark::State& state) {
     std::atomic<std::size_t> total_ops{0};
 
     for ([[maybe_unused]] auto _ : state) {
-      TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+      TShardedMap<TUserId, TDummyQueue> map(256);
       std::vector<userver::engine::Task> tasks;
       tasks.reserve(thread_count);
 
@@ -208,7 +208,7 @@ BENCHMARK(BM_ShardedMap_ConcurrentPut)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16);
 
 void BM_ShardedMap_ConcurrentMixed(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
 
     // Prepare initial data
     for (int i = 0; i < 5000; ++i) {
@@ -258,7 +258,7 @@ BENCHMARK(BM_ShardedMap_ConcurrentMixed)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(16
 
 void BM_ShardedMap_RealisticWorkload(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
 
     // Prepare initial data
     for (int i = 0; i < 10000; ++i) {
@@ -344,7 +344,7 @@ void BM_ShardedMap_ShardingEfficiency(benchmark::State& state) {
   const auto shard_count = state.range(0);
 
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(shard_count);
+    TShardedMap<TUserId, TDummyQueue> map(shard_count);
 
     // Prepare data
     for (int i = 0; i < 10000; ++i) {
@@ -396,7 +396,7 @@ void BM_ShardedMap_CleanupWithDelay(benchmark::State& state) {
   const auto delay_ms = state.range(0);
 
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
 
     for ([[maybe_unused]] auto _ : state) {
       state.PauseTiming();
@@ -427,7 +427,7 @@ BENCHMARK(BM_ShardedMap_CleanupWithDelay)->Arg(0)->Arg(1)->Arg(5)->Arg(10);
 
 void BM_ShardedMap_GetOrCreateNew(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
     std::size_t i = 0;
 
     for ([[maybe_unused]] auto _ : state) {
@@ -445,7 +445,7 @@ BENCHMARK(BM_ShardedMap_GetOrCreateNew);
 
 void BM_ShardedMap_GetOrCreateExisting(benchmark::State& state) {
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
 
     // Prepare data
     for (int i = 0; i < 10000; ++i) {
@@ -470,7 +470,7 @@ void BM_ShardedMap_GetOrCreateMixed(benchmark::State& state) {
   const auto hit_rate = state.range(0);  // 0-100
 
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
 
     // Prepare some data based on hit rate
     const int total_keys = 10000;
@@ -504,7 +504,7 @@ void BM_ShardedMap_ConcurrentGetOrCreate(benchmark::State& state) {
     std::atomic<std::size_t> total_ops{0};
 
     for ([[maybe_unused]] auto _ : state) {
-      TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+      TShardedMap<TUserId, TDummyQueue> map(256);
       std::vector<userver::engine::Task> tasks;
       tasks.reserve(thread_count);
 
@@ -538,7 +538,7 @@ void BM_ShardedMap_ConcurrentGetOrCreateDistinct(benchmark::State& state) {
     std::atomic<std::size_t> total_ops{0};
 
     for ([[maybe_unused]] auto _ : state) {
-      TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+      TShardedMap<TUserId, TDummyQueue> map(256);
       std::vector<userver::engine::Task> tasks;
       tasks.reserve(thread_count);
 
@@ -571,7 +571,7 @@ void BM_ShardedMap_GetOrCreateVsPutGet(benchmark::State& state) {
   const auto use_get_or_create = state.range(0);
 
   userver::engine::RunStandalone([&]() {
-    TShardedMap<TUserId, TDummyQueue, NUtils::TaggedHasher<TUserId>> map(256);
+    TShardedMap<TUserId, TDummyQueue> map(256);
     std::size_t i = 0;
 
     if (use_get_or_create) {

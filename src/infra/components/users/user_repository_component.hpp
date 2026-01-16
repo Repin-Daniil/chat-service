@@ -4,7 +4,6 @@
 
 #include <userver/components/loggable_component_base.hpp>
 
-
 namespace NChat::NInfra::NComponents {
 
 class TUserRepoComponent final : public userver::components::LoggableComponentBase {

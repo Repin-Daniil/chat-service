@@ -1,5 +1,7 @@
 #include "mailbox.hpp"
 
+#include <infra/messaging/sessions/mocks.hpp>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -8,20 +10,6 @@ using namespace NChat::NCore::NDomain;
 using ::testing::_;
 using ::testing::NiceMock;
 using ::testing::Return;
-
-//fixme дублируетвя
-
-class MockSessionsRegistry : public ISessionsRegistry {
- public:
-  MOCK_METHOD(bool, FanOutMessage, (TMessage message), (override));
-  MOCK_METHOD(std::shared_ptr<TUserSession>, GetSession, (const TSessionId& session_id), (override));
-  MOCK_METHOD(std::shared_ptr<TUserSession>, GetOrCreateSession, (const TSessionId& session_id), (override));
-  MOCK_METHOD(std::shared_ptr<TUserSession>, CreateSession, (const TSessionId& session_id), (override));
-  MOCK_METHOD(bool, HasNoConsumer, (), (const, override));
-  MOCK_METHOD(std::size_t, CleanIdle, (), (override));
-  MOCK_METHOD(std::size_t, GetOnlineAmount, (), (const, override));
-  MOCK_METHOD(void, RemoveSession, (const TSessionId& sessiond_id), (override));
-};
 
 class TUserMailboxTest : public ::testing::Test {
  protected:

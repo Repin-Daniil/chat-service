@@ -29,7 +29,9 @@ bool TAuthServiceImpl::CheckPassword(std::string_view input_password, std::strin
   return computed_hash == stored_password_hash;
 }
 
-std::string TAuthServiceImpl::CreateJwt(TUserId id) { return NUtils::NTokens::GenerateJWT(id.GetUnderlying(), ExpiryDuration_); }
+std::string TAuthServiceImpl::CreateJwt(TUserId id) {
+  return NUtils::NTokens::GenerateJWT(id.GetUnderlying(), ExpiryDuration_);
+}
 
 std::optional<TUserId> TAuthServiceImpl::DecodeJwt(std::string_view token) {
   if (auto user_id = NUtils::NTokens::DecodeJWT(token)) {

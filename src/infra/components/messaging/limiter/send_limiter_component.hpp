@@ -1,7 +1,8 @@
 #pragma once
 
-#include <app/services/message/send_limiter.hpp>
 #include <core/messaging/queue/message_queue_factory.hpp>
+
+#include <app/services/message/send_limiter.hpp>
 
 #include <infra/components/object_factory.hpp>
 

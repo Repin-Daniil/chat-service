@@ -14,6 +14,8 @@
 
 namespace NChat::NInfra::NComponents {
 
+// todo Метрики
+
 TGarbageCollectorComponent::TGarbageCollectorComponent(const userver::components::ComponentConfig& config,
                                                        const userver::components::ComponentContext& context)
     : LoggableComponentBase(config, context),
@@ -21,7 +23,7 @@ TGarbageCollectorComponent::TGarbageCollectorComponent(const userver::components
       Limiter_(context.FindComponent<TSendLimiterComponent>().GetLimiter()),
       ConfigSource_(context.FindComponent<userver::components::DynamicConfig>().GetSource()) {
   StartPeriodicTraverse();
-  SetupTestsuite(context);  // fixme
+  SetupTestsuite(context);
 }
 
 void TGarbageCollectorComponent::Traverse() {

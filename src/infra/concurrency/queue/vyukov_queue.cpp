@@ -20,7 +20,7 @@ bool TVyukovMessageQueue::Push(TMessage&& message) {
 std::vector<TMessage> TVyukovMessageQueue::PopBatch(std::size_t max_batch_size, std::chrono::milliseconds timeout) {
   TMessage message;
   if (HasConsumer_.exchange(true)) {
-    //todo ТУт теперь надо ошибку выстреливать прям, метрику сюда
+    // todo ТУт теперь надо ошибку выстреливать прям, метрику сюда
     throw std::runtime_error("Queue already has a consumer. Multi-consumer access is not allowed.");
   }
   {

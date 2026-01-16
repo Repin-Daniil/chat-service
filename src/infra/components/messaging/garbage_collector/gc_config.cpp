@@ -8,4 +8,4 @@ TGCSettings Parse(const userver::formats::json::Value& value, userver::formats::
   return TGCSettings{value["is_enabled"].As<bool>(), std::chrono::seconds{value["period_seconds"].As<int>()},
                      std::chrono::milliseconds{value["inter_shard_pause_ms"].As<int>()}};
 }
-}
+}  // namespace NChat::NInfra::NComponents

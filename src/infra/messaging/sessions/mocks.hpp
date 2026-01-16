@@ -1,6 +1,6 @@
 #pragma once
-#include <core/messaging/session/sessions_factory.hpp>
 #include <core/messaging/queue/message_queue_factory.hpp>
+#include <core/messaging/session/sessions_factory.hpp>
 
 #include <gmock/gmock.h>
 
@@ -26,7 +26,6 @@ class MockMessageQueueFactory : public IMessageQueueFactory {
  public:
   MOCK_METHOD(std::unique_ptr<IMessageQueue>, Create, (), (const, override));
 };
-
 
 class MockSessionsFactory : public ISessionsFactory {
  public:

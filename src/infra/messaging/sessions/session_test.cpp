@@ -348,7 +348,9 @@ TEST_F(SessionTest, GetSizeMultipleCalls) {
 // Тесты GetSessionId
 // ============================================================================
 
-TEST_F(SessionTest, GetSessionIdReturnsCorrectId) { EXPECT_EQ(Session_->GetSessionId().GetUnderlying(), "user123session"); }
+TEST_F(SessionTest, GetSessionIdReturnsCorrectId) {
+  EXPECT_EQ(Session_->GetSessionId().GetUnderlying(), "user123session");
+}
 
 TEST_F(SessionTest, GetSessionIdConsistency) {
   auto id1 = Session_->GetSessionId();

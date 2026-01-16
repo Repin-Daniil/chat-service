@@ -37,7 +37,6 @@ class TestMessageQueueFactory : public IMessageQueueFactory {
   }
 };
 
-//todo Тут можно на Mock MessageQueue Facotyr переехать?
 // ============ Базовые тесты ============
 
 UTEST(RcuSessionsRegistryTest, InitialStateEmpty) {

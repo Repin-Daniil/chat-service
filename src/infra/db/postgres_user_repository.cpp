@@ -96,7 +96,8 @@ std::optional<TUserTinyProfile> TPostgresUserRepository::GetProfileById(const TU
     return {{.Id = id, .Username = username, .DisplayName = display_name}};
   }
 
-  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetProfileById, id.GetUnderlying());
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetProfileById,
+                                    id.GetUnderlying());
 
   if (result.IsEmpty()) {
     return std::nullopt;

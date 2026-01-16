@@ -39,7 +39,7 @@ services:
       - "8081:8081"
     volumes:
       - ./configs/config_vars_docker.yaml:/app/configs/config_vars.yaml
-      - ./configs/dynamic_config.yaml:/app/configs/dynamic_config_fallback.json
+      - ./configs/dynamic_config_fallback.json:/app/configs/dynamic_config_fallback.json
       - cache:/app/cache
     depends_on:
       - postgres

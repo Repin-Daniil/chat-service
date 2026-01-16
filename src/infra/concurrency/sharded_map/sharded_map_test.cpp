@@ -37,9 +37,7 @@ UTEST(ShardedMap, ConstructionNotPowerOfTwo) {
   ASSERT_THROW((TShardedMap<TUserId, TDummyQueue>(100)), std::invalid_argument);
 }
 
-UTEST(ShardedMap, ConstructionZero) {
-  ASSERT_THROW((TShardedMap<TUserId, TDummyQueue>(0)), std::invalid_argument);
-}
+UTEST(ShardedMap, ConstructionZero) { ASSERT_THROW((TShardedMap<TUserId, TDummyQueue>(0)), std::invalid_argument); }
 
 // ============================================================================
 // Put Tests

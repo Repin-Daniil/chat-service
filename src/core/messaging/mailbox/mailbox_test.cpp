@@ -9,6 +9,8 @@ using ::testing::_;
 using ::testing::NiceMock;
 using ::testing::Return;
 
+//fixme дублируетвя
+
 class MockSessionsRegistry : public ISessionsRegistry {
  public:
   MOCK_METHOD(bool, FanOutMessage, (TMessage message), (override));

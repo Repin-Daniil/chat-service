@@ -3,7 +3,7 @@
 #include <core/users/user_repo.hpp>
 
 #include <userver/components/loggable_component_base.hpp>
-#include <userver/storages/postgres/component.hpp>
+
 
 namespace NChat::NInfra::NComponents {
 

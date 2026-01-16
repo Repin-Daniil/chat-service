@@ -1,6 +1,6 @@
 #include "start_session_handler.hpp"
 
-#include <infra/components/messaging_service_component.hpp>
+#include <infra/components/messaging/messaging_service_component.hpp>
 
 #include <api/http/common/context.hpp>
 #include <api/http/exceptions/handler_exceptions.hpp>

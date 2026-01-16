@@ -4,6 +4,7 @@
 #include <infra/db/postgres_user_repository.hpp>
 
 #include <userver/components/component.hpp>
+#include <userver/storages/postgres/component.hpp>
 #include <userver/components/component_context.hpp>
 #include <userver/yaml_config/merge_schemas.hpp>
 

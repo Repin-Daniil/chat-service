@@ -2,12 +2,10 @@
 
 #include <app/dto/users/user_delete_dto.hpp>
 
-#include <infra/components/user_service_component.hpp>
+#include <infra/components/users/user_service_component.hpp>
 
 #include <api/http/common/context.hpp>
 #include <api/http/exceptions/handler_exceptions.hpp>
-
-#include <userver/storages/postgres/component.hpp>
 
 using NChat::NApp::NDto::TUserDeleteRequest;
 

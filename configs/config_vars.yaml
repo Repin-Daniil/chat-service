@@ -13,7 +13,8 @@ database: postgres
 token_expiry_hours: 1
 
 registry-shards-amount: 256
-mailbox-queue-type: Vyukov
+sessions-queue-type: Vyukov
+sessions-registry-type: RcuFlatMap
 mailbox-registry-type: ShardedMap
 limiter-registry-type: ShardedMap
 

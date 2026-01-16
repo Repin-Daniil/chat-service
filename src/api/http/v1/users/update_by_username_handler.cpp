@@ -2,11 +2,9 @@
 
 #include <app/dto/users/user_update_dto.hpp>
 
-#include <infra/components/user_service_component.hpp>
+#include <infra/components/users/user_service_component.hpp>
 
 #include <api/http/exceptions/handler_exceptions.hpp>
-
-#include <userver/storages/postgres/component.hpp>
 
 using NChat::NApp::NDto::TUserUpdateRequest;
 using NChat::NApp::NDto::TUserUpdateResult;

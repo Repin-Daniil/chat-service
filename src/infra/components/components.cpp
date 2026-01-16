@@ -1,8 +1,12 @@
 #include "components.hpp"
 
-#include <infra/components/messaging_service_component.hpp>
-#include <infra/components/user_repository_component.hpp>
-#include <infra/components/user_service_component.hpp>
+#include <infra/components/messaging/garbage_collector/gc_task_component.hpp>
+#include <infra/components/messaging/limiter/send_limiter_component.hpp>
+#include <infra/components/messaging/messaging_service_component.hpp>
+#include <infra/components/messaging/registry/mailbox_registry_component.hpp>
+#include <infra/components/messaging/sessions/sessions_registry_component.hpp>
+#include <infra/components/users/user_repository_component.hpp>
+#include <infra/components/users/user_service_component.hpp>
 #include <infra/db/postgres_profile_by_user_id_cache.hpp>
 #include <infra/db/postgres_profile_by_username_cache.hpp>
 
@@ -73,7 +77,12 @@ void RegisterMessagesHandlers(userver::components::ComponentList& list) {
 
 // Components
 void RegisterServiceComponents(userver::components::ComponentList& list) {
-  list.Append<NComponents::TUserServiceComponent>().Append<NComponents::TMessagingServiceComponent>();
+  list.Append<NComponents::TUserServiceComponent>()
+      .Append<NComponents::TMessagingServiceComponent>()
+      .Append<NComponents::TGarbageCollectorComponent>()
+      .Append<NComponents::TMailboxRegistryComponent>()
+      .Append<NComponents::TSendLimiterComponent>()
+      .Append<NComponents::TSessionsFactoryComponent>();
 }
 
 void RegisterRepositoryComponents(userver::components::ComponentList& list) {

@@ -1,8 +1,9 @@
+#pragma once
+
 #include <userver/components/component_context.hpp>
 #include <userver/yaml_config/yaml_config.hpp>
 
 #include <functional>
-#include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>

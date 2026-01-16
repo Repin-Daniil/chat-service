@@ -2,7 +2,7 @@
 
 #include <app/dto/users/login_dto.hpp>
 
-#include <infra/components/user_service_component.hpp>
+#include <infra/components/users/user_service_component.hpp>
 
 #include <api/http/exceptions/handler_exceptions.hpp>
 

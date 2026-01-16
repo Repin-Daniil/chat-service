@@ -1,8 +1,5 @@
 #include "sharded_registry.hpp"
 
-#include "infra/messaging/queue/vyukov_queue_factory.hpp"
-#include "infra/messaging/sessions/rcu_sessions_registry.hpp"
-
 #include <infra/concurrency/queue/vyukov_queue.hpp>
 #include <infra/messaging/registry/registry_config.hpp>
 
@@ -12,8 +9,8 @@
 namespace NChat::NInfra {
 
 TShardedRegistry::TShardedRegistry(std::size_t shard_amount, userver::dynamic_config::Source config_source,
-                                   NCore::IMessageQueueFactory& queue_factory)
-    : Registry_(shard_amount), ConfigSource_(std::move(config_source)), QueueFactory_(queue_factory) {
+                                   NCore::ISessionsFactory& sessions_factory)
+    : Registry_(shard_amount), ConfigSource_(std::move(config_source)), SessionsFactory_(sessions_factory) {
   LOG_INFO() << fmt::format("Start Registry on Sharded Map with {} shards", shard_amount);
 }
 
@@ -32,10 +29,7 @@ NCore::TMailboxPtr TShardedRegistry::CreateOrGetMailbox(const TUserId& user_id) 
   }
 
   auto mailbox_factory = [user_id, this]() {
-    auto sessions = std::make_unique<TRcuSessionsRegistry>(
-        QueueFactory_, []() { return userver::utils::datetime::SteadyNow(); }, ConfigSource_);
-
-    return std::make_shared<NCore::TUserMailbox>(user_id, std::move(sessions));
+    return std::make_shared<NCore::TUserMailbox>(user_id, SessionsFactory_.Create());
   };
 
   auto [mailbox, inserted] = Registry_.GetOrCreate(user_id, mailbox_factory);

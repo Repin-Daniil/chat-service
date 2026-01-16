@@ -1,10 +1,13 @@
 #include "sharded_registry.hpp"
 
+#include "infra/messaging/sessions/rcu_sessions_registry.hpp"
+
 #include <core/common/ids.hpp>
 
 #include <infra/messaging/registry/registry_config.hpp>
 #include <infra/messaging/sessions/mocks.hpp>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <userver/dynamic_config/test_helpers.hpp>
 #include <userver/engine/async.hpp>
@@ -18,9 +21,16 @@ using namespace NChat::NCore::NDomain;
 
 class TShardedRegistryTest : public ::testing::Test {
  protected:
-  void SetUp() override { Factory = std::make_unique<MockMessageQueueFactory>(); }
+  void SetUp() override {
+    Factory = std::make_unique<MockSessionsFactory>();
+    auto& MockRef = dynamic_cast<MockSessionsFactory&>(*Factory);
 
-  std::unique_ptr<IMessageQueueFactory> Factory;
+    EXPECT_CALL(MockRef, Create()).WillRepeatedly(::testing::Invoke([]() {
+      return std::make_unique<MockSessionsRegistry>();
+    }));
+  }
+
+  std::unique_ptr<ISessionsFactory> Factory;
 };
 
 // Базовые тесты функциональности
@@ -117,8 +127,17 @@ UTEST_F(TShardedRegistryTest, MultipleMailboxes) {
   }
 }
 
-UTEST_F(TShardedRegistryTest, TraverseRegistryRemovesExpiredMailboxes) {
-  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource(), *Factory);
+UTEST(TShardedRegistryTestRcu, TraverseRegistryRemovesExpiredMailboxes) {
+  auto Factory = std::make_unique<MockSessionsFactory>();
+  auto& MockRef = dynamic_cast<MockSessionsFactory&>(*Factory);
+
+  EXPECT_CALL(MockRef, Create()).WillRepeatedly(::testing::Invoke([]() {
+    auto factory = std::make_unique<MockMessageQueueFactory>();
+    auto now_fn = []() { return std::chrono::steady_clock::now(); };
+    return std::make_unique<TRcuSessionsRegistry>(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
+  }));
+
+  TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource(), MockRef);
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
   TUserId user_id{"42"};
 

@@ -94,10 +94,24 @@ components_manager:
 
         messaging-service-component:
             load-enabled: true
+
+        mailbox-registry-component:
+            load-enabled: true
             shards-amount: $registry-shards-amount
-            queue-type: $mailbox-queue-type
-            registry-type: $mailbox-registry-type
-            limiter-type: $limiter-registry-type
+            type: $mailbox-registry-type
+        
+        send-limiter-component:
+            load-enabled: true
+            shards-amount: $registry-shards-amount
+            type: $limiter-registry-type
+
+        sessions-registry-component:
+            load-enabled: true
+            registry-type: $sessions-registry-type
+            queue-type: $sessions-queue-type
+
+        garbage-collector-component:
+            load-enabled: true
 
         # Handlers 
 

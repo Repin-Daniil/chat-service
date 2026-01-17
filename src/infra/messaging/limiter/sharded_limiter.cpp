@@ -34,6 +34,9 @@ bool TSendLimiter::TryAcquire(const TUserId& user_id) {
   auto config = snapshot[kLimiterConfig];
   const auto is_enabled = config.IsEnabled;
 
+  //todo ratelimiter.allowed: +1 при успешном TryAcquire.
+// ratelimiter.rejected: +1 при возврате false.
+// Важно: Построй график rejected / (allowed + rejected). Это % троттлинга. Если он > 1-5% для обычных пользователей — это инцидент.
   if (is_enabled) {
     const auto token_refill_amount = config.TokenRefillAmount;
     const auto max_rps = config.MaxRps;
@@ -70,6 +73,8 @@ void TSendLimiter::TraverseLimiters() {
 
   auto metrics_cb = [&](const TLimiterPtr& limiter) {
     // todo в чатике есть метрики, которые следует добавитьы
+    // limiter.count — количетсов созданных лимитеров
+    // limiter.exhausted.count — количетсо пользователей, у которых сейчас все плохо 
     total_tokens_available += limiter->GetBucket().GetTokensApprox();
     active_users_count++;
   };
@@ -80,6 +85,7 @@ void TSendLimiter::TraverseLimiters() {
 
   // todo: Записать total_tokens_available / active_users_count в метрики сервиса
   LOG_INFO() << fmt::format("Limiter GC: removed {}, kept {}", removed_amount, active_users_count);
+  //todo gc.removed_limiters
 }
 
 std::int64_t TSendLimiter::GetTotalLimiters() const { return LimiterCounter_.load(std::memory_order_relaxed); }

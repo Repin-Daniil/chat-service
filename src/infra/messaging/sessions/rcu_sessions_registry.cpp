@@ -6,8 +6,8 @@ namespace NChat::NInfra {
 
 TRcuSessionsRegistry::TRcuSessionsRegistry(const NCore::IMessageQueueFactory& queue_factory,
                                            std::function<TTimePoint()> now,
-                                           userver::dynamic_config::Source config_source)
-    : QueueFactory_(queue_factory), GetNow_(now), ConfigSource_(std::move(config_source)) {}
+                                           userver::dynamic_config::Source config_source, TSessionsStatistics& stats)
+    : QueueFactory_(queue_factory), GetNow_(now), ConfigSource_(std::move(config_source)), Stats_(stats) {}
 
 bool TRcuSessionsRegistry::FanOutMessage(TMessage message) {
   auto sessions_ptr = Sessions_.Read();
@@ -108,7 +108,8 @@ std::size_t TRcuSessionsRegistry::CleanIdle() {
   if (removed > 0) {
     sessions_ptr.Commit();
   }
-
+  // todo метрики на очередь
+  // Queue Saturation (Гистограмма): * chat_mailbox_fill_percent:
   return removed;
 }
 

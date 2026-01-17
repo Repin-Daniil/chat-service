@@ -130,11 +130,13 @@ UTEST_F(TShardedRegistryTest, MultipleMailboxes) {
 UTEST(TShardedRegistryTestRcu, TraverseRegistryRemovesExpiredMailboxes) {
   auto Factory = std::make_unique<MockSessionsFactory>();
   auto& MockRef = dynamic_cast<MockSessionsFactory&>(*Factory);
+  TSessionsStatistics stats{};
 
-  EXPECT_CALL(MockRef, Create()).WillRepeatedly(::testing::Invoke([]() {
+  EXPECT_CALL(MockRef, Create()).WillRepeatedly(::testing::Invoke([&stats]() {
     auto factory = std::make_unique<MockMessageQueueFactory>();
     auto now_fn = []() { return std::chrono::steady_clock::now(); };
-    return std::make_unique<TRcuSessionsRegistry>(*factory, now_fn, userver::dynamic_config::GetDefaultSource());
+    
+    return std::make_unique<TRcuSessionsRegistry>(*factory, now_fn, userver::dynamic_config::GetDefaultSource(), stats);
   }));
 
   TShardedRegistry registry(256, userver::dynamic_config::GetDefaultSource(), MockRef);

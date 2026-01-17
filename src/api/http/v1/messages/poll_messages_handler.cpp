@@ -76,10 +76,18 @@ userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
     response.SetStatus(userver::server::http::HttpStatus::kGone);
     return MakeError(ex.what());
   }
-
+  //todo Наверное везде надо на исключения навесить метрики?
   userver::formats::json::StringBuilder sb;
   NInfra::WriteToStream(result, sb);
 
+  //chat_pop_batch_size: Среднее количество сообщений, отдаваемых за один Long-poll.
+  //todo chat_delivery_latency_ms и прочая статистика из DeliveryContext Histogram
+  // internal_processing_latency_ms
+  // queue_wait_latency_ms — сколько сообщение ждало вычитки
+  // delivery_overhead_ms — накладные расходы на сериализацию, батчинг
+
+  //todo Можно наверное попробовать сделать опциональную оптимизацию
+  // Делать второй раз PopBatch если сообщений мало, а SLA еще не истек
   return userver::formats::json::FromString(sb.GetString());
 }
 

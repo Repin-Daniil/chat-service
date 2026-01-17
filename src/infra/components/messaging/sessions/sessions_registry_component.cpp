@@ -4,11 +4,14 @@
 #include <infra/messaging/queue/vyukov_queue_factory.hpp>
 #include <infra/messaging/registry/sharded_registry.hpp>
 #include <infra/messaging/sessions/rcu_sessions_factory.hpp>
+#include <infra/messaging/sessions/sessions_stats.hpp>
 
 #include <userver/components/component.hpp>
 #include <userver/components/component_context.hpp>
+#include <userver/components/statistics_storage.hpp>
 #include <userver/dynamic_config/storage/component.hpp>
 #include <userver/formats/json/value_builder.hpp>
+#include <userver/utils/statistics/metrics_storage.hpp>
 #include <userver/yaml_config/merge_schemas.hpp>
 
 namespace NChat::NInfra::NComponents {
@@ -24,7 +27,10 @@ TObjectFactory<NCore::ISessionsFactory> TSessionsFactoryComponent::GetSessionsFa
 
   sessions_factory.Register("RcuFlatMap", [this](const auto& /*config*/, const auto& context) {
     auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
-    return std::make_unique<TRcuSessionsFactory>(*QueueFactory_, config_source);
+    return std::make_unique<TRcuSessionsFactory>(
+        *QueueFactory_, config_source,
+        context.template FindComponent<userver::components::StatisticsStorage>().GetMetricsStorage()->GetMetric(
+            kSessionsTag));
   });
 
   return sessions_factory;

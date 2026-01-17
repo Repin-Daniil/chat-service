@@ -7,11 +7,11 @@
 namespace NChat::NInfra {
 
 TRcuSessionsFactory::TRcuSessionsFactory(NCore::IMessageQueueFactory& factory,
-                                         userver::dynamic_config::Source config_source)
-    : Factory_(factory), ConfigSource_(std::move(config_source)) {}
+                                         userver::dynamic_config::Source config_source, TSessionsStatistics& stats)
+    : Factory_(factory), ConfigSource_(std::move(config_source)), Stats_(stats) {}
 
 std::unique_ptr<NCore::ISessionsRegistry> TRcuSessionsFactory::Create() const {
   return std::make_unique<TRcuSessionsRegistry>(
-      Factory_, []() { return userver::utils::datetime::SteadyNow(); }, ConfigSource_);
+      Factory_, []() { return userver::utils::datetime::SteadyNow(); }, ConfigSource_, Stats_);
 }
 }  // namespace NChat::NInfra

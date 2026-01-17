@@ -51,7 +51,9 @@ void TGarbageCollectorComponent::SetupTestsuite(const userver::components::Compo
   Task_.RegisterInTestsuite(context.FindComponent<userver::components::TestsuiteSupport>().GetPeriodicTaskControl());
 
   auto& testsuite_tasks = userver::testsuite::GetTestsuiteTasks(context);
-
+ //chat_active_mailboxes_count: Сколько сейчас объектов в мапе.
+  // chat_idle_mailboxes_evicted_total: Сколько удалено по GC
+  
   auto clear_cb = std::function<void()>([this] { Registry_.Clear(); });
   if (testsuite_tasks.IsEnabled()) {
     testsuite_tasks.RegisterTask("reset-task", [clear_cb] {

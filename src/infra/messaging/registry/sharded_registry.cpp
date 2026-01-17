@@ -61,6 +61,7 @@ void TShardedRegistry::TraverseRegistry(std::chrono::milliseconds inter_pause) {
     // todo метрика количетсов сессий на mailbox
     // Средний возраст сессии
     // todo метрики был чатик с нейронкой
+    // chat_mailbox_queue_size Histogram
   };
 
   auto removed_amount = Registry_.CleanupAndCount(is_expired, metrics_cb, inter_pause);

@@ -11,7 +11,8 @@
 #include <userver/rcu/rcu.hpp>
 
 namespace NChat::NInfra {
-
+  
+//todo Метрики нужны
 class TRcuSessionsRegistry : public NCore::ISessionsRegistry {
  public:
   using TSessionId = NCore::NDomain::TSessionId;
@@ -21,7 +22,7 @@ class TRcuSessionsRegistry : public NCore::ISessionsRegistry {
   using TTimePoint = std::chrono::steady_clock::time_point;
 
   TRcuSessionsRegistry(const NCore::IMessageQueueFactory& queue_factory, std::function<TTimePoint()> now,
-                       userver::dynamic_config::Source config_source);  // fixme добавить , TSessionsStatistics& stats
+                       userver::dynamic_config::Source config_source, TSessionsStatistics& stats);
 
   bool FanOutMessage(TMessage message) override;
   TSessionPtr CreateSession(const TSessionId& session_id) override;
@@ -42,6 +43,6 @@ class TRcuSessionsRegistry : public NCore::ISessionsRegistry {
   const NCore::IMessageQueueFactory& QueueFactory_;
   std::function<TTimePoint()> GetNow_;
   userver::dynamic_config::Source ConfigSource_;
-  // TSessionsStatistics& Stats_;
+  TSessionsStatistics& Stats_;
 };
 }  // namespace NChat::NInfra

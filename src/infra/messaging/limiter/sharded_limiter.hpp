@@ -12,7 +12,6 @@
 
 namespace NChat::NInfra {
 
-// todo метрики
 class TLimiterWrapper {
  public:
   using TTimePoint = std::chrono::steady_clock::time_point;

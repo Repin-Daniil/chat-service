@@ -31,7 +31,7 @@ TObjectFactory<NApp::ISendLimiter> TSendLimiterComponent::GetLimiterFactory() {
 }
 
 userver::yaml_config::Schema TSendLimiterComponent::GetStaticConfigSchema() {
-  return userver::yaml_config::MergeSchemas<userver::components::ComponentBase>(
+  return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(
       R"(
 type: object
 description: Component for send limiter

@@ -1,7 +1,7 @@
 #include "vyukov_queue.hpp"
 
 #include <userver/utils/datetime_light.hpp>
-#include <userver/utils/scope_guard.hpp>
+#include <userver/utils/fast_scope_guard.hpp>
 
 namespace {
 std::chrono::steady_clock::time_point GetNowTimePoint() { return userver::utils::datetime::SteadyNow(); }
@@ -20,11 +20,10 @@ bool TVyukovMessageQueue::Push(TMessage&& message) {
 std::vector<TMessage> TVyukovMessageQueue::PopBatch(std::size_t max_batch_size, std::chrono::milliseconds timeout) {
   TMessage message;
   if (HasConsumer_.exchange(true)) {
-    // todo ТУт теперь надо ошибку выстреливать прям, метрику сюда
-    throw std::runtime_error("Queue already has a consumer. Multi-consumer access is not allowed.");
+    throw NCore::TConsumerAlreadyExists("Queue already has a consumer. Multi-consumer access is not allowed.");
   }
   {
-    userver::utils::ScopeGuard guard([this] { HasConsumer_.store(false); });
+    userver::utils::FastScopeGuard guard([this] noexcept { HasConsumer_.store(false); });
 
     // Здесь как раз и сидит Long Polling
     if (!Consumer_.Pop(message, userver::engine::Deadline::FromDuration(timeout))) {

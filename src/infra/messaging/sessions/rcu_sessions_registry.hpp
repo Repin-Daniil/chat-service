@@ -11,8 +11,7 @@
 #include <userver/rcu/rcu.hpp>
 
 namespace NChat::NInfra {
-  
-//todo Метрики нужны
+
 class TRcuSessionsRegistry : public NCore::ISessionsRegistry {
  public:
   using TSessionId = NCore::NDomain::TSessionId;

@@ -66,11 +66,6 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     response.SetStatus(userver::server::http::HttpStatus::kServiceUnavailable);
     return MakeError(ex.what());
   }
-
-  //todo Drop Counter (Счетчик с причинами):
-  // chat_messages_dropped_total{reason="overflow"}
-  // chat_messages_dropped_total{reason="rate_limit"}
-
   
   auto& response = request.GetHttpResponse();
   response.SetStatus(userver::server::http::HttpStatus::kAccepted);

@@ -24,6 +24,10 @@ bool TRcuSessionsRegistry::FanOutMessage(TMessage message) {
     }
   }
 
+  if (success) {
+    ++Stats_.messages_sent_total;
+  }
+
   return success;
 }
 
@@ -62,14 +66,17 @@ TRcuSessionsRegistry::TSessionPtr TRcuSessionsRegistry::TryCreateSession(const T
   const auto snapshot = ConfigSource_.GetSnapshot();
   auto config = snapshot[kSessionsConfig];
 
-  if (sessions_ptr->size() >= config.MaxSessionsAmount) {
+  const auto size = sessions_ptr->size();
+  if (size >= config.MaxSessionsAmount) {
     throw NCore::TSessionLimitExceeded();
   }
 
   auto session = std::make_shared<NCore::TUserSession>(session_id, QueueFactory_.Create(), GetNow_);
   sessions_ptr->emplace(session_id, session);
   sessions_ptr.Commit();
-  ++Stats_.opened_sessions_total;
+
+  Stats_.sessions_per_user_hist.Account(size + 1);
+  ++Stats_.opened_sessions_current;
 
   return session;
 }
@@ -78,7 +85,7 @@ void TRcuSessionsRegistry::RemoveSession(const TSessionId& session_id) {
   auto sessions_ptr = Sessions_.StartWrite();
   sessions_ptr->erase(session_id);
   sessions_ptr.Commit();
-  --Stats_.opened_sessions_total;
+  --Stats_.opened_sessions_current;
 }
 
 bool TRcuSessionsRegistry::HasNoConsumer() const {
@@ -99,6 +106,8 @@ std::size_t TRcuSessionsRegistry::CleanIdle() {
   std::size_t removed = 0;
 
   for (auto it = sessions_ptr->begin(); it != sessions_ptr->end();) {
+    Stats_.queue_size_hist.Account(it->second->GetSizeApproximate());  // metrics
+
     if (!it->second->IsActive(config.IdleTimeout)) {
       it = sessions_ptr->erase(it);
       ++removed;
@@ -109,11 +118,11 @@ std::size_t TRcuSessionsRegistry::CleanIdle() {
 
   if (removed > 0) {
     sessions_ptr.Commit();
-    Stats_.opened_sessions_total -= removed;
+    Stats_.opened_sessions_current -= removed;
   }
-  // todo метрики на очередь
-  // Queue Saturation (Гистограмма): * chat_mailbox_fill_percent:
+
   return removed;
 }
+//todo Возможно еще какая метрика полезной будет
 
 };  // namespace NChat::NInfra

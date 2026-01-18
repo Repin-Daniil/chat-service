@@ -57,11 +57,8 @@ void TShardedRegistry::TraverseRegistry(std::chrono::milliseconds inter_pause) {
   auto metrics_cb = [](const NCore::TMailboxPtr& mailbox) {
     mailbox->GetUserId();
     // todo метрики
-    // mailbox->GetSizeApproximate(); Теперь нужно по сессиям
     // todo метрика количетсов сессий на mailbox
-    // Средний возраст сессии
     // todo метрики был чатик с нейронкой
-    // chat_mailbox_queue_size Histogram
   };
 
   auto removed_amount = Registry_.CleanupAndCount(is_expired, metrics_cb, inter_pause);

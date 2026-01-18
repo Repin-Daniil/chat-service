@@ -6,6 +6,11 @@
 
 namespace NChat::NCore {
 
+class TConsumerAlreadyExists : public std::runtime_error {
+ public:
+  using std::runtime_error::runtime_error;
+};
+
 class IMessageQueue {
  public:
   virtual bool Push(NDomain::TMessage&&) = 0;

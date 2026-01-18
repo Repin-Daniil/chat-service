@@ -20,7 +20,7 @@ TUserServiceComponent::TUserServiceComponent(const userver::components::Componen
 }
 
 userver::yaml_config::Schema TUserServiceComponent::GetStaticConfigSchema() {
-  return userver::yaml_config::MergeSchemas<userver::components::ComponentBase>(
+  return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(
       R"(
 type: object
 description: Component for user service logic

@@ -28,7 +28,7 @@ TUserRepoComponent::TUserRepoComponent(const userver::components::ComponentConfi
 }
 
 userver::yaml_config::Schema TUserRepoComponent::GetStaticConfigSchema() {
-  return userver::yaml_config::MergeSchemas<userver::components::ComponentBase>(
+  return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(
       R"(
 type: object
 description: Component for user repository creation

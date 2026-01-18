@@ -7,10 +7,13 @@
 
 #include <api/http/common/context.hpp>
 #include <api/http/exceptions/handler_exceptions.hpp>
+#include <api/http/v1/messages/polling/config/polling_config.hpp>
 
 #include <userver/components/component_context.hpp>
+#include <userver/components/statistics_storage.hpp>
 #include <userver/dynamic_config/source.hpp>
 #include <userver/dynamic_config/storage/component.hpp>
+#include <userver/utils/fast_scope_guard.hpp>
 
 using NChat::NApp::NDto::TPollMessagesRequest;
 using NChat::NApp::NDto::TPollMessagesSettings;
@@ -19,34 +22,20 @@ using NChat::NCore::NDomain::TUserId;
 
 namespace NChat::NInfra::NHandlers {
 
-struct TPollingSettings {
-  std::size_t MaxSize{100};
-  std::chrono::seconds PollTime{10};
-};
-
-TPollingSettings Parse(const userver::formats::json::Value& value, userver::formats::parse::To<TPollingSettings>) {
-  return TPollingSettings{value["max_size"].As<std::size_t>(),
-                          std::chrono::seconds{value["polling_time_sec"].As<int>()}};
-}
-
-const userver::dynamic_config::Key<TPollingSettings> kPollingConfig{"POLLING_CONFIG",
-                                                                    userver::dynamic_config::DefaultAsJsonString{R"(
-  {
-    "max_size": 100,
-    "polling_time_sec": 180
-  }
-)"}};
-////////////////////////////////////////////////////
-
 TPollMessageHandler::TPollMessageHandler(const userver::components::ComponentConfig& config,
                                          const userver::components::ComponentContext& context)
     : HttpHandlerJsonBase(config, context),
       MessageService_(context.FindComponent<NComponents::TMessagingServiceComponent>().GetService()),
-      ConfigSource_(context.FindComponent<userver::components::DynamicConfig>().GetSource()) {}
+      ConfigSource_(context.FindComponent<userver::components::DynamicConfig>().GetSource()),
+      Stats_(
+          context.FindComponent<userver::components::StatisticsStorage>().GetMetricsStorage()->GetMetric(kPollingTag)) {
+}
 
 userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& /*request_json*/,
     userver::server::request::RequestContext& request_context) const {
+  const auto start_polling_tp = userver::utils::datetime::SteadyNow();
+
   TUserId consumer_id{request_context.GetData<std::string>(ToString(EContextKey::UserId))};
   TSessionId session_id{request.GetPathArg("session_id")};
 
@@ -66,6 +55,8 @@ userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
   TPollMessagesResult result;
 
   try {
+    ++Stats_.active_polling_amount;
+    userver::utils::FastScopeGuard guard([this] noexcept { --Stats_.active_polling_amount; });
     result = MessageService_.PollMessages(request_dto, request_settings);
   } catch (const NApp::TMailboxNotFound& ex) {
     auto& response = request.GetHttpResponse();
@@ -75,20 +66,48 @@ userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
     auto& response = request.GetHttpResponse();
     response.SetStatus(userver::server::http::HttpStatus::kGone);
     return MakeError(ex.what());
+  } catch (const NCore::TConsumerAlreadyExists& ex) {
+    throw TConflictException(ex.what());
   }
-  //todo Наверное везде надо на исключения навесить метрики?
+
   userver::formats::json::StringBuilder sb;
   NInfra::WriteToStream(result, sb);
 
-  //chat_pop_batch_size: Среднее количество сообщений, отдаваемых за один Long-poll.
-  //todo chat_delivery_latency_ms и прочая статистика из DeliveryContext Histogram
-  // internal_processing_latency_ms
-  // queue_wait_latency_ms — сколько сообщение ждало вычитки
-  // delivery_overhead_ms — накладные расходы на сериализацию, батчинг
+  ExportMessagesMetrics(result, start_polling_tp);
 
-  //todo Можно наверное попробовать сделать опциональную оптимизацию
-  // Делать второй раз PopBatch если сообщений мало, а SLA еще не истек
   return userver::formats::json::FromString(sb.GetString());
+}
+
+void TPollMessageHandler::ExportMessagesMetrics(const NApp::NDto::TPollMessagesResult& messages,
+                                                const std::chrono::steady_clock::time_point start_polling_tp) const {
+  using period_us = std::chrono::microseconds::period;
+  using period_sec = std::chrono::seconds::period;
+
+  auto duration_since = [](auto start) {
+    const auto now = userver::utils::datetime::SteadyNow();
+    return now - start;
+  };
+
+  for (const auto& message : messages.Messages) {
+    Stats_.polling_overhead_us_hist.Account(
+        std::chrono::duration<double, period_us>(duration_since(message.Context.Dequeued)).count());
+
+    Stats_.queue_wait_latency_sec_hist.Account(
+        std::chrono::duration<double, period_sec>(message.Context.Dequeued - message.Context.Enqueued).count());
+
+    Stats_.send_overhead_us_hist.Account(
+        std::chrono::duration<double, period_us>(message.Context.Enqueued - message.Context.Get).count());
+    ;
+  }
+
+  if (messages.ResyncRequired) {
+    ++Stats_.resync_required_total;
+  }
+
+  Stats_.batch_size_hist.Account(messages.Messages.size());
+
+  Stats_.polling_duration_sec_hist.Account(
+      std::chrono::duration<double, period_sec>(duration_since(start_polling_tp)).count());
 }
 
 }  // namespace NChat::NInfra::NHandlers

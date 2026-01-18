@@ -3,20 +3,18 @@
 #include <userver/utils/statistics/fwd.hpp>
 #include <userver/utils/statistics/histogram.hpp>
 #include <userver/utils/statistics/metric_tag.hpp>
+#include <userver/utils/statistics/rate_counter.hpp>
 
-// #include <userver/utils/statistics/histogram_aggregator.hpp>
 #include <atomic>
 
 namespace NChat::NInfra {
 struct TSessionsStatistics {
-  std::atomic<int> opened_sessions_total{0};
-  userver::utils::statistics::Histogram sessions_amount_hist{{1.5, 5, 42, 60}};
-  // userver::utils::statistics::Percentile<std::size_t M>
-  // userver::utils::statistics::RateCounter
-  //  userver::utils::statistics::RecentPeriod<typename Counter, typename Result>
-
-  // Гистограмма количества удаленных сессий
-  // Гистограмма количества сессий в каждой мапе
+  std::atomic<int> opened_sessions_current{0};
+  userver::utils::statistics::RateCounter removed_sessions_total{0};
+  userver::utils::statistics::RateCounter messages_sent_total{0};
+  userver::utils::statistics::Histogram sessions_per_user_hist{{1, 2, 3, 4, 5}};
+  userver::utils::statistics::Histogram queue_size_hist{{1, 5, 10, 25, 50, 100, 500, 1000}};
+  //todo возраст сессий гистограмма? 
 };
 
 inline const userver::utils::statistics::MetricTag<TSessionsStatistics> kSessionsTag{"chat_sessions"};

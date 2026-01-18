@@ -32,7 +32,7 @@ TObjectFactory<NCore::IMailboxRegistry> TMailboxRegistryComponent::GetRegistryFa
 }
 
 userver::yaml_config::Schema TMailboxRegistryComponent::GetStaticConfigSchema() {
-  return userver::yaml_config::MergeSchemas<userver::components::ComponentBase>(
+  return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(
       R"(
 type: object
 description: Component for mailbox registry

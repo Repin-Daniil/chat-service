@@ -2,6 +2,8 @@
 
 #include <app/services/message/messaging_service.hpp>
 
+#include <api/http/v1/messages/polling/metrics/polling_stats.hpp>
+
 #include <userver/server/handlers/http_handler_json_base.hpp>
 
 namespace NChat::NInfra::NHandlers {
@@ -16,8 +18,13 @@ class TPollMessageHandler : public userver::server::handlers::HttpHandlerJsonBas
       userver::server::request::RequestContext& context) const override;
 
  private:
+  void ExportMessagesMetrics(const NApp::NDto::TPollMessagesResult& messages,
+                             const std::chrono::steady_clock::time_point start_polling_tp) const;
+
+ private:
   NApp::NServices::TMessagingService& MessageService_;
   userver::dynamic_config::Source ConfigSource_;
+  TPollingStatistics& Stats_;
 };
 
 }  // namespace NChat::NInfra::NHandlers

@@ -22,7 +22,7 @@ async def test_multiple_sessions(service_client, registered_user, monitor_client
         assert response.status == HTTPStatus.OK
         assert validate_session(response)
         metrics = await monitor_client.metrics(prefix='chat_sessions.')
-        assert metrics.value_at('chat_sessions.opened.total') == (i + 1)
+        assert metrics.value_at('chat_sessions.opened.current') == (i + 1)
 
 
 @pytest.mark.parametrize('sessions_config', [(1, 1)], indirect=True)

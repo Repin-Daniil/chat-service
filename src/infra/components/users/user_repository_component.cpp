@@ -27,6 +27,8 @@ TUserRepoComponent::TUserRepoComponent(const userver::components::ComponentConfi
   UserRepo_ = repo_factory.Create(config, context, "storage-type");
 }
 
+NCore::IUserRepository& TUserRepoComponent::GetRepository() { return *UserRepo_; }
+
 userver::yaml_config::Schema TUserRepoComponent::GetStaticConfigSchema() {
   return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(
       R"(

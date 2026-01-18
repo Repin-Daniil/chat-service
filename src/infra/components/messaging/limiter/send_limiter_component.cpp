@@ -5,6 +5,7 @@
 
 #include <userver/components/component.hpp>
 #include <userver/components/component_context.hpp>
+#include <userver/components/statistics_storage.hpp>
 #include <userver/dynamic_config/storage/component.hpp>
 #include <userver/formats/json/value_builder.hpp>
 #include <userver/yaml_config/merge_schemas.hpp>
@@ -21,7 +22,10 @@ TObjectFactory<NApp::ISendLimiter> TSendLimiterComponent::GetLimiterFactory() {
   limiter_factory.Register("ShardedMap", [](const auto& config, const auto& context) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
     auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
-    return std::make_unique<TSendLimiter>(shards_amount, config_source);
+    return std::make_unique<TSendLimiter>(
+        shards_amount, config_source,
+        context.template FindComponent<userver::components::StatisticsStorage>().GetMetricsStorage()->GetMetric(
+            kLimiterTag));
   });
 
   limiter_factory.Register(
@@ -29,6 +33,8 @@ TObjectFactory<NApp::ISendLimiter> TSendLimiterComponent::GetLimiterFactory() {
 
   return limiter_factory;
 }
+
+NApp::ISendLimiter& TSendLimiterComponent::GetLimiter() { return *Limiter_; }
 
 userver::yaml_config::Schema TSendLimiterComponent::GetStaticConfigSchema() {
   return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(

@@ -190,7 +190,7 @@ UTEST(ShardedMap, CleanupBasic) {
   map.Put(TUserId{"3"}, std::make_shared<TDummyQueue>(true, 300));
 
   auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-  auto metrics = [](const TQueuePtr&) {};
+  auto metrics = [](const std::unordered_map<TUserId, TQueuePtr>&) {};
 
   std::size_t removed = map.CleanupAndCount(is_expired, metrics);
   ASSERT_EQ(2, removed);
@@ -207,20 +207,20 @@ UTEST(ShardedMap, CleanupWithMetrics) {
   map.Put(TUserId{"2"}, std::make_shared<TDummyQueue>(false, 200));
   map.Put(TUserId{"3"}, std::make_shared<TDummyQueue>(true, 300));
 
-  std::atomic<int> metrics_count{0};
+  std::atomic<int> shards_amount{0};
   auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-  auto metrics = [&metrics_count](const TQueuePtr&) { metrics_count++; };
+  auto metrics = [&shards_amount](const std::unordered_map<TUserId, TQueuePtr>&) { shards_amount++; };
 
   std::size_t removed = map.CleanupAndCount(is_expired, metrics);
   ASSERT_EQ(1, removed);
-  ASSERT_EQ(2, metrics_count.load());
+  ASSERT_EQ(128, shards_amount.load());
 }
 
 UTEST(ShardedMap, CleanupEmpty) {
   TShardedMap<TUserId, TDummyQueue> map(128);
 
   auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-  auto metrics = [](const TQueuePtr&) {};
+  auto metrics = [](const std::unordered_map<TUserId, TQueuePtr>&) {};
 
   std::size_t removed = map.CleanupAndCount(is_expired, metrics);
   ASSERT_EQ(0, removed);
@@ -233,7 +233,7 @@ UTEST(ShardedMap, CleanupWithDelay) {
 
   auto start = std::chrono::steady_clock::now();
   auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-  auto metrics = [](const TQueuePtr&) {};
+  auto metrics = [](const std::unordered_map<TUserId, TQueuePtr>&) {};
 
   map.CleanupAndCount(is_expired, metrics, std::chrono::milliseconds(10));
   auto end = std::chrono::steady_clock::now();
@@ -463,8 +463,7 @@ UTEST_MT(ShardedMap, RealisticWorkload, 8) {
   // Background cleanup
   tasks.push_back(userver::engine::AsyncNoSpan([&]() {
     auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-    std::atomic<int> total_size{0};
-    auto metrics = [&total_size](const TQueuePtr& q) { total_size += q->Size; };
+    auto metrics = [](const std::unordered_map<TUserId, TQueuePtr>&) {};
 
     while (!stop_flag.load()) {
       map.CleanupAndCount(is_expired, metrics, std::chrono::milliseconds(1));
@@ -509,7 +508,7 @@ UTEST_MT(ShardedMap, CleanupDuringReads, 8) {
   // Cleanup task
   tasks.push_back(userver::engine::AsyncNoSpan([&]() {
     auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-    auto metrics = [](const TQueuePtr&) {};
+    auto metrics = [](const std::unordered_map<TUserId, TQueuePtr>&) {};
 
     std::size_t removed = map.CleanupAndCount(is_expired, metrics);
     ASSERT_EQ(500, removed);

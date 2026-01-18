@@ -47,6 +47,8 @@ TObjectFactory<NCore::IMessageQueueFactory> TSessionsFactoryComponent::GetQueueF
   return queue_factory;
 }
 
+NCore::ISessionsFactory& TSessionsFactoryComponent::GetFactory() { return *SessionsFactory_; }
+
 userver::yaml_config::Schema TSessionsFactoryComponent::GetStaticConfigSchema() {
   return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(
       R"(

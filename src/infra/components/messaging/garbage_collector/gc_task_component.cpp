@@ -1,6 +1,6 @@
 #include "gc_task_component.hpp"
 
-#include <infra/components/messaging/garbage_collector/gc_config.hpp>
+#include <infra/components/messaging/garbage_collector/config/gc_config.hpp>
 #include <infra/components/messaging/limiter/send_limiter_component.hpp>
 #include <infra/components/messaging/registry/mailbox_registry_component.hpp>
 
@@ -13,8 +13,6 @@
 #include <userver/testsuite/testsuite_support.hpp>
 
 namespace NChat::NInfra::NComponents {
-
-// todo Метрики
 
 TGarbageCollectorComponent::TGarbageCollectorComponent(const userver::components::ComponentConfig& config,
                                                        const userver::components::ComponentContext& context)
@@ -51,9 +49,7 @@ void TGarbageCollectorComponent::SetupTestsuite(const userver::components::Compo
   Task_.RegisterInTestsuite(context.FindComponent<userver::components::TestsuiteSupport>().GetPeriodicTaskControl());
 
   auto& testsuite_tasks = userver::testsuite::GetTestsuiteTasks(context);
- //chat_active_mailboxes_count: Сколько сейчас объектов в мапе.
-  // chat_idle_mailboxes_evicted_total: Сколько удалено по GC
-  
+
   auto clear_cb = std::function<void()>([this] { Registry_.Clear(); });
   if (testsuite_tasks.IsEnabled()) {
     testsuite_tasks.RegisterTask("reset-task", [clear_cb] {

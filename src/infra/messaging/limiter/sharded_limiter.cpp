@@ -1,6 +1,6 @@
 #include "sharded_limiter.hpp"
 
-#include <infra/messaging/limiter/limiter_config.hpp>
+#include <infra/messaging/limiter/config/limiter_config.hpp>
 
 #include <userver/logging/log.hpp>
 
@@ -24,8 +24,9 @@ TLimiterWrapper::TTimePoint TLimiterWrapper::GetLastAccess() const {
 
 TLimiterWrapper::TTokenBucket& TLimiterWrapper::GetBucket() { return Bucket_; }
 
-TSendLimiter::TSendLimiter(std::size_t shard_amount, userver::dynamic_config::Source config_source)
-    : Limiters_(shard_amount), ConfigSource_(std::move(config_source)) {
+TSendLimiter::TSendLimiter(std::size_t shard_amount, userver::dynamic_config::Source config_source,
+                           TLimiterStatistics& stats)
+    : Limiters_(shard_amount), ConfigSource_(std::move(config_source)), Stats_(stats) {
   LOG_INFO() << "Start SendLimiterRegistry";
 }
 
@@ -33,9 +34,6 @@ bool TSendLimiter::TryAcquire(const TUserId& user_id) {
   const auto snapshot = ConfigSource_.GetSnapshot();
   auto config = snapshot[kLimiterConfig];
   const auto is_enabled = config.IsEnabled;
-
-  // todo ratelimiter.allowed: +1 при успешном TryAcquire.
-  // ratelimiter.rejected: +1 при возврате false.
 
   if (is_enabled) {
     const auto token_refill_amount = config.TokenRefillAmount;
@@ -50,7 +48,10 @@ bool TSendLimiter::TryAcquire(const TUserId& user_id) {
       LimiterCounter_.fetch_add(1, std::memory_order_relaxed);
     }
 
-    return limiter->TryAcquire();
+    if (!limiter->TryAcquire()) {
+      ++Stats_.rejected_total;
+      return false;
+    }
   }
 
   return true;
@@ -68,23 +69,17 @@ void TSendLimiter::TraverseLimiters() {
     return (now - last) > idle_timeout;
   };
 
-  std::size_t total_tokens_available = 0;
-  std::size_t active_users_count = 0;
-
-  auto metrics_cb = [&](const TLimiterPtr& limiter) {
-    // todo в чатике есть метрики, которые следует добавитьы
-    // limiter.count — количетсов созданных лимитеров
-    // limiter.exhausted.count — количетсо пользователей, у которых сейчас все плохо 
-    total_tokens_available += limiter->GetBucket().GetTokensApprox();
-    active_users_count++;
+  auto metrics_cb = [&](const std::unordered_map<TUserId, TLimiterPtr>& shard) {
+    Stats_.shard_size.Account(shard.size());
   };
 
   auto removed_amount = Limiters_.CleanupAndCount(is_expired, metrics_cb);
 
-  LimiterCounter_.fetch_sub(removed_amount, std::memory_order_relaxed);
+  const auto old_value = LimiterCounter_.fetch_sub(removed_amount, std::memory_order_relaxed);
+  Stats_.active_amount = old_value - removed_amount;
+  Stats_.removed_total.Add({removed_amount});
 
   LOG_INFO() << fmt::format("Limiter GC: removed {}", removed_amount);
-  // todo gc.removed_limiters
 }
 
 std::int64_t TSendLimiter::GetTotalLimiters() const { return LimiterCounter_.load(std::memory_order_relaxed); }

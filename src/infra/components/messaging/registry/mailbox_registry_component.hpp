@@ -17,7 +17,7 @@ class TMailboxRegistryComponent final : public userver::components::LoggableComp
   TMailboxRegistryComponent(const userver::components::ComponentConfig& config,
                             const userver::components::ComponentContext& context);
 
-  NCore::IMailboxRegistry& GetRegistry() { return *Registry_; }
+  NCore::IMailboxRegistry& GetRegistry();
 
   static userver::yaml_config::Schema GetStaticConfigSchema();
 

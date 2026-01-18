@@ -107,6 +107,7 @@ std::size_t TRcuSessionsRegistry::CleanIdle() {
 
   for (auto it = sessions_ptr->begin(); it != sessions_ptr->end();) {
     Stats_.queue_size_hist.Account(it->second->GetSizeApproximate());  // metrics
+    Stats_.lifetime_sec_hist.Account(it->second->GetLifetimeSeconds().count());
 
     if (!it->second->IsActive(config.IdleTimeout)) {
       it = sessions_ptr->erase(it);
@@ -123,6 +124,5 @@ std::size_t TRcuSessionsRegistry::CleanIdle() {
 
   return removed;
 }
-//todo Возможно еще какая метрика полезной будет
 
 };  // namespace NChat::NInfra

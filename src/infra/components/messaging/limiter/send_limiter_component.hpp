@@ -17,7 +17,7 @@ class TSendLimiterComponent final : public userver::components::LoggableComponen
   TSendLimiterComponent(const userver::components::ComponentConfig& config,
                         const userver::components::ComponentContext& context);
 
-  NApp::ISendLimiter& GetLimiter() { return *Limiter_; }
+  NApp::ISendLimiter& GetLimiter();
 
   static userver::yaml_config::Schema GetStaticConfigSchema();
 

@@ -114,7 +114,7 @@ void BM_ShardedMap_Cleanup(benchmark::State& state) {
       state.ResumeTiming();
 
       auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-      auto metrics = [](const TQueuePtr&) {};
+      auto metrics = [](const std::unordered_map<TUserId, TQueuePtr>&) {};
       auto removed = map.CleanupAndCount(is_expired, metrics);
 
       benchmark::DoNotOptimize(removed);
@@ -310,8 +310,8 @@ void BM_ShardedMap_RealisticWorkload(benchmark::State& state) {
       // Background cleanup (1 thread)
       tasks.push_back(userver::engine::AsyncNoSpan([&]() {
         auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-        std::atomic<std::size_t> total_size{0};
-        auto metrics = [&total_size](const TQueuePtr& q) { total_size += q->Size; };
+
+        auto metrics = [](const std::unordered_map<TUserId, TQueuePtr>&) {};
         std::size_t ops = 0;
 
         while (!stop_flag.load()) {
@@ -410,7 +410,7 @@ void BM_ShardedMap_CleanupWithDelay(benchmark::State& state) {
       state.ResumeTiming();
 
       auto is_expired = [](const TQueuePtr& q) { return q->IsExpired; };
-      auto metrics = [](const TQueuePtr&) {};
+      auto metrics = [](const std::unordered_map<TUserId, TQueuePtr>&) {};
       auto removed = map.CleanupAndCount(is_expired, metrics, std::chrono::milliseconds(delay_ms));
 
       benchmark::DoNotOptimize(removed);

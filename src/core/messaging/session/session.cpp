@@ -42,6 +42,10 @@ bool TUserSession::IsActive(std::chrono::seconds idle_threshold) const {
   return (GetNow_() - LastConsumerActivity_.load()) <= idle_threshold;
 }
 
+std::chrono::seconds TUserSession::GetLifetimeSeconds() const {
+  return std::chrono::seconds{(GetNow_() - LastConsumerActivity_.load()).count()};
+}
+
 NDomain::TSessionId TUserSession::GetSessionId() const { return SessionId_; }
 
 std::size_t TUserSession::GetSizeApproximate() const { return MessageBus_->GetSizeApproximate(); }

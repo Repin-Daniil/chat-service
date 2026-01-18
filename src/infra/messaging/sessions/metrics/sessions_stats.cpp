@@ -6,13 +6,12 @@
 // #include <userver/utils/statistics/rate_counter.hpp>
 
 namespace NChat::NInfra {
-// const userver::utils::statistics::MetricTag<TSessionsStatistics> kSessionsTag =
-//     userver::utils::statistics::MetricTag<TSessionsStatistics>("sessions");
 
 void DumpMetric(userver::utils::statistics::Writer& writer, const TSessionsStatistics& stats) {
-  writer["sessions"]["opened"] = stats.opened_sessions;
+  writer["opened"]["total"] = stats.opened_sessions_total;
+  writer["sessions"]["histogram"] = stats.sessions_amount_hist;
   // userver::utils::statistics::;
 }
 
-void ResetMetric(TSessionsStatistics& stats) { stats.opened_sessions = 0; }
+void ResetMetric(TSessionsStatistics& stats) { stats.opened_sessions_total = 0; }
 }  // namespace NChat::NInfra

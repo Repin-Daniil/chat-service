@@ -1,6 +1,6 @@
 #include "rcu_sessions_registry.hpp"
 
-#include <infra/messaging/sessions/sessions_config.hpp>
+#include <infra/messaging/sessions/config/sessions_config.hpp>
 
 namespace NChat::NInfra {
 
@@ -69,6 +69,7 @@ TRcuSessionsRegistry::TSessionPtr TRcuSessionsRegistry::TryCreateSession(const T
   auto session = std::make_shared<NCore::TUserSession>(session_id, QueueFactory_.Create(), GetNow_);
   sessions_ptr->emplace(session_id, session);
   sessions_ptr.Commit();
+  ++Stats_.opened_sessions_total;
 
   return session;
 }
@@ -77,6 +78,7 @@ void TRcuSessionsRegistry::RemoveSession(const TSessionId& session_id) {
   auto sessions_ptr = Sessions_.StartWrite();
   sessions_ptr->erase(session_id);
   sessions_ptr.Commit();
+  --Stats_.opened_sessions_total;
 }
 
 bool TRcuSessionsRegistry::HasNoConsumer() const {
@@ -107,6 +109,7 @@ std::size_t TRcuSessionsRegistry::CleanIdle() {
 
   if (removed > 0) {
     sessions_ptr.Commit();
+    Stats_.opened_sessions_total -= removed;
   }
   // todo метрики на очередь
   // Queue Saturation (Гистограмма): * chat_mailbox_fill_percent:

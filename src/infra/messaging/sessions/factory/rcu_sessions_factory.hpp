@@ -2,7 +2,7 @@
 
 #include <core/messaging/session/sessions_factory.hpp>
 
-#include <infra/messaging/sessions/sessions_stats.hpp>
+#include <infra/messaging/sessions/metrics/sessions_stats.hpp>
 
 #include <userver/dynamic_config/source.hpp>
 

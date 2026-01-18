@@ -1,5 +1,5 @@
 #include "mocks.hpp"
-#include "rcu_sessions_registry.hpp"
+#include <infra/messaging/sessions/rcu_sessions_registry.hpp>
 
 #include <core/common/ids.hpp>
 #include <core/messaging/session/sessions_registry.hpp>

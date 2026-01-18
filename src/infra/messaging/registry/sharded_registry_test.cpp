@@ -5,7 +5,7 @@
 #include <core/common/ids.hpp>
 
 #include <infra/messaging/registry/registry_config.hpp>
-#include <infra/messaging/sessions/mocks.hpp>
+#include <infra/messaging/sessions/tests/mocks.hpp>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

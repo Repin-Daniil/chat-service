@@ -3,7 +3,7 @@
 #include <core/messaging/queue/message_queue_factory.hpp>
 #include <core/messaging/session/sessions_registry.hpp>
 
-#include <infra/messaging/sessions/sessions_stats.hpp>
+#include <infra/messaging/sessions/metrics/sessions_stats.hpp>
 
 #include <boost/container/flat_map.hpp>
 #include <userver/dynamic_config/source.hpp>

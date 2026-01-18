@@ -1,6 +1,6 @@
 #include "mailbox.hpp"
 
-#include <infra/messaging/sessions/mocks.hpp>
+#include <infra/messaging/sessions/tests/mocks.hpp>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

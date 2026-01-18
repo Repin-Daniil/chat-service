@@ -3,8 +3,8 @@
 #include <infra/components/messaging/sessions/sessions_registry_component.hpp>
 #include <infra/messaging/queue/vyukov_queue_factory.hpp>
 #include <infra/messaging/registry/sharded_registry.hpp>
-#include <infra/messaging/sessions/rcu_sessions_factory.hpp>
-#include <infra/messaging/sessions/sessions_stats.hpp>
+#include <infra/messaging/sessions/factory/rcu_sessions_factory.hpp>
+#include <infra/messaging/sessions/metrics/sessions_stats.hpp>
 
 #include <userver/components/component.hpp>
 #include <userver/components/component_context.hpp>

@@ -1,4 +1,4 @@
-#include "rcu_sessions_registry.hpp"
+#include <infra/messaging/sessions/rcu_sessions_registry.hpp>
 
 #include <benchmark/benchmark.h>
 #include <userver/dynamic_config/test_helpers.hpp>
@@ -48,8 +48,10 @@ void BM_Sessions_HighContentionReads(benchmark::State& state) {
 
   userver::engine::RunStandalone(num_threads, [&]() {
     auto factory = std::make_unique<TMockMessageQueueFactory>();
+    TSessionsStatistics stats{};
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource());
+        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource(),
+        stats);
 
     // Создаем 5 сессий
     for (std::size_t i = 0; i < 5; ++i) {
@@ -97,8 +99,10 @@ void BM_Sessions_ReadHeavyWithWrites(benchmark::State& state) {
   userver::engine::RunStandalone(num_reader_threads + num_writer_threads + 1, [&]() {
     auto factory = std::make_unique<TMockMessageQueueFactory>();
 
+    TSessionsStatistics stats{};
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource());
+        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource(),
+        stats);
 
     // Начальные сессии
     for (std::size_t i = 0; i < 5; ++i) {
@@ -170,8 +174,10 @@ void BM_Sessions_ReadWithChurn(benchmark::State& state) {
   userver::engine::RunStandalone(num_reader_threads + 2, [&]() {
     auto factory = std::make_unique<TMockMessageQueueFactory>();
 
+    TSessionsStatistics stats{};
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource());
+        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource(),
+        stats);
 
     // Начальные сессии
     for (std::size_t i = 0; i < 5; ++i) {
@@ -244,8 +250,10 @@ void BM_Sessions_FanOutUnderLoad(benchmark::State& state) {
 
   auto factory = std::make_unique<TMockMessageQueueFactory>();
   userver::engine::RunStandalone(num_reader_threads + 1, [&]() {
+    TSessionsStatistics stats{};
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource());
+        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource(),
+        stats);
 
     for (std::size_t i = 0; i < 5; ++i) {
       registry->GetOrCreateSession(TSessionId{"session_" + std::to_string(i)});
@@ -291,8 +299,11 @@ void BM_Sessions_FullContention(benchmark::State& state) {
 
   userver::engine::RunStandalone(num_threads + 1, [&]() {
     auto factory = std::make_unique<TMockMessageQueueFactory>();
+    TSessionsStatistics stats{};
+
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource());
+        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource(),
+        stats);
 
     for (std::size_t i = 0; i < 5; ++i) {
       registry->GetOrCreateSession(TSessionId{"session_" + std::to_string(i)});
@@ -354,8 +365,10 @@ void BM_Sessions_GetVsGetOrCreate(benchmark::State& state) {
 
   userver::engine::RunStandalone(num_threads, [&]() {
     auto factory = std::make_unique<TMockMessageQueueFactory>();
+    TSessionsStatistics stats{};
     auto registry = std::make_shared<TRcuSessionsRegistry>(
-        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource());
+        *factory, []() { return userver::utils::datetime::SteadyNow(); }, userver::dynamic_config::GetDefaultSource(),
+        stats);
 
     for (std::size_t i = 0; i < 5; ++i) {
       registry->GetOrCreateSession(TSessionId{"session_" + std::to_string(i)});

@@ -86,7 +86,6 @@ components:
     UserLoginRequest:
       type: object
       additionalProperties: false
-      required: [username, password]
       properties:
         user:
           type: object
@@ -444,6 +443,13 @@ paths:
         - Messages
       summary: Получить сообщения пользователя
       operationId: pollMessages
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: ID сессии пользователя
+          schema:
+            type: string
       security:
         - BearerAuth: []
       responses:

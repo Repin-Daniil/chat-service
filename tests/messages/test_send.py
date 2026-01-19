@@ -8,7 +8,7 @@ from utils import Routes, username_generator, get_session_id
 from validators import validate_user_reg, validate_messages
 
 
-async def test_send_message(service_client, communication):
+async def test_send_message(service_client, communication, monitor_client):
     sender, recipient, message = communication
     response = await send_message(service_client, message, sender.token)
     assert response.status == HTTPStatus.ACCEPTED

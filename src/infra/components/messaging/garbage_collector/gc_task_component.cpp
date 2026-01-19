@@ -1,6 +1,6 @@
 #include "gc_task_component.hpp"
 
-#include <infra/components/messaging/garbage_collector/gc_config.hpp>
+#include <infra/components/messaging/garbage_collector/config/gc_config.hpp>
 #include <infra/components/messaging/limiter/send_limiter_component.hpp>
 #include <infra/components/messaging/registry/mailbox_registry_component.hpp>
 
@@ -13,8 +13,6 @@
 #include <userver/testsuite/testsuite_support.hpp>
 
 namespace NChat::NInfra::NComponents {
-
-// todo Метрики
 
 TGarbageCollectorComponent::TGarbageCollectorComponent(const userver::components::ComponentConfig& config,
                                                        const userver::components::ComponentContext& context)

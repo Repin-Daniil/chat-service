@@ -1,5 +1,7 @@
 #pragma once
 
+#include "infra/messaging/limiter/metrics/limiter_stats.hpp"
+
 #include <app/services/message/send_limiter.hpp>
 
 #include <infra/concurrency/sharded_map/sharded_map.hpp>
@@ -39,7 +41,8 @@ class TSendLimiter : public NApp::ISendLimiter {
   using TUserId = NCore::NDomain::TUserId;
   using TShardedMap = NConcurrency::TShardedMap<TUserId, TLimiterWrapper>;
 
-  explicit TSendLimiter(std::size_t shard_amount, userver::dynamic_config::Source config_source);
+  explicit TSendLimiter(std::size_t shard_amount, userver::dynamic_config::Source config_source,
+                        TLimiterStatistics& stats);
   bool TryAcquire(const TUserId& user_id) override;
   void TraverseLimiters() override;
   std::int64_t GetTotalLimiters() const override;
@@ -48,6 +51,7 @@ class TSendLimiter : public NApp::ISendLimiter {
   TShardedMap Limiters_;
   std::atomic<int64_t> LimiterCounter_{0};
   userver::dynamic_config::Source ConfigSource_;
+  TLimiterStatistics& Stats_;
 };
 
 }  // namespace NChat::NInfra

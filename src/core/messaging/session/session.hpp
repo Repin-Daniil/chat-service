@@ -25,6 +25,7 @@ class TUserSession {
   bool IsActive(std::chrono::seconds idle_threshold) const;
   NDomain::TSessionId GetSessionId() const;
   std::size_t GetSizeApproximate() const;
+  std::chrono::seconds GetLifetimeSeconds() const;
 
  private:
   NDomain::TSessionId SessionId_;

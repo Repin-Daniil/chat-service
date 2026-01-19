@@ -455,6 +455,8 @@ paths:
                 $ref: "#/components/schemas/PolledMessages"
         "401":
           description: Не авторизован
+        "409":
+          description: У сессии уже есть активный consumer
         "410":
           description: Сессия неактивна
 

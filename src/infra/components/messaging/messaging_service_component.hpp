@@ -13,7 +13,7 @@ class TMessagingServiceComponent final : public userver::components::LoggableCom
   TMessagingServiceComponent(const userver::components::ComponentConfig& config,
                              const userver::components::ComponentContext& context);
 
-  NApp::NServices::TMessagingService& GetService() { return *MessageService_; }
+  NApp::NServices::TMessagingService& GetService();
 
  private:
   std::unique_ptr<NApp::NServices::TMessagingService> MessageService_;

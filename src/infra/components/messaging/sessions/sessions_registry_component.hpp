@@ -15,7 +15,7 @@ class TSessionsFactoryComponent final : public userver::components::LoggableComp
   TSessionsFactoryComponent(const userver::components::ComponentConfig& config,
                             const userver::components::ComponentContext& context);
 
-  NCore::ISessionsFactory& GetFactory() { return *SessionsFactory_; }
+  NCore::ISessionsFactory& GetFactory();
 
   static userver::yaml_config::Schema GetStaticConfigSchema();
 

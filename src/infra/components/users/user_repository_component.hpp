@@ -13,7 +13,7 @@ class TUserRepoComponent final : public userver::components::LoggableComponentBa
   TUserRepoComponent(const userver::components::ComponentConfig& config,
                      const userver::components::ComponentContext& context);
 
-  NCore::IUserRepository& GetRepository() { return *UserRepo_; }
+  NCore::IUserRepository& GetRepository();
 
   static userver::yaml_config::Schema GetStaticConfigSchema();
 

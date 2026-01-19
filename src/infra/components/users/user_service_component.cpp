@@ -19,8 +19,10 @@ TUserServiceComponent::TUserServiceComponent(const userver::components::Componen
   UserService_ = std::make_unique<NApp::NServices::TUserService>(user_repo, *AuthService_);
 }
 
+NApp::NServices::TUserService& TUserServiceComponent::GetService() { return *UserService_; }
+
 userver::yaml_config::Schema TUserServiceComponent::GetStaticConfigSchema() {
-  return userver::yaml_config::MergeSchemas<userver::components::ComponentBase>(
+  return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(
       R"(
 type: object
 description: Component for user service logic

@@ -24,7 +24,6 @@ class TUserMailbox {
   std::size_t CleanIdle();
   NDomain::TUserId GetUserId() const;
 
-  // todo GetMetrics
  private:
   NDomain::TUserId UserId_;
   TSessions Sessions_;

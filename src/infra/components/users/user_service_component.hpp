@@ -13,7 +13,7 @@ class TUserServiceComponent final : public userver::components::LoggableComponen
   TUserServiceComponent(const userver::components::ComponentConfig& config,
                         const userver::components::ComponentContext& context);
 
-  NApp::NServices::TUserService& GetService() { return *UserService_; }
+  NApp::NServices::TUserService& GetService();
 
   static userver::yaml_config::Schema GetStaticConfigSchema();
 

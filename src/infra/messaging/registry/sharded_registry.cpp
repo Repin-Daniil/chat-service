@@ -1,16 +1,19 @@
 #include "sharded_registry.hpp"
 
 #include <infra/concurrency/queue/vyukov_queue.hpp>
-#include <infra/messaging/registry/registry_config.hpp>
+#include <infra/messaging/registry/config/registry_config.hpp>
 
 #include <userver/logging/log.hpp>
 #include <userver/utils/datetime_light.hpp>
 
 namespace NChat::NInfra {
 
-TShardedRegistry::TShardedRegistry(std::size_t shard_amount, userver::dynamic_config::Source config_source,
-                                   NCore::ISessionsFactory& sessions_factory)
-    : Registry_(shard_amount), ConfigSource_(std::move(config_source)), SessionsFactory_(sessions_factory) {
+TShardedRegistry::TShardedRegistry(std::size_t shard_amount, NCore::ISessionsFactory& sessions_factory,
+                                   userver::dynamic_config::Source config_source, TMailboxStatistics& stats)
+    : Registry_(shard_amount),
+      SessionsFactory_(sessions_factory),
+      ConfigSource_(std::move(config_source)),
+      Stats_(stats) {
   LOG_INFO() << fmt::format("Start Registry on Sharded Map with {} shards", shard_amount);
 }
 
@@ -54,18 +57,18 @@ void TShardedRegistry::TraverseRegistry(std::chrono::milliseconds inter_pause) {
     return mailbox->HasNoConsumer();
   };
 
-  auto metrics_cb = [](const NCore::TMailboxPtr& mailbox) {
-    mailbox->GetUserId();
-    // todo метрики
-    // mailbox->GetSizeApproximate(); Теперь нужно по сессиям
-    // todo метрика количетсов сессий на mailbox
-    // Средний возраст сессии
-    // todo метрики был чатик с нейронкой
+  auto metrics_cb = [this](const std::unordered_map<TUserId, NCore::TMailboxPtr>& shard) {
+    Stats_.shard_size.Account(shard.size());
   };
 
   auto removed_amount = Registry_.CleanupAndCount(is_expired, metrics_cb, inter_pause);
 
-  OnlineCounter_.fetch_sub(removed_amount, std::memory_order_relaxed);
+  const auto old_value = OnlineCounter_.fetch_sub(removed_amount, std::memory_order_relaxed);
+
+  Stats_.active_amount = old_value - removed_amount;
+  Stats_.removed_total.Add({removed_amount});
+
+  LOG_INFO() << fmt::format("Mailbox Registry GC: removed {}", removed_amount);
 }
 
 void TShardedRegistry::Clear() { Registry_.Clear(); }

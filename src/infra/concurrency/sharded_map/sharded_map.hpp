@@ -75,7 +75,8 @@ class TShardedMap {
     std::size_t removed_amount = 0;
 
     for (auto& shard : Shards_) {
-      removed_amount += ProcessShard(shard, should_remove_pred, metrics_cb);
+      removed_amount += ProcessShard(shard, should_remove_pred);
+      metrics_cb(shard.Map);
       userver::engine::SleepFor(shard_delay);
     }
 
@@ -91,8 +92,8 @@ class TShardedMap {
   TShard& GetShard(const Key& key) { return Shards_[Hash{}(key) & (Shards_.size() - 1)]; }
   const TShard& GetShard(const Key& key) const { return Shards_[Hash{}(key) & (Shards_.size() - 1)]; }
 
-  template <typename Predicate, typename MetricsCallback>
-  std::size_t ProcessShard(TShard& shard, Predicate should_remove_pred, MetricsCallback metrics_cb) {
+  template <typename Predicate>
+  std::size_t ProcessShard(TShard& shard, Predicate should_remove_pred) {
     std::vector<Key> keys_to_remove;
     std::size_t kEuristicSize = 16;
     keys_to_remove.reserve(kEuristicSize);
@@ -103,8 +104,6 @@ class TShardedMap {
       for (const auto& [key, value_ptr] : shard.Map) {
         if (should_remove_pred(value_ptr)) {
           keys_to_remove.push_back(key);
-        } else {
-          metrics_cb(value_ptr);
         }
       }
     }

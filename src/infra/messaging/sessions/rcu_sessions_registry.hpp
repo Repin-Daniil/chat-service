@@ -3,7 +3,7 @@
 #include <core/messaging/queue/message_queue_factory.hpp>
 #include <core/messaging/session/sessions_registry.hpp>
 
-#include <infra/messaging/sessions/sessions_stats.hpp>
+#include <infra/messaging/sessions/metrics/sessions_stats.hpp>
 
 #include <boost/container/flat_map.hpp>
 #include <userver/dynamic_config/source.hpp>
@@ -21,7 +21,7 @@ class TRcuSessionsRegistry : public NCore::ISessionsRegistry {
   using TTimePoint = std::chrono::steady_clock::time_point;
 
   TRcuSessionsRegistry(const NCore::IMessageQueueFactory& queue_factory, std::function<TTimePoint()> now,
-                       userver::dynamic_config::Source config_source);  // fixme добавить , TSessionsStatistics& stats
+                       userver::dynamic_config::Source config_source, TSessionsStatistics& stats);
 
   bool FanOutMessage(TMessage message) override;
   TSessionPtr CreateSession(const TSessionId& session_id) override;
@@ -42,6 +42,6 @@ class TRcuSessionsRegistry : public NCore::ISessionsRegistry {
   const NCore::IMessageQueueFactory& QueueFactory_;
   std::function<TTimePoint()> GetNow_;
   userver::dynamic_config::Source ConfigSource_;
-  // TSessionsStatistics& Stats_;
+  TSessionsStatistics& Stats_;
 };
 }  // namespace NChat::NInfra

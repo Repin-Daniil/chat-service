@@ -11,9 +11,9 @@
 #include <infra/db/postgres_profile_by_username_cache.hpp>
 
 #include <api/http/middlewares/auth_bearer.hpp>
-#include <api/http/v1/messages/poll_messages_handler.hpp>
-#include <api/http/v1/messages/send_message_handler.hpp>
-#include <api/http/v1/messages/start_session_handler.hpp>
+#include <api/http/v1/messages/polling/poll_messages_handler.hpp>
+#include <api/http/v1/messages/send/send_message_handler.hpp>
+#include <api/http/v1/messages/session/start_session_handler.hpp>
 #include <api/http/v1/users/delete_by_username_handler.hpp>
 #include <api/http/v1/users/get_by_username_handler.hpp>
 #include <api/http/v1/users/update_by_username_handler.hpp>

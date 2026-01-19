@@ -6,6 +6,7 @@
 
 #include <userver/components/component.hpp>
 #include <userver/components/component_context.hpp>
+#include <userver/components/statistics_storage.hpp>
 #include <userver/dynamic_config/storage/component.hpp>
 #include <userver/formats/json/value_builder.hpp>
 #include <userver/yaml_config/merge_schemas.hpp>
@@ -25,14 +26,20 @@ TObjectFactory<NCore::IMailboxRegistry> TMailboxRegistryComponent::GetRegistryFa
   registry_factory.Register("ShardedMap", [this](const auto& config, const auto& context) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
     auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
-    return std::make_unique<TShardedRegistry>(shards_amount, config_source, SessionsFactory_);
+    auto& registry_stats =
+        context.template FindComponent<userver::components::StatisticsStorage>().GetMetricsStorage()->GetMetric(
+            kMailboxTag);
+
+    return std::make_unique<TShardedRegistry>(shards_amount, SessionsFactory_, config_source, registry_stats);
   });
 
   return registry_factory;
 }
 
+NCore::IMailboxRegistry& TMailboxRegistryComponent::GetRegistry() { return *Registry_; }
+
 userver::yaml_config::Schema TMailboxRegistryComponent::GetStaticConfigSchema() {
-  return userver::yaml_config::MergeSchemas<userver::components::ComponentBase>(
+  return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(
       R"(
 type: object
 description: Component for mailbox registry

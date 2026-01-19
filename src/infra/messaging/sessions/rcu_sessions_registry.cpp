@@ -1,13 +1,13 @@
 #include "rcu_sessions_registry.hpp"
 
-#include <infra/messaging/sessions/sessions_config.hpp>
+#include <infra/messaging/sessions/config/sessions_config.hpp>
 
 namespace NChat::NInfra {
 
 TRcuSessionsRegistry::TRcuSessionsRegistry(const NCore::IMessageQueueFactory& queue_factory,
                                            std::function<TTimePoint()> now,
-                                           userver::dynamic_config::Source config_source)
-    : QueueFactory_(queue_factory), GetNow_(now), ConfigSource_(std::move(config_source)) {}
+                                           userver::dynamic_config::Source config_source, TSessionsStatistics& stats)
+    : QueueFactory_(queue_factory), GetNow_(now), ConfigSource_(std::move(config_source)), Stats_(stats) {}
 
 bool TRcuSessionsRegistry::FanOutMessage(TMessage message) {
   auto sessions_ptr = Sessions_.Read();
@@ -22,6 +22,10 @@ bool TRcuSessionsRegistry::FanOutMessage(TMessage message) {
     } else {
       success &= it->second->PushMessage(message);
     }
+  }
+
+  if (success) {
+    ++Stats_.messages_sent_total;
   }
 
   return success;
@@ -62,13 +66,17 @@ TRcuSessionsRegistry::TSessionPtr TRcuSessionsRegistry::TryCreateSession(const T
   const auto snapshot = ConfigSource_.GetSnapshot();
   auto config = snapshot[kSessionsConfig];
 
-  if (sessions_ptr->size() >= config.MaxSessionsAmount) {
+  const auto size = sessions_ptr->size();
+  if (size >= config.MaxSessionsAmount) {
     throw NCore::TSessionLimitExceeded();
   }
 
   auto session = std::make_shared<NCore::TUserSession>(session_id, QueueFactory_.Create(), GetNow_);
   sessions_ptr->emplace(session_id, session);
   sessions_ptr.Commit();
+
+  Stats_.sessions_per_user_hist.Account(size + 1);
+  ++Stats_.opened_sessions_current;
 
   return session;
 }
@@ -77,6 +85,7 @@ void TRcuSessionsRegistry::RemoveSession(const TSessionId& session_id) {
   auto sessions_ptr = Sessions_.StartWrite();
   sessions_ptr->erase(session_id);
   sessions_ptr.Commit();
+  --Stats_.opened_sessions_current;
 }
 
 bool TRcuSessionsRegistry::HasNoConsumer() const {
@@ -97,6 +106,9 @@ std::size_t TRcuSessionsRegistry::CleanIdle() {
   std::size_t removed = 0;
 
   for (auto it = sessions_ptr->begin(); it != sessions_ptr->end();) {
+    Stats_.queue_size_hist.Account(it->second->GetSizeApproximate());  // metrics
+    Stats_.lifetime_sec_hist.Account(it->second->GetLifetimeSeconds().count());
+
     if (!it->second->IsActive(config.IdleTimeout)) {
       it = sessions_ptr->erase(it);
       ++removed;
@@ -107,6 +119,7 @@ std::size_t TRcuSessionsRegistry::CleanIdle() {
 
   if (removed > 0) {
     sessions_ptr.Commit();
+    Stats_.opened_sessions_current -= removed;
   }
 
   return removed;

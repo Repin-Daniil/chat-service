@@ -5,6 +5,7 @@
 #include <core/messaging/session/sessions_factory.hpp>
 
 #include <infra/concurrency/sharded_map/sharded_map.hpp>
+#include <infra/messaging/registry/metrics/registry_stats.hpp>
 
 #include <userver/dynamic_config/source.hpp>
 
@@ -15,8 +16,8 @@ class TShardedRegistry : public NCore::IMailboxRegistry {
   using TUserId = NCore::NDomain::TUserId;
   using TShardedMap = NConcurrency::TShardedMap<TUserId, NCore::TUserMailbox>;
 
-  TShardedRegistry(std::size_t shard_amount, userver::dynamic_config::Source config_source,
-                   NCore::ISessionsFactory& sessions_factory);
+  TShardedRegistry(std::size_t shard_amount, NCore::ISessionsFactory& sessions_factory,
+                   userver::dynamic_config::Source config_source, TMailboxStatistics& stats);
 
   // Hot path
   NCore::TMailboxPtr GetMailbox(const TUserId& user_id) const override;
@@ -30,12 +31,13 @@ class TShardedRegistry : public NCore::IMailboxRegistry {
   // For reset in tests
   void Clear() override;
 
-  // todo Нужна метрика сбалансированности шардов
  private:
   TShardedMap Registry_;
   std::atomic<int64_t> OnlineCounter_{0};
-  userver::dynamic_config::Source ConfigSource_;
   NCore::ISessionsFactory& SessionsFactory_;
+
+  userver::dynamic_config::Source ConfigSource_;
+  TMailboxStatistics& Stats_;
 };
 
 }  // namespace NChat::NInfra

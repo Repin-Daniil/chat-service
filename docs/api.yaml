@@ -86,7 +86,6 @@ components:
     UserLoginRequest:
       type: object
       additionalProperties: false
-      required: [username, password]
       properties:
         user:
           type: object

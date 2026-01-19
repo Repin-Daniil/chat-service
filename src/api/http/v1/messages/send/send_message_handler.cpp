@@ -66,7 +66,7 @@ userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     response.SetStatus(userver::server::http::HttpStatus::kServiceUnavailable);
     return MakeError(ex.what());
   }
-  
+
   auto& response = request.GetHttpResponse();
   response.SetStatus(userver::server::http::HttpStatus::kAccepted);
   return {};

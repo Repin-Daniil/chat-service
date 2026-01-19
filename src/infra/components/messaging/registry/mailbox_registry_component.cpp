@@ -26,11 +26,11 @@ TObjectFactory<NCore::IMailboxRegistry> TMailboxRegistryComponent::GetRegistryFa
   registry_factory.Register("ShardedMap", [this](const auto& config, const auto& context) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
     auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
-
-    return std::make_unique<TShardedRegistry>(
-        shards_amount, SessionsFactory_, config_source,
+    auto& registry_stats =
         context.template FindComponent<userver::components::StatisticsStorage>().GetMetricsStorage()->GetMetric(
-            kMailboxTag));
+            kMailboxTag);
+
+    return std::make_unique<TShardedRegistry>(shards_amount, SessionsFactory_, config_source, registry_stats);
   });
 
   return registry_factory;

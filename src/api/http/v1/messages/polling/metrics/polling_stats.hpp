@@ -19,7 +19,7 @@ struct TPollingStatistics {
   userver::utils::statistics::Histogram send_overhead_us_hist{{1, 100, 500, 1000, 5'000}};  // microseconds
   userver::utils::statistics::Histogram queue_wait_latency_sec_hist{{1, 3, 5, 10, 15, 50, 100, 150, 200}};
   userver::utils::statistics::Histogram polling_overhead_us_hist{
-      {1, 500, 700, 1000, 5'000, 10'000, 100'000}};  // microseconds  
+      {1, 500, 700, 1000, 5'000, 10'000, 100'000}};  // microseconds
 };
 
 inline const userver::utils::statistics::MetricTag<TPollingStatistics> kPollingTag{"chat_messages"};

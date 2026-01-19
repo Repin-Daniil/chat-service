@@ -99,7 +99,6 @@ class TSendLimiterTest : public ::testing::Test {
 UTEST_F(TSendLimiterTest, InitialState) { EXPECT_EQ(Limiter->GetTotalLimiters(), 0); }
 
 UTEST_F(TSendLimiterTest, SingleUserLimiting) {
-
   TUserId user_id("1");
 
   // Default is 5 RPS, should allow 5 tokens
@@ -114,7 +113,6 @@ UTEST_F(TSendLimiterTest, SingleUserLimiting) {
 }
 
 UTEST_F(TSendLimiterTest, MultipleUsersIndependentLimits) {
-
   TUserId user1("1");
   TUserId user2("2");
 
@@ -134,8 +132,6 @@ UTEST_F(TSendLimiterTest, MultipleUsersIndependentLimits) {
 }
 
 UTEST_F(TSendLimiterTest, LimiterCounterIncrement) {
-
-
   EXPECT_EQ(Limiter->GetTotalLimiters(), 0);
 
   Limiter->TryAcquire(TUserId("1"));
@@ -150,7 +146,6 @@ UTEST_F(TSendLimiterTest, LimiterCounterIncrement) {
 }
 
 UTEST_F(TSendLimiterTest, TraverseLimitersCleanup) {
-
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
   TUserId user1("1");
   TUserId user2("2");
@@ -169,7 +164,6 @@ UTEST_F(TSendLimiterTest, TraverseLimitersCleanup) {
 }
 
 UTEST_F(TSendLimiterTest, TraverseLimitersKeepsActive) {
-
   TUserId user1("1");
   TUserId user2("2");
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
@@ -191,8 +185,6 @@ UTEST_F(TSendLimiterTest, TraverseLimitersKeepsActive) {
 }
 
 UTEST_F(TSendLimiterTest, TraverseLimitersEmptyMap) {
-
-
   // Should not crash on empty map
   Limiter->TraverseLimiters();
   EXPECT_EQ(Limiter->GetTotalLimiters(), 0);
@@ -203,7 +195,6 @@ UTEST_F(TSendLimiterTest, TraverseLimitersEmptyMap) {
 // ============================================================================
 
 UTEST_F_MT(TSendLimiterTest, ConcurrentAccess, 4) {
-
   const auto concurrent_jobs = GetThreadCount();
 
   std::vector<userver::engine::Task> tasks;
@@ -232,7 +223,6 @@ UTEST_F_MT(TSendLimiterTest, ConcurrentAccess, 4) {
 }
 
 UTEST_F_MT(TSendLimiterTest, ConcurrentSameUser, 4) {
-
   const auto concurrent_jobs = GetThreadCount();
   TUserId shared_user("42");
 
@@ -266,7 +256,6 @@ UTEST_F_MT(TSendLimiterTest, ConcurrentSameUser, 4) {
 }
 
 UTEST_F_MT(TSendLimiterTest, ConcurrentTraversal, 4) {
-
   const auto concurrent_jobs = GetThreadCount();
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
 
@@ -306,7 +295,6 @@ UTEST_F_MT(TSendLimiterTest, ConcurrentTraversal, 4) {
 }
 
 UTEST_F_MT(TSendLimiterTest, StressTest, 8) {
-
   const auto concurrent_jobs = GetThreadCount();
 
   std::atomic<std::size_t> total_attempts{0};
@@ -375,7 +363,6 @@ UTEST_F(TSendLimiterTest, ManyShards) {
 }
 
 UTEST_F(TSendLimiterTest, RepeatedTraversal) {
-
   TUserId user_id("1");
 
   Limiter->TryAcquire(user_id);

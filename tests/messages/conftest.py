@@ -5,7 +5,7 @@ import pytest
 async def garbage_collect(service_client, testpoint, request):
     """Сброс сервиса после теста"""
     await service_client.reset_metrics()
-    
+
     yield
 
     @testpoint('reset-task/action')

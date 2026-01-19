@@ -27,10 +27,11 @@ TObjectFactory<NCore::ISessionsFactory> TSessionsFactoryComponent::GetSessionsFa
 
   sessions_factory.Register("RcuFlatMap", [this](const auto& /*config*/, const auto& context) {
     auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
-    return std::make_unique<TRcuSessionsFactory>(
-        *QueueFactory_, config_source,
+    auto& sessions_stats =
         context.template FindComponent<userver::components::StatisticsStorage>().GetMetricsStorage()->GetMetric(
-            kSessionsTag));
+            kSessionsTag);
+
+    return std::make_unique<TRcuSessionsFactory>(*QueueFactory_, config_source, sessions_stats);
   });
 
   return sessions_factory;

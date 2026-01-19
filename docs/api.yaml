@@ -443,6 +443,13 @@ paths:
         - Messages
       summary: Получить сообщения пользователя
       operationId: pollMessages
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: ID сессии пользователя
+          schema:
+            type: string
       security:
         - BearerAuth: []
       responses:

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   nginx:
     image: nginx:alpine
@@ -11,56 +9,54 @@ services:
       - ./www:/var/www/www:ro
     depends_on:
       - chat-server
-    # extra_hosts: for developing
-    #   - "host.docker.internal:host-gateway"
-    networks:
-      - backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   postgres:
     container_name: service-postgres
     image: postgres:12
-    environment: &db_env
+    environment:
       POSTGRES_DB: chat_service
       POSTGRES_USER: chat-user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
     volumes:
       - ./postgresql/schemas:/docker-entrypoint-initdb.d
-      - ./.pgdata:/var/lib/postgresql/data
-    networks:
-      - backend
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chat-user -d chat_service"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   chat-server:
     container_name: chat-server
     build: .
     ports:
-      - "8080:8080"
+      # Оставляем только для отладки, в продакшене можно убрать, т.к. nginx ходит внутри сети
+      - "8080:8080" 
       - "8081:8081"
     volumes:
       - ./configs/config_vars_docker.yaml:/app/configs/config_vars.yaml
       - ./configs/dynamic_config_fallback.json:/app/configs/dynamic_config_fallback.json
-      - cache:/app/cache
+      - userver_cache:/app/cache
     depends_on:
-      - postgres
-    networks:
-      - backend
-
+      postgres:
+        condition: service_healthy
+  
   prometheus:
     image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    networks:
-      - backend
 
   grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
-    networks:
-      - backend
     depends_on:
       - prometheus
     volumes:
@@ -69,10 +65,8 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
 
-networks:
-  backend:
-    driver: bridge
 
 volumes:
+  userver_cache:
+  postgres_data:
   grafana:
-  cache:

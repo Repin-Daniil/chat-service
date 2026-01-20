@@ -18,8 +18,8 @@ void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
   auto recipient_id = UserRepo_.FindByUsername(recipient_username.Value());
   if (!recipient_id.has_value()) {
     throw TRecipientNotFound("Recipient Not Found");
-  }
-
+  } 
+  // Тут надо будет просто передать в Channel/Router что нить такое
   auto mailbox = Registry_.GetMailbox(*recipient_id);
 
   if (!mailbox) {

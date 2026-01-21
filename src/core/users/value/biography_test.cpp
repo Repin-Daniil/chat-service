@@ -184,7 +184,8 @@ TEST(TBiographyTest, EqualityAfterTrim) {
 
 TEST(TBiographyTest, ComplexUtf8Biography) {
   std::string complex =
-      "👨‍💻 Developer from 🇷🇺\nПрограммирование на C++\n日本語も少し";
+      "👨‍💻 Developer from 🇷🇺\nПрограммирование на "
+      "C++\n日本語も少し";
   EXPECT_NO_THROW(TBiography{complex});
 
   TBiography bio(complex);

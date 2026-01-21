@@ -8,11 +8,11 @@
 namespace NChat::NCore::NDomain {
 
 struct TUserIdTag {};
-struct TChannelIdTag {};
+struct TChatIdTag {};
 struct TSessionIdTag {};
 
 using TUserId = NUtils::TStrongTypedef<TUserIdTag, std::string, NUtils::EStrongTypedefOps::kCompareStrong>;
-using TChannelId = NUtils::TStrongTypedef<TUserIdTag, std::uint64_t, NUtils::EStrongTypedefOps::kCompareStrong>;
+using TChatId = NUtils::TStrongTypedef<TUserIdTag, std::string, NUtils::EStrongTypedefOps::kCompareStrong>;
 using TSessionId = NUtils::TStrongTypedef<TSessionIdTag, std::string, NUtils::EStrongTypedefOps::kCompareStrong>;
 
 }  // namespace NChat::NCore::NDomain

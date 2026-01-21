@@ -9,6 +9,7 @@ find_package(
     userver
     COMPONENTS core #
     postgresql
+    chaotic
     QUIET
 )
 if(NOT userver_FOUND)
@@ -42,6 +43,19 @@ target_link_libraries(
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
 target_link_libraries(${PROJECT_NAME}_objs PUBLIC jwt-cpp)
+
+file(GLOB_RECURSE SCHEMAS ${CMAKE_CURRENT_SOURCE_DIR}/docs/*.yaml)
+userver_target_generate_chaotic(${PROJECT_NAME}-chgen
+    LAYOUT "/components/schemas/chats/([^/]*)/=NChat::NInfra::NHandlers::{0}"
+    GENERATE_SERIALIZERS
+    OUTPUT_DIR
+        ${CMAKE_CURRENT_BINARY_DIR}/src
+    SCHEMAS
+        ${SCHEMAS}
+    RELATIVE_TO
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(${PROJECT_NAME}_objs PUBLIC ${PROJECT_NAME}-chgen)
 
 userver_add_sql_library(
     ${PROJECT_NAME}_sql

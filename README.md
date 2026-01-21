@@ -33,6 +33,9 @@ docker compose up
 
 <img width="664" height="579" alt="image" src="https://github.com/user-attachments/assets/1fbd59c7-4589-45a8-b713-0ef757f40fbb" />
 
+### База данных
+<img width="2092" height="1242" alt="image" src="https://github.com/user-attachments/assets/9c9b58d5-0cff-4ef6-bab8-7d2c6300d30a" />
+
 
 ### Тесты
 - 100 функциональных тестов на Python (`testsuite`)

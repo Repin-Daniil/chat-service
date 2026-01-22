@@ -21,6 +21,9 @@ class Routes(str, Enum):
     SEND_MESSAGE = '/v1/messages/send'
     POLL_MESSAGES = '/v1/messages/poll/{session_id}'
 
+    # chats
+    PRIVATE_CHAT = '/v1/chats/private'
+
     def __str__(self) -> str:
         return self.value
 
@@ -28,6 +31,7 @@ class Routes(str, Enum):
 class RequiredFields(tuple, Enum):
     LOGIN = 'username', 'password'
     REGISTRATION = 'username', 'password', 'display_name'
+    PRIVATE_CHAT = 'target_username'
 
 
 def model_dump(model, **kwargs):

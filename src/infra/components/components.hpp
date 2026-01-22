@@ -14,6 +14,7 @@ void RegisterCacheComponent(userver::components::ComponentList&);
 // Handlers
 void RegisterUserHandlers(userver::components::ComponentList&);
 void RegisterMessagesHandlers(userver::components::ComponentList&);
+void RegisterChatHandlers(userver::components::ComponentList& list);
 
 // Components
 void RegisterServiceComponents(userver::components::ComponentList&);

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <app/exceptions.hpp>
 #include <core/chats/chat_repo.hpp>
 #include <core/common/ids.hpp>
 #include <core/users/user_repo.hpp>
 
 #include <app/dto/chats/private_chat_dto.hpp>
+#include <app/exceptions.hpp>
 
 namespace NChat::NApp {
 

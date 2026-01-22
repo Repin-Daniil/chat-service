@@ -57,3 +57,11 @@ async def poll_messages(service_client, user):
         Routes.POLL_MESSAGES.format(session_id=(user.session_id or "")),
         headers={'Authorization': user.token or ""},
     )
+
+async def get_private_chat(service_client, private_chat, token):
+    return await service_client.post(
+        Routes.PRIVATE_CHAT,
+        json=private_chat.model_dump(include={'target_username'}),
+        headers={'Authorization': token or ""},
+    )
+

@@ -2,7 +2,7 @@
 
 #include <infra/auth/auth_service_impl.hpp>
 #include <infra/components/users/user_repository_component.hpp>
-#include <infra/db/postgres_user_repository.hpp>
+#include <infra/db/user/postgres_user_repository.hpp>
 
 #include <userver/components/component.hpp>
 #include <userver/components/component_context.hpp>

@@ -20,9 +20,9 @@ NDto::TPrivateChatResult TPrivateChatUseCase::Execute(const NDto::TPrivateChatRe
     throw TUserNotFound{fmt::format("User '{}' not found", request.TargetUsername)};
   }
 
-  auto [chat_id, is_new] = ChatRepo_.GetPrivateChat(request.RequesterUserId, target_user_id.value());
+  auto [chat_id, is_new] = ChatRepo_.GetOrCreatePrivateChat(request.RequesterUserId, target_user_id.value());
 
-  return {chat_id, is_new};
+  return {.ChatId = chat_id, .IsNewChat = is_new};
 }
 
 }  // namespace NChat::NApp

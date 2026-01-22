@@ -2,12 +2,13 @@
 
 #include <app/dto/chats/private_chat_dto.hpp>
 
+#include <infra/components/chats/chat_service_component.hpp>
+
 #include <api/http/common/context.hpp>
+#include <api/http/exceptions/handler_exceptions.hpp>
 
 #include <docs/api.hpp>
 #include <userver/components/component_context.hpp>
-
-#include
 
 namespace NChat::NInfra::NHandlers {
 
@@ -15,7 +16,6 @@ TPrivateChatHandler::TPrivateChatHandler(const userver::components::ComponentCon
                                          const userver::components::ComponentContext& context)
     : HttpHandlerJsonBase(config, context),
       ChatService_(context.FindComponent<NComponents::TChatServiceComponent>().GetService()) {}
-// todo component
 
 userver::formats::json::Value TPrivateChatHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& request_json,
@@ -25,8 +25,13 @@ userver::formats::json::Value TPrivateChatHandler::HandleRequestJsonThrow(
 
   auto request_dto = NApp::NDto::TPrivateChatRequest{.RequesterUserId = requester,
                                                      .TargetUsername = parsed_request.target_username};
+  NApp::NDto::TPrivateChatResult result;
 
-  const auto& result = ChatService_.GetOrCreatePrivateChat(request_dto);
+  try {
+    result = ChatService_.GetOrCreatePrivateChat(request_dto);
+  } catch (const NApp::TUserNotFound& ex) {
+    throw TNotFoundException(fmt::format("User with username {} not found.", request_dto.TargetUsername));
+  }
 
   if (result.IsNewChat) {
     auto& http_response = request.GetHttpResponse();

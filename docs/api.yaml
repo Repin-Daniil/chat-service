@@ -688,7 +688,7 @@ paths:
   #             schema:
   #               $ref: "#/components/schemas/Error"
 
-  #todo Создать или получить существующую личку
+  # Создать или получить существующую личку
   /chats/private:
     post:
       summary: Начать диалог (Get or Create)
@@ -701,9 +701,8 @@ paths:
         required: true
         content:
           application/json:
-          #todo надо вынести в схему отделльную $ref: "#/components/schemas/...."
             schema:
-              $ref: "#/components/schemas/GetPrivateRequest"
+              $ref: "#/components/schemas/TPrivateChatRequest"
       responses:
         '200':
           description: Чат найден
@@ -720,12 +719,6 @@ paths:
                 $ref: "#/components/schemas/TCreateChatResponse"
         '404':
           description: Целевой пользователь не найден
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        '400':
-          description: Нельзя создать чат с самим собой
           content:
             application/json:
               schema:

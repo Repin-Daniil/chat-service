@@ -1,217 +1,184 @@
-#include "registration.hpp"
+#include "private_chat.hpp"
 
-#include <app/use-cases/mocks/auth_service_mock.hpp>
+#include <app/use-cases/mocks/chat_repo_mock.hpp>
 #include <app/use-cases/mocks/user_repo_mock.hpp>
-
-#include <infra/auth/auth_service_impl.hpp>  // for password hashing
 
 #include <gtest/gtest.h>
 
 using namespace testing;
 using namespace NChat::NCore;
+using namespace NChat::NCore::NDomain;
 using namespace NChat::NApp;
 
-class RegistrationUseCaseIntegrationTest : public Test {
+class PrivateChatUseCaseIntegrationTest : public Test {
  protected:
   void SetUp() override {
-    user_repo_ = std::make_unique<MockUserRepository>();
-    auth_service_ = std::make_unique<MockAuthService>();
-
-    user_repo_ptr_ = user_repo_.get();
-    auth_service_ptr_ = auth_service_.get();
-
-    use_case_ = std::make_unique<TRegistrationUseCase>(*user_repo_, *auth_service_);
+    ChatRepo_ = std::make_unique<MockChatRepository>();
+    UserRepo_ = std::make_unique<MockUserRepository>();
+    UseCase_ = std::make_unique<TPrivateChatUseCase>(*ChatRepo_, *UserRepo_);
   }
 
-  std::unique_ptr<MockUserRepository> user_repo_;
-  std::unique_ptr<MockAuthService> auth_service_;
-  std::unique_ptr<TRegistrationUseCase> use_case_;
+  std::unique_ptr<MockChatRepository> ChatRepo_;
+  std::unique_ptr<MockUserRepository> UserRepo_;
+  std::unique_ptr<TPrivateChatUseCase> UseCase_;
 
-  MockUserRepository* user_repo_ptr_;
-  MockAuthService* auth_service_ptr_;
+  // Константы для тестов
+  const TUserId kRequesterUserId{"user_123"};
+  const TUserId kTargetUserId{"user_456"};
+  const std::string kTargetUsername = "target_user";
+  const std::string kNonexistentUsername = "nonexistent_user";
+  const TChatId kExistingChatId{"chat_existing"};
+  const TChatId kNewChatId{"chat_new"};
 };
 
-NDomain::TPasswordHash HashPasswordUtil(std::string_view password) {
-  return NChat::NInfra::TAuthServiceImpl().HashPassword(password);
+// Успешное получение существующего чата
+TEST_F(PrivateChatUseCaseIntegrationTest, GetExistingChat_Success) {
+  NDto::TPrivateChatRequest request{.RequesterUserId = kRequesterUserId, .TargetUsername = kTargetUsername};
+
+  EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
+
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+      .WillOnce(Return(std::make_pair(kExistingChatId, false)));
+
+  auto result = UseCase_->Execute(request);
+
+  EXPECT_EQ(result.ChatId, kExistingChatId);
+  EXPECT_FALSE(result.IsNewChat);
 }
 
-// Успешная регистрация нового пользователя
-TEST_F(RegistrationUseCaseIntegrationTest, SuccessfulRegistration) {
-  NDto::TUserRegistrationRequest request{
-      .Username = "testuser",
-      .Password = "secure#Password123",
-      .Biography = "Test biography",
-      .DisplayName = "Test User",
-  };
+// Успешное создание нового чата
+TEST_F(PrivateChatUseCaseIntegrationTest, CreateNewChat_Success) {
+  NDto::TPrivateChatRequest request{.RequesterUserId = kRequesterUserId, .TargetUsername = kTargetUsername};
 
-  // Настройка ожиданий
-  EXPECT_CALL(*user_repo_ptr_, FindByUsername("testuser")).WillOnce(Return(std::nullopt));
+  EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
 
-  NDomain::TPasswordHash expected_hash = HashPasswordUtil(request.Password);
-  EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password)).WillOnce(Return(expected_hash));
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+      .WillOnce(Return(std::make_pair(kNewChatId, true)));
 
-  NDomain::TUserId expected_user_id{"generated-uuid-123"};
-  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(testing::_));
+  auto result = UseCase_->Execute(request);
 
-  std::string expected_token = "jwt.token.here";
-  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).WillOnce(Return(expected_token));
-
-  // Выполнение
-  auto result = use_case_->Execute(request);
-
-  // Проверка
-  EXPECT_EQ(result.Username, "testuser");
-  EXPECT_EQ(result.Token, expected_token);
+  EXPECT_EQ(result.ChatId, kNewChatId);
+  EXPECT_TRUE(result.IsNewChat);
 }
 
-// Попытка регистрации с уже существующим username
-TEST_F(RegistrationUseCaseIntegrationTest, UserAlreadyExists) {
-  NDto::TUserRegistrationRequest request{
-      .Username = "existinguser",
-      .Password = "passworD-123",
-      .Biography = "Biography",
-      .DisplayName = "Existing User",
-  };
-  std::string dummy_hash = "hash";
-  std::string dummy_salt = "salt";
+// Целевой пользователь не существует
+TEST_F(PrivateChatUseCaseIntegrationTest, TargetUserNotFound_ThrowsException) {
+  NDto::TPrivateChatRequest request{.RequesterUserId = kRequesterUserId, .TargetUsername = kNonexistentUsername};
 
-  EXPECT_CALL(*user_repo_ptr_, FindByUsername("existinguser")).WillOnce(Return(NDomain::TUserId{"123"}));
+  EXPECT_CALL(*UserRepo_, FindByUsername(kNonexistentUsername)).WillOnce(Return(std::nullopt));
 
-  // Не должны вызываться другие методы
-  EXPECT_CALL(*auth_service_ptr_, HashPassword(_)).Times(0);
-  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(testing::_)).Times(0);
-  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).Times(0);
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(_, _)).Times(0);  // Не должен быть вызван
 
-  EXPECT_THROW(use_case_->Execute(request), NDomain::TUserAlreadyExistsException);
+  EXPECT_THROW(
+      {
+        try {
+          UseCase_->Execute(request);
+        } catch (const TUserNotFound& e) {
+          EXPECT_THAT(e.what(), HasSubstr(kNonexistentUsername));
+          throw;
+        }
+      },
+      TUserNotFound);
 }
 
-// UUID коллизия с успешным retry
-TEST_F(RegistrationUseCaseIntegrationTest, UuidCollisionWithSuccessfulRetry) {
-  NDto::TUserRegistrationRequest request{.Username = "newuser",
-                                         .Password = "passworDD$123",
-                                         .Biography = "Biography",
-                                         .DisplayName = "New User"};
+// Создание чата с самим собой (если это валидный сценарий)
+TEST_F(PrivateChatUseCaseIntegrationTest, CreateChatWithSelf_Success) {
+  const TUserId kSelfUserId{"user_self"};
+  const std::string kSelfUsername = "self_user";
 
-  EXPECT_CALL(*user_repo_ptr_, FindByUsername("newuser")).WillOnce(Return(std::nullopt));
+  NDto::TPrivateChatRequest request{.RequesterUserId = kSelfUserId, .TargetUsername = kSelfUsername};
 
-  NDomain::TPasswordHash password_hash = HashPasswordUtil(request.Password);
-  EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password)).WillOnce(Return(password_hash));
+  EXPECT_CALL(*UserRepo_, FindByUsername(kSelfUsername)).WillOnce(Return(kSelfUserId));
 
-  // Первые 2 попытки - коллизия UUID, третья успешна
-  NDomain::TUserId success_id{"uuid-success"};
-  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(testing::_))
-      .WillOnce(Throw(TUserIdAlreadyExists("collision")))
-      .WillOnce(Throw(TUserIdAlreadyExists("collision")))
-      .WillOnce(Return());
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kSelfUserId, kSelfUserId))
+      .WillOnce(Return(std::make_pair(TChatId{"self_chat"}, true)));
 
-  std::string token = "jwt.token";
-  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).WillOnce(Return(token));
+  auto result = UseCase_->Execute(request);
 
-  auto result = use_case_->Execute(request);
-
-  EXPECT_EQ(result.Username, "newuser");
-  EXPECT_EQ(result.Token, token);
+  EXPECT_EQ(result.ChatId.GetUnderlying(), "self_chat");
+  EXPECT_TRUE(result.IsNewChat);
 }
 
-// Исчерпание попыток при UUID коллизии
-TEST_F(RegistrationUseCaseIntegrationTest, UuidCollisionMaxAttemptsExceeded) {
-  NDto::TUserRegistrationRequest request{
-      .Username = "unluckyuser",
-      .Password = "PsWrDD@123",
-      .Biography = "Biography",
-      .DisplayName = "Unlucky User",
-  };
+// Пользователь с пустым username
+TEST_F(PrivateChatUseCaseIntegrationTest, EmptyUsername_ThrowsException) {
+  NDto::TPrivateChatRequest request{.RequesterUserId = kRequesterUserId, .TargetUsername = ""};
 
-  EXPECT_CALL(*user_repo_ptr_, FindByUsername("unluckyuser")).WillOnce(Return(std::nullopt));
+  EXPECT_CALL(*UserRepo_, FindByUsername("")).WillOnce(Return(std::nullopt));
 
-  NDomain::TPasswordHash password_hash = HashPasswordUtil(request.Password);
-  EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password)).WillOnce(Return(password_hash));
-
-  // Все 5 попыток заканчиваются коллизией
-  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(_)).Times(5).WillRepeatedly(Throw(TUserIdAlreadyExists("collision")));
-
-  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).Times(0);
-
-  EXPECT_THROW(use_case_->Execute(request), TRegistrationTemporaryUnavailable);
+  EXPECT_THROW({ UseCase_->Execute(request); }, TUserNotFound);
 }
 
-// Полный поток: хэширование -> сохранение -> генерация JWT
-TEST_F(RegistrationUseCaseIntegrationTest, CompleteIntegrationFlow) {
-  NDto::TUserRegistrationRequest request{
-      .Username = "john_doe",
-      .Password = "MySecureP#ssw0rd",
-      .Biography = "Software engineer",
-      .DisplayName = "John Doe",
-  };
+// Проверка корректности передачи параметров в репозиторий
+TEST_F(PrivateChatUseCaseIntegrationTest, VerifyRepositoryCallOrder) {
+  NDto::TPrivateChatRequest request{.RequesterUserId = kRequesterUserId, .TargetUsername = kTargetUsername};
 
-  // Последовательность вызовов
-  {
-    InSequence seq;
+  InSequence seq;
 
-    // 1. Проверка существования пользователя
-    EXPECT_CALL(*user_repo_ptr_, FindByUsername("john_doe")).WillOnce(Return(std::nullopt));
+  // Сначала должен быть вызван FindByUsername
+  EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
 
-    // 2. Хэширование пароля
-    EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password))
-        .WillOnce(Return(HashPasswordUtil(request.Password)));
+  // Затем GetOrCreatePrivateChat с правильными параметрами
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+      .WillOnce(Return(std::make_pair(kNewChatId, true)));
 
-    // 3. Сохранение пользователя
-    EXPECT_CALL(*user_repo_ptr_, InsertNewUser(testing::_));
-
-    // 4. Создание JWT токена
-    EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).WillOnce(Return("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."));
-  }
-
-  auto result = use_case_->Execute(request);
-
-  EXPECT_EQ(result.Username, "john_doe");
-  EXPECT_FALSE(result.Token.empty());
+  UseCase_->Execute(request);
 }
 
-// Проверка передачи правильных параметров в InsertNewUser
-TEST_F(RegistrationUseCaseIntegrationTest, CorrectUserDataPassed) {
-  NDto::TUserRegistrationRequest request{
-      .Username = "testuser",
-      .Password = "Password@123",
-      .Biography = "My bio",
-      .DisplayName = "Test Display",
-  };
+// Проверка различных комбинаций ID пользователей
+TEST_F(PrivateChatUseCaseIntegrationTest, DifferentUserIdFormats_Success) {
+  const TUserId kNumericId{"12345"};
+  const TUserId kAlphanumericId{"abc-def-123"};
+  const std::string kUsername = "user_with_complex_id";
 
-  EXPECT_CALL(*user_repo_ptr_, FindByUsername("testuser")).WillOnce(Return(std::nullopt));
+  NDto::TPrivateChatRequest request{.RequesterUserId = kNumericId, .TargetUsername = kUsername};
 
-  NDomain::TPasswordHash hash = HashPasswordUtil(request.Password);
-  EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password)).WillOnce(Return(hash));
+  EXPECT_CALL(*UserRepo_, FindByUsername(kUsername)).WillOnce(Return(kAlphanumericId));
 
-  // Проверяем, что переданный User содержит правильные данные
-  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(testing::_)).WillOnce([](const NDomain::TUser& user) {
-    EXPECT_EQ(user.GetUsername(), "testuser");
-    EXPECT_EQ(user.GetDisplayName(), "Test Display");
-    EXPECT_EQ(user.GetBiography(), "My bio");
-  });
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kNumericId, kAlphanumericId))
+      .WillOnce(Return(std::make_pair(TChatId{"chat_123"}, false)));
 
-  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).WillOnce(Return("token"));
+  auto result = UseCase_->Execute(request);
 
-  use_case_->Execute(request);
+  EXPECT_EQ(result.ChatId.GetUnderlying(), "chat_123");
+  EXPECT_FALSE(result.IsNewChat);
 }
 
-// Ошибка репозитория
-TEST_F(RegistrationUseCaseIntegrationTest, RepositoryError) {
-  NDto::TUserRegistrationRequest request{
-      .Username = "testuser",
-      .Password = "Password@123",
-      .Biography = "My bio",
-      .DisplayName = "Test Display",
-  };
+// Специальные символы в username
+TEST_F(PrivateChatUseCaseIntegrationTest, SpecialCharactersInUsername_Success) {
+  const std::string kSpecialUsername = "user.name-123_test";
+  const TUserId kSpecialUserId{"special_user_id"};
 
-  EXPECT_CALL(*user_repo_ptr_, FindByUsername("testuser")).WillOnce(Return(std::nullopt));
+  NDto::TPrivateChatRequest request{.RequesterUserId = kRequesterUserId, .TargetUsername = kSpecialUsername};
 
-  NDomain::TPasswordHash hash = HashPasswordUtil(request.Password);
-  EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password)).WillOnce(Return(hash));
+  EXPECT_CALL(*UserRepo_, FindByUsername(kSpecialUsername)).WillOnce(Return(kSpecialUserId));
 
-  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(testing::_))
-      .WillOnce(Throw(std::runtime_error("Database connection failed")));
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kSpecialUserId))
+      .WillOnce(Return(std::make_pair(kNewChatId, true)));
 
-  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).Times(0);
+  auto result = UseCase_->Execute(request);
 
-  EXPECT_THROW(use_case_->Execute(request), TRegistrationTemporaryUnavailable);
+  EXPECT_EQ(result.ChatId, kNewChatId);
+  EXPECT_TRUE(result.IsNewChat);
+}
+
+// Множественные вызовы для одной пары пользователей
+TEST_F(PrivateChatUseCaseIntegrationTest, MultipleCallsSamePair_ReturnsExistingChat) {
+  NDto::TPrivateChatRequest request{.RequesterUserId = kRequesterUserId, .TargetUsername = kTargetUsername};
+
+  // Первый вызов - создание нового чата
+  EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+      .WillOnce(Return(std::make_pair(kNewChatId, true)));
+
+  auto result1 = UseCase_->Execute(request);
+  EXPECT_TRUE(result1.IsNewChat);
+
+  // Второй вызов - получение существующего чата
+  EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+      .WillOnce(Return(std::make_pair(kNewChatId, false)));
+
+  auto result2 = UseCase_->Execute(request);
+  EXPECT_FALSE(result2.IsNewChat);
+  EXPECT_EQ(result2.ChatId, result1.ChatId);
 }

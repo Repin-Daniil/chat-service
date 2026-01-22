@@ -18,3 +18,6 @@ class Message(BaseModel):
     recipient: str = Field(default="")
     payload: str = Field(default_factory=fake.paragraph)
     sender: str = Field(default=None, exclude=True)
+
+class PrivateChat(BaseModel):
+    target_username: str = Field(default = "")

@@ -64,7 +64,7 @@ CREATE TABLE chat.private_chats (
     chat_id TEXT PRIMARY KEY REFERENCES chat.chats(chat_id) ON DELETE CASCADE,
     user_id_1 TEXT NOT NULL,
     user_id_2 TEXT NOT NULL,
-    CHECK (user_id_1 < user_id_2),
+    CHECK (user_id_1 <= user_id_2),
     UNIQUE (user_id_1, user_id_2)
 );
 

@@ -1,4 +1,5 @@
 #include "update_by_username_handler.hpp"
+
 #include "api/http/common/context.hpp"
 
 #include <app/dto/users/user_update_dto.hpp>

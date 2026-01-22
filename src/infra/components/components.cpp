@@ -13,6 +13,7 @@
 #include <infra/db/user/postgres_profile_by_username_cache.hpp>
 
 #include <api/http/middlewares/auth_bearer.hpp>
+#include <api/http/v1/chats/private/chat_private_handler.hpp>
 #include <api/http/v1/messages/polling/poll_messages_handler.hpp>
 #include <api/http/v1/messages/send/send_message_handler.hpp>
 #include <api/http/v1/messages/session/start_session_handler.hpp>
@@ -21,7 +22,6 @@
 #include <api/http/v1/users/update_by_username_handler.hpp>
 #include <api/http/v1/users/user_login_handler.hpp>
 #include <api/http/v1/users/user_register_handler.hpp>
-#include <api/http/v1/chats/private/chat_private_handler.hpp>
 
 #include <userver/clients/dns/component.hpp>
 #include <userver/clients/http/component_list.hpp>
@@ -78,9 +78,7 @@ void RegisterMessagesHandlers(userver::components::ComponentList& list) {
   list.Append<NHandlers::TStartSessionHandler>();
 }
 
-void RegisterChatHandlers(userver::components::ComponentList& list) {
-  list.Append<NHandlers::TPrivateChatHandler>();
-}
+void RegisterChatHandlers(userver::components::ComponentList& list) { list.Append<NHandlers::TPrivateChatHandler>(); }
 
 // Components
 void RegisterServiceComponents(userver::components::ComponentList& list) {

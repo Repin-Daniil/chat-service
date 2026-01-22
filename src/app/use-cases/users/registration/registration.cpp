@@ -37,7 +37,7 @@ NDto::TUserRegistrationResult TRegistrationUseCase::Execute(const NDto::TUserReg
   NUtils::NId::UuidGenerator generator;
   auto user_id = NCore::NDomain::TUserId{generator.Generate()};
   auto user = NCore::NDomain::TUser(user_id, username, display_name, password_hash, biography);
-  
+
   try {
     UserRepo_.InsertNewUser(user);
   } catch (const std::exception& e) {

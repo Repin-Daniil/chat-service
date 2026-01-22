@@ -12,14 +12,14 @@ using namespace NChat::NApp;
 class DeleteUserUseCaseIntegrationTest : public Test {
  protected:
   void SetUp() override {
-    user_repo_ = std::make_unique<MockUserRepository>();
+    user_repo_ = std::make_unique<TMockUserRepository>();
     user_repo_ptr_ = user_repo_.get();
     use_case_ = std::make_unique<TDeleteUserUseCase>(*user_repo_);
   }
 
-  std::unique_ptr<MockUserRepository> user_repo_;
+  std::unique_ptr<TMockUserRepository> user_repo_;
   std::unique_ptr<TDeleteUserUseCase> use_case_;
-  MockUserRepository* user_repo_ptr_;
+  TMockUserRepository* user_repo_ptr_;
 };
 
 // Успешное удаление пользователем самого себя

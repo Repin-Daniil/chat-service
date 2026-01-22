@@ -13,13 +13,13 @@ using namespace NChat::NApp;
 class PrivateChatUseCaseIntegrationTest : public Test {
  protected:
   void SetUp() override {
-    ChatRepo_ = std::make_unique<MockChatRepository>();
-    UserRepo_ = std::make_unique<MockUserRepository>();
+    ChatRepo_ = std::make_unique<TMockChatRepository>();
+    UserRepo_ = std::make_unique<TMockUserRepository>();
     UseCase_ = std::make_unique<TPrivateChatUseCase>(*ChatRepo_, *UserRepo_);
   }
 
-  std::unique_ptr<MockChatRepository> ChatRepo_;
-  std::unique_ptr<MockUserRepository> UserRepo_;
+  std::unique_ptr<TMockChatRepository> ChatRepo_;
+  std::unique_ptr<TMockUserRepository> UserRepo_;
   std::unique_ptr<TPrivateChatUseCase> UseCase_;
 
   // Константы для тестов

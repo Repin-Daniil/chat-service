@@ -16,17 +16,17 @@ using namespace NChat::NApp;
 class UpdateUserUseCaseIntegrationTest : public Test {
  protected:
   void SetUp() override {
-    user_repo_ = std::make_unique<MockUserRepository>();
+    user_repo_ = std::make_unique<TMockUserRepository>();
     auth_service_ = std::make_unique<MockAuthService>();
     user_repo_ptr_ = user_repo_.get();
     auth_service_ptr_ = auth_service_.get();
     use_case_ = std::make_unique<TUpdateUserUseCase>(*user_repo_, *auth_service_);
   }
 
-  std::unique_ptr<MockUserRepository> user_repo_;
+  std::unique_ptr<TMockUserRepository> user_repo_;
   std::unique_ptr<MockAuthService> auth_service_;
   std::unique_ptr<TUpdateUserUseCase> use_case_;
-  MockUserRepository* user_repo_ptr_;
+  TMockUserRepository* user_repo_ptr_;
   MockAuthService* auth_service_ptr_;
 };
 

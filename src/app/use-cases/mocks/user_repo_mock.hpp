@@ -7,7 +7,7 @@
 using namespace testing;
 using namespace NChat::NCore;
 
-class MockUserRepository : public IUserRepository {
+class TMockUserRepository : public IUserRepository {
  public:
   MOCK_METHOD(void, InsertNewUser, (const TUser& user), (const, override));
   MOCK_METHOD(void, DeleteUser, (std::string_view username), (const, override));

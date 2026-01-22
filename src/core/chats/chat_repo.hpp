@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/common/ids.hpp>
+
 namespace NChat::NCore {
 
 class IChatRepository {

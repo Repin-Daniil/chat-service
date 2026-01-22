@@ -14,7 +14,7 @@ using namespace NChat::NApp;
 class LoginUseCaseIntegrationTest : public Test {
  protected:
   void SetUp() override {
-    user_repo_ = std::make_unique<MockUserRepository>();
+    user_repo_ = std::make_unique<TMockUserRepository>();
     auth_service_ = std::make_unique<MockAuthService>();
 
     user_repo_ptr_ = user_repo_.get();
@@ -33,11 +33,11 @@ class LoginUseCaseIntegrationTest : public Test {
     return std::make_unique<NDomain::TUser>(data);
   }
 
-  std::unique_ptr<MockUserRepository> user_repo_;
+  std::unique_ptr<TMockUserRepository> user_repo_;
   std::unique_ptr<MockAuthService> auth_service_;
   std::unique_ptr<TLoginUseCase> use_case_;
 
-  MockUserRepository* user_repo_ptr_;
+  TMockUserRepository* user_repo_ptr_;
   MockAuthService* auth_service_ptr_;
 };
 

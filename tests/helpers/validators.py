@@ -57,3 +57,7 @@ def validate_messages(response, expected_messages: List[Message]):
                 f"Message #{i}: Wrong sender. Expected: '{expected.sender}', got: '{actual.get('sender')}'"
 
     return data
+
+
+def validate_chat(response):
+    return 'chat_id' in response.json()

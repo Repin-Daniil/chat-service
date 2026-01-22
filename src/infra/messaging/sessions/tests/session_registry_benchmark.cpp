@@ -35,8 +35,8 @@ class TMockMessageQueueFactory : public IMessageQueueFactory {
 TMessage CreateTestMessage(std::size_t id) {
   TMessage msg;
   msg.RecipientId = TUserId{"recipient" + std::to_string(id)};
-  msg.Payload =
-      std::make_shared<TMessagePayload>(TUserId{"sender_id"}, TMessageText{"Test message " + std::to_string(id)});
+  msg.Payload = std::make_shared<TMessagePayload>(TUserId{"sender_id"},
+                                                  TMessageText{"Test message " + std::to_string(id)});
   return msg;
 }
 

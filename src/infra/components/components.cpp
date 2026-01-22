@@ -1,5 +1,7 @@
 #include "components.hpp"
 
+#include <infra/components/chats/chat_repository_component.hpp>
+#include <infra/components/chats/chat_service_component.hpp>
 #include <infra/components/messaging/garbage_collector/gc_task_component.hpp>
 #include <infra/components/messaging/limiter/send_limiter_component.hpp>
 #include <infra/components/messaging/messaging_service_component.hpp>
@@ -7,10 +9,11 @@
 #include <infra/components/messaging/sessions/sessions_registry_component.hpp>
 #include <infra/components/users/user_repository_component.hpp>
 #include <infra/components/users/user_service_component.hpp>
-#include <infra/db/postgres_profile_by_user_id_cache.hpp>
-#include <infra/db/postgres_profile_by_username_cache.hpp>
+#include <infra/db/user/postgres_profile_by_user_id_cache.hpp>
+#include <infra/db/user/postgres_profile_by_username_cache.hpp>
 
 #include <api/http/middlewares/auth_bearer.hpp>
+#include <api/http/v1/chats/private/chat_private_handler.hpp>
 #include <api/http/v1/messages/polling/poll_messages_handler.hpp>
 #include <api/http/v1/messages/send/send_message_handler.hpp>
 #include <api/http/v1/messages/session/start_session_handler.hpp>
@@ -75,6 +78,8 @@ void RegisterMessagesHandlers(userver::components::ComponentList& list) {
   list.Append<NHandlers::TStartSessionHandler>();
 }
 
+void RegisterChatHandlers(userver::components::ComponentList& list) { list.Append<NHandlers::TPrivateChatHandler>(); }
+
 // Components
 void RegisterServiceComponents(userver::components::ComponentList& list) {
   list.Append<NComponents::TUserServiceComponent>()
@@ -82,11 +87,12 @@ void RegisterServiceComponents(userver::components::ComponentList& list) {
       .Append<NComponents::TGarbageCollectorComponent>()
       .Append<NComponents::TMailboxRegistryComponent>()
       .Append<NComponents::TSendLimiterComponent>()
-      .Append<NComponents::TSessionsFactoryComponent>();
+      .Append<NComponents::TSessionsFactoryComponent>()
+      .Append<NComponents::TChatServiceComponent>();
 }
 
 void RegisterRepositoryComponents(userver::components::ComponentList& list) {
-  list.Append<NComponents::TUserRepoComponent>();
+  list.Append<NComponents::TUserRepoComponent>().Append<NComponents::TChatRepoComponent>();
 }
 
 }  // namespace NChat::NInfra

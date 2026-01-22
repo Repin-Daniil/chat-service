@@ -3,9 +3,13 @@ info:
   title: Chat API
   description: MVP чата-хаба на userver
   version: 1.0.0
+
 servers:
   - url: /v1
     description: Основной шлюз API
+
+security:
+  - BearerAuth: []
 
 tags:
   - name: Auth
@@ -15,7 +19,7 @@ tags:
   - name: Messages
     description: Отправка и получение сообщений
   - name: Chats
-    description: (Пока не используется)
+    description: Управление чатами
 
 components:
   securitySchemes:
@@ -23,6 +27,30 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  
+  parameters:
+    ChatIdParam:
+      name: chat_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  
+    UsernameParam:
+      name: username
+      in: path
+      required: true
+      schema:
+        type: string
+    
+    SessionIdParam:
+      name: session_id
+      in: path
+      required: true
+      description: ID сессии пользователя
+      schema:
+        type: string
 
   schemas:
     # Error
@@ -53,7 +81,6 @@ components:
       properties:
         access-token:
           type: string
-          format: jwt
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
 
     # Users
@@ -74,7 +101,6 @@ components:
             password:
               type: string
               minLength: 8
-              format: password
             display_name:
               type: string
               minLength: 3
@@ -99,7 +125,6 @@ components:
             password:
               type: string
               minLength: 8
-              format: password
 
     UserRegistered:
       type: object
@@ -145,7 +170,6 @@ components:
             password:
               type: string
               minLength: 8
-              format: password
             display_name:
               type: string
               minLength: 3
@@ -217,16 +241,150 @@ components:
       properties:
         session_id:
           type: string
-          description: ID сессии {gateway_id}-{sessiond_id}
-          example: 2531-3847323
+          description: ID сессии
+          format: uuid
       description: Созданная сессия
       
+    chats:
+    # --- Enums ---
+    # ChatType:
+    #   type: string
+    #   enum: [PRIVATE, GROUP, CHANNEL]
+
+    # MemberRole:
+    #   type: string
+    #   enum: [MEMBER, ADMIN, OWNER]
+
+      # --- Models ---      
+      # Модель для списка (облегченная)
+      # ChatPreview:
+      #   type: object
+      #   required:
+      #     - chat_id
+      #     - type
+      #     - title
+      #   properties:
+      #     chat_id:
+      #       type: string
+      #       format: uuid
+      #     type:
+      #       type: string
+      #     title:
+      #       type: string
+      #       description: Для лички это имя собеседника, для группы - название группы
+      #     avatar_url:
+      #       type: string
+      #       nullable: true
+      #     # unread_count:
+      #     #   type: integer
+      #     #   default: 0
+      #     updated_at:
+      #       type: string
+      #       format: date-time
+
+      # ChatDetails:
+      #   type: object
+      #   required:
+      #     - chat_id
+      #     - type
+      #     - created_at
+      #   properties:
+      #     chat_id:
+      #       type: string
+      #       format: uuid
+      #     type:
+      #       type: string
+      #     created_at:
+      #       type: string
+      #       format: date-time
+      #     # Поля для группы (заполнены только если type == GROUP)
+      #     group_details:
+      #       type: object
+      #       nullable: true
+      #       required:
+      #         - title
+      #         - members_count
+      #       properties:
+      #         title:
+      #           type: string
+      #         description:
+      #           type: string
+      #           nullable: true
+      #         owner_username:
+      #           type: string
+      #         members_count:
+      #           type: integer
+      #     # Поля для лички (заполнены только если type == PRIVATE)
+      #     private_details:
+      #       type: object
+      #       nullable: true
+      #       required:
+      #         - other_user_name
+      #       properties:
+      #         other_user_name:
+      #           type: string
+
+      # Запрос на создание группы
+      # CreateGroupRequest:
+      #   type: object
+      #   required:
+      #     - title
+      #   properties:
+      #     title:
+      #       type: string
+      #       minLength: 1
+      #       maxLength: 100
+      #     description:
+      #       type: string
+      #       nullable: true
+      #     member_ids:
+      #       type: array
+      #       items:
+      #         type: string
+      #       description: Список ID пользователей, которых сразу добавить
+
+      # Участник чата
+      # ChatMember:
+      #   type: object
+      #   required:
+      #     - username
+      #     - role
+      #   properties:
+      #     username:
+      #       type: string
+      #     role:
+      #       type: string
+      #     joined_at:
+      #       type: string
+      #       format: date-time
+
+      TCreateChatResponse:
+        type: object
+        required:
+          - chat_id
+        properties:
+          chat_id:
+            type: string
+            # format: uuid
+
+      TPrivateChatRequest:
+        type: object
+        required:
+          - target_username
+        properties:
+          target_username:
+            type: string
+            description: username пользователя, с которым хотим общаться
+        
 paths:
+  # -------------------------------------------------------------------------
   # Users
+  # -------------------------------------------------------------------------
   /users/register:
     post:
       tags:
         - Auth
+      security: [] 
       summary: Регистрация нового пользователя
       operationId: registerUser
       requestBody:
@@ -259,6 +417,7 @@ paths:
     post:
       tags:
         - Auth
+      security: [] 
       summary: Вход пользователя (получение токена)
       operationId: loginUser
       requestBody:
@@ -287,14 +446,9 @@ paths:
         - Users
       summary: Получение профиля пользователя по username
       operationId: getUserProfileByUsername
-      security:
-        - BearerAuth: []
       parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/UsernameParam'
+        
       responses:
         "200":
           description: Профиль получен
@@ -319,14 +473,8 @@ paths:
         - Users
       summary: Обновление профиля пользователя по username
       operationId: updateUserProfileByUsername
-      security:
-        - BearerAuth: []
       parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/UsernameParam'
       requestBody:
         required: true
         content:
@@ -372,14 +520,8 @@ paths:
         - Users
       summary: Удаление пользователя по username
       operationId: deleteUserProfileByUsername
-      security:
-        - BearerAuth: []
       parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/UsernameParam'
       responses:
         "200":
           description: Пользователь удален
@@ -402,15 +544,15 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+  # -------------------------------------------------------------------------
   # Messages
+  # -------------------------------------------------------------------------
   /messages/send:
     post:
       tags:
         - Messages
       summary: Отправить сообщение пользователю
       operationId: sendMessage
-      security:
-        - BearerAuth: []
       requestBody:
         description: Сообщение для отправки
         required: true
@@ -444,14 +586,7 @@ paths:
       summary: Получить сообщения пользователя
       operationId: pollMessages
       parameters:
-        - name: session_id
-          in: path
-          required: true
-          description: ID сессии пользователя
-          schema:
-            type: string
-      security:
-        - BearerAuth: []
+        - $ref: '#/components/parameters/SessionIdParam'
       responses:
         "200":
           description: Полученные сообщения
@@ -472,8 +607,6 @@ paths:
         - Messages
       summary: Открыть сессию поллинга
       operationId: startPolling
-      security:
-        - BearerAuth: []
       responses:
         "200":
           description: ID сессии
@@ -487,3 +620,213 @@ paths:
           description: Уже открыто максимальное количество сессий
         "503":
           description: Сервис временно недоступен
+
+  # -------------------------------------------------------------------------
+  # Chats
+  # -------------------------------------------------------------------------
+
+  #todo Список всех чатов
+  # /chats:
+  #   get:
+  #     summary: Получить список моих чатов
+  #     description: Возвращает отсортированный список чатов (лички и группы) с пагинацией.
+  #     tags:
+  #       - Chats
+  #     parameters:
+  #       - name: limit
+  #         in: query
+  #         schema:
+  #           type: integer
+  #           default: 20
+  #           maximum: 100
+  #       - name: cursor
+  #         in: query
+  #         description: Курсор для пагинации (обычно ID или timestamp последнего чата)
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '200':
+  #         description: Список чатов получен
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 items:
+  #                   type: array
+  #                   items:
+  #                     $ref: '#/components/schemas/ChatPreview'
+  #                 next_cursor:
+  #                   type: string
+  #                   nullable: true
+  #       "401":
+  #         description: Не авторизован
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+
+  #todo Детали конкретного чата
+  # /chats/{chat_id}:
+  #   get:
+  #     summary: Получить полную информацию о чате
+  #     tags:
+  #       - Chats
+  #     parameters:
+  #       - $ref: '#/components/parameters/ChatIdParam'
+  #     responses:
+  #       '200':
+  #         description: Детальная информация
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/ChatDetails'
+  #       '404':
+  #         description: Чат не найден или нет доступа
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+
+  # Создать или получить существующую личку
+  /chats/private:
+    post:
+      summary: Начать диалог (Get or Create)
+      description: |
+        Идемпотентный метод. Если личка с пользователем уже есть — возвращает её ID.
+        Если нет — создает новую.
+      tags:
+        - Chats
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TPrivateChatRequest"
+      responses:
+        '200':
+          description: Чат найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TCreateChatResponse"
+                
+        '201':
+          description: Чат успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TCreateChatResponse"
+        '404':
+          description: Целевой пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  
+  #todo Создание новой группы
+  # /chats/group:
+  #   post:
+  #     summary: Создать новую группу
+  #     tags:
+  #       - Chats
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/CreateGroupRequest'
+  #     responses:
+  #       '201':
+  #         description: Группа создана
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/TCreateChatResponse"
+
+  # Управление участниками (только для Групп)
+  # /chats/{chat_id}/members:
+  #   get:
+  #     summary: Получить список участников
+  #     tags:
+  #       - Chats
+  #     parameters:
+  #       - $ref: '#/components/parameters/ChatIdParam'
+  #     responses:
+  #       '200':
+  #         description: Список участников
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 items:
+  #                   type: array
+  #                   items:
+  #                     $ref: '#/components/schemas/ChatMember'
+  #       '404':
+  #         description: Чат не найден
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+
+  #   post:
+  #     summary: Добавить участников (Invite)
+  #     tags:
+  #       - Chats
+  #     parameters:
+  #       - $ref: '#/components/parameters/ChatIdParam'
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             required: [usernames]
+  #             properties:
+  #               usernames:
+  #                 type: array
+  #                 items:
+  #                   type: string
+  #                 minItems: 1
+  #     responses:
+  #       '200':
+  #         description: Участники добавлены
+  #       '403':
+  #         description: Нет прав на добавление (не админ)
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+  #       '404':
+  #         description: Чат или один из пользователей не найден
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+
+  #todo Кикнуть / Выйти
+  # /chats/{chat_id}/members/{username}:
+  #   delete:
+  #     summary: Удалить участника (или выйти самому)
+  #     tags:
+  #       - Chats
+  #     parameters:
+  #       - $ref: '#/components/parameters/ChatIdParam'
+  #       - $ref: '#/components/parameters/UsernameParam'
+  #     responses:
+  #       '204':
+  #         description: Успешно (нет контента)
+  #       '403':
+  #         description: Недостаточно прав
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Error"
+  #       '404':
+  #         description: Чат или участник не найден
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/Error"

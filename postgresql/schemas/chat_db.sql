@@ -2,23 +2,15 @@ DROP SCHEMA IF EXISTS chat CASCADE;
 
 CREATE SCHEMA IF NOT EXISTS chat;
 
-SET search_path TO chat;
+SET
+    search_path TO chat;
 
 -- ===========================
 --  ENUM TYPES
 -- ===========================
+CREATE TYPE chat.chat_type AS ENUM ('PRIVATE', 'GROUP', 'CHANNEL');
 
-CREATE TYPE chat.chat_type AS ENUM (
-    'DM',
-    'GROUP',
-    'CHANNEL'
-);
-
-CREATE TYPE chat.member_role AS ENUM (
-    'MEMBER',
-    'ADMIN',
-    'OWNER'
-);
+CREATE TYPE chat.member_role AS ENUM ('MEMBER', 'ADMIN', 'OWNER');
 
 -- ===========================
 --  FUNCTIONS
@@ -37,64 +29,52 @@ $$ LANGUAGE plpgsql;
 -- ===========================
 --  USERS
 -- ===========================
-
 CREATE TABLE chat.users (
-    user_id       TEXT NOT NULL PRIMARY KEY,
-    username      TEXT NOT NULL UNIQUE,
-    display_name  TEXT NOT NULL,
+    user_id TEXT NOT NULL PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    display_name TEXT NOT NULL,
     password_hash TEXT NOT NULL,
-    salt          TEXT NOT NULL,
-    biography     TEXT,
-    is_deleted    BOOLEAN NOT NULL DEFAULT false,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    salt TEXT NOT NULL,
+    biography TEXT,
+    is_deleted BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- ===========================
 --  CHATS
 -- ===========================
-
 CREATE TABLE chat.chats (
-    chat_id       TEXT NOT NULL PRIMARY KEY,
-    type          chat.chat_type NOT NULL,
-    owner_id      TEXT REFERENCES chat.users(user_id) ON DELETE SET NULL,
-    title         TEXT,
-    description   TEXT,
-    is_deleted    BOOLEAN NOT NULL DEFAULT false,
-    max_members   INT,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    chat_id TEXT PRIMARY KEY,
+    type chat.chat_type NOT NULL,
+    is_deleted BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX chats_type_idx ON chat.chats(type);
+CREATE TABLE chat.groups (
+    chat_id TEXT PRIMARY KEY REFERENCES chat.chats(chat_id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    owner_id TEXT NOT NULL REFERENCES chat.users(user_id),
+    max_members INT DEFAULT 200000,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
--- ===========================
---  CHAT MEMBERS
--- ===========================
+CREATE TABLE chat.private_chats (
+    chat_id TEXT PRIMARY KEY REFERENCES chat.chats(chat_id) ON DELETE CASCADE,
+    user_id_1 TEXT NOT NULL,
+    user_id_2 TEXT NOT NULL,
+    CHECK (user_id_1 <= user_id_2),
+    UNIQUE (user_id_1, user_id_2)
+);
 
-CREATE TABLE chat.chat_members (
-    chat_id   TEXT NOT NULL REFERENCES chat.chats(chat_id) ON DELETE CASCADE,
-    user_id   TEXT NOT NULL REFERENCES chat.users(user_id) ON DELETE CASCADE,
-    role      chat.member_role NOT NULL DEFAULT 'MEMBER',
+CREATE TABLE chat.group_members (
+    chat_id TEXT NOT NULL REFERENCES chat.groups(chat_id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES chat.users(user_id),
+    role chat.member_role NOT NULL DEFAULT 'MEMBER',
     joined_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-
     PRIMARY KEY (chat_id, user_id)
 );
-
--- ===========================
---  (OPTIONAL) CHAT BANS
--- ===========================
-
--- CREATE TABLE chat.chat_bans (
---     chat_id       TEXT NOT NULL REFERENCES chat.chats(chat_id) ON DELETE CASCADE,
---     user_id       TEXT NOT NULL REFERENCES chat.users(user_id) ON DELETE CASCADE,
---     banned_by     TEXT NOT NULL REFERENCES chat.users(user_id) ON DELETE SET NULL,
---     banned_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
---     reason        TEXT,
---
---     PRIMARY KEY (chat_id, user_id)
--- );
-
 
 -- ===========================
 --  FOR MAPPERS
@@ -108,17 +88,13 @@ CREATE TYPE chat.user AS (
     biography TEXT
 );
 
-
 -- ===========================
 --  UPDATE TRIGGERS
 -- ===========================
+CREATE TRIGGER users_set_updated_at BEFORE
+UPDATE
+    ON chat.users FOR EACH ROW EXECUTE FUNCTION chat.set_updated_at();
 
-CREATE TRIGGER users_set_updated_at
-BEFORE UPDATE ON chat.users
-FOR EACH ROW
-EXECUTE FUNCTION chat.set_updated_at();
-
-CREATE TRIGGER chats_set_updated_at
-BEFORE UPDATE ON chat.chats
-FOR EACH ROW
-EXECUTE FUNCTION chat.set_updated_at();
+CREATE TRIGGER chats_set_updated_at BEFORE
+UPDATE
+    ON chat.chats FOR EACH ROW EXECUTE FUNCTION chat.set_updated_at();

@@ -4,6 +4,7 @@
 
 #include <infra/components/users/user_service_component.hpp>
 
+#include <api/http/common/context.hpp>
 #include <api/http/exceptions/handler_exceptions.hpp>
 
 using NChat::NApp::NDto::TUserUpdateRequest;
@@ -61,8 +62,8 @@ userver::formats::json::Value TUpdateByUsernameHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& request_json,
     userver::server::request::RequestContext& request_context) const {
   TUserUpdateRequest dto = request_json["user"].As<TUserUpdateRequest>();
-  dto.RequesterUsername = request_context.GetData<std::string>("username");
-  dto.UsernameToUpdate = request.GetPathArg("username");
+  dto.RequesterUsername = request_context.GetData<std::string>(ToString(EContextKey::Username));
+  dto.UsernameToUpdate = request.GetPathArg(ToString(EContextKey::Username));
 
   TUserUpdateResult result;
   try {

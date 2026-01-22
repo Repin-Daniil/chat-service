@@ -37,7 +37,8 @@ void TGarbageCollectorComponent::Traverse() {
   }
 
   if (!task_config.IsEnabled) {
-    LOG_WARNING() << "Garbage Collector task skipped due to configuration: metrics not collected, garbage not removed";
+    LOG_WARNING() << "Garbage Collector task skipped due to configuration: metrics not collected, "
+                     "garbage not removed";
     return;
   }
 

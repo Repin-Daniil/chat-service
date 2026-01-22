@@ -12,8 +12,9 @@ using NCore::NDomain::TUsername;
 TEST(TMessageSerializer, SimpleMessage) {
   userver::formats::json::StringBuilder sb;
 
-  TPollMessagesResult::TResultMessage msg{
-      .Sender = TUsername({"user123"}), .Text = TMessageText{"Hello, World!"}, .Context = {}};
+  TPollMessagesResult::TResultMessage msg{.Sender = TUsername({"user123"}),
+                                          .Text = TMessageText{"Hello, World!"},
+                                          .Context = {}};
 
   WriteToStream(msg, sb);
 
@@ -23,8 +24,9 @@ TEST(TMessageSerializer, SimpleMessage) {
 TEST(TMessageSerializer, SpecialCharactersInText) {
   userver::formats::json::StringBuilder sb;
 
-  TPollMessagesResult::TResultMessage msg{
-      .Sender = TUsername({"admin"}), .Text = TMessageText{"Message with \"quotes\" and \n newline"}, .Context = {}};
+  TPollMessagesResult::TResultMessage msg{.Sender = TUsername({"admin"}),
+                                          .Text = TMessageText{"Message with \"quotes\" and \n newline"},
+                                          .Context = {}};
 
   WriteToStream(msg, sb);
 
@@ -58,11 +60,13 @@ TEST(TPollMessagesResultSerializer, ResyncRequired) {
 TEST(TPollMessagesResultSerializer, MultipleMessages) {
   userver::formats::json::StringBuilder sb;
 
-  TPollMessagesResult::TResultMessage msg1{
-      .Sender = TUsername({"alice"}), .Text = TMessageText{"First message"}, .Context = {}};
+  TPollMessagesResult::TResultMessage msg1{.Sender = TUsername({"alice"}),
+                                           .Text = TMessageText{"First message"},
+                                           .Context = {}};
 
-  TPollMessagesResult::TResultMessage msg2{
-      .Sender = TUsername({"bob"}), .Text = TMessageText{"Second message"}, .Context = {}};
+  TPollMessagesResult::TResultMessage msg2{.Sender = TUsername({"bob"}),
+                                           .Text = TMessageText{"Second message"},
+                                           .Context = {}};
 
   TPollMessagesResult result{.ResyncRequired = false, .Messages = {msg1, msg2}};
 
@@ -79,8 +83,9 @@ TEST(TPollMessagesResultSerializer, MultipleMessages) {
 TEST(TPollMessagesResultSerializer, SingleMessage) {
   userver::formats::json::StringBuilder sb;
 
-  TPollMessagesResult::TResultMessage msg{
-      .Sender = TUsername({"user1"}), .Text = TMessageText{"Single msg"}, .Context = {}};
+  TPollMessagesResult::TResultMessage msg{.Sender = TUsername({"user1"}),
+                                          .Text = TMessageText{"Single msg"},
+                                          .Context = {}};
 
   TPollMessagesResult result{.ResyncRequired = true, .Messages = {msg}};
 

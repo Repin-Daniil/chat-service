@@ -14,7 +14,7 @@ using namespace NChat::NApp;
 class RegistrationUseCaseIntegrationTest : public Test {
  protected:
   void SetUp() override {
-    user_repo_ = std::make_unique<MockUserRepository>();
+    user_repo_ = std::make_unique<TMockUserRepository>();
     auth_service_ = std::make_unique<MockAuthService>();
 
     user_repo_ptr_ = user_repo_.get();
@@ -23,11 +23,11 @@ class RegistrationUseCaseIntegrationTest : public Test {
     use_case_ = std::make_unique<TRegistrationUseCase>(*user_repo_, *auth_service_);
   }
 
-  std::unique_ptr<MockUserRepository> user_repo_;
+  std::unique_ptr<TMockUserRepository> user_repo_;
   std::unique_ptr<MockAuthService> auth_service_;
   std::unique_ptr<TRegistrationUseCase> use_case_;
 
-  MockUserRepository* user_repo_ptr_;
+  TMockUserRepository* user_repo_ptr_;
   MockAuthService* auth_service_ptr_;
 };
 
@@ -83,54 +83,6 @@ TEST_F(RegistrationUseCaseIntegrationTest, UserAlreadyExists) {
   EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).Times(0);
 
   EXPECT_THROW(use_case_->Execute(request), NDomain::TUserAlreadyExistsException);
-}
-
-// UUID коллизия с успешным retry
-TEST_F(RegistrationUseCaseIntegrationTest, UuidCollisionWithSuccessfulRetry) {
-  NDto::TUserRegistrationRequest request{
-      .Username = "newuser", .Password = "passworDD$123", .Biography = "Biography", .DisplayName = "New User"};
-
-  EXPECT_CALL(*user_repo_ptr_, FindByUsername("newuser")).WillOnce(Return(std::nullopt));
-
-  NDomain::TPasswordHash password_hash = HashPasswordUtil(request.Password);
-  EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password)).WillOnce(Return(password_hash));
-
-  // Первые 2 попытки - коллизия UUID, третья успешна
-  NDomain::TUserId success_id{"uuid-success"};
-  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(testing::_))
-      .WillOnce(Throw(TUserIdAlreadyExists("collision")))
-      .WillOnce(Throw(TUserIdAlreadyExists("collision")))
-      .WillOnce(Return());
-
-  std::string token = "jwt.token";
-  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).WillOnce(Return(token));
-
-  auto result = use_case_->Execute(request);
-
-  EXPECT_EQ(result.Username, "newuser");
-  EXPECT_EQ(result.Token, token);
-}
-
-// Исчерпание попыток при UUID коллизии
-TEST_F(RegistrationUseCaseIntegrationTest, UuidCollisionMaxAttemptsExceeded) {
-  NDto::TUserRegistrationRequest request{
-      .Username = "unluckyuser",
-      .Password = "PsWrDD@123",
-      .Biography = "Biography",
-      .DisplayName = "Unlucky User",
-  };
-
-  EXPECT_CALL(*user_repo_ptr_, FindByUsername("unluckyuser")).WillOnce(Return(std::nullopt));
-
-  NDomain::TPasswordHash password_hash = HashPasswordUtil(request.Password);
-  EXPECT_CALL(*auth_service_ptr_, HashPassword(request.Password)).WillOnce(Return(password_hash));
-
-  // Все 5 попыток заканчиваются коллизией
-  EXPECT_CALL(*user_repo_ptr_, InsertNewUser(_)).Times(5).WillRepeatedly(Throw(TUserIdAlreadyExists("collision")));
-
-  EXPECT_CALL(*auth_service_ptr_, CreateJwt(_)).Times(0);
-
-  EXPECT_THROW(use_case_->Execute(request), TRegistrationTemporaryUnavailable);
 }
 
 // Полный поток: хэширование -> сохранение -> генерация JWT

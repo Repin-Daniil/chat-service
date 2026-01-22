@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
 
   NChat::NInfra::RegisterUserHandlers(component_list);
   NChat::NInfra::RegisterMessagesHandlers(component_list);
+  NChat::NInfra::RegisterChatHandlers(component_list);
 
   return userver::utils::DaemonMain(argc, argv, component_list);
 }

@@ -20,7 +20,7 @@ userver::formats::json::Value TDeleteByUsernameHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& /*request_json*/,
     userver::server::request::RequestContext& request_context) const {
   const auto& username = request.GetPathArg(ToString(EContextKey::Username));
-  const auto& requester_username = request_context.GetData<std::string>("username");
+  const auto& requester_username = request_context.GetData<std::string>(ToString(EContextKey::Username));
 
   TUserDeleteRequest dto{.UsernameToDelete = username, .RequesterUsername = requester_username};
 

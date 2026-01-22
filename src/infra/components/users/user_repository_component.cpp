@@ -1,7 +1,7 @@
 #include "user_repository_component.hpp"
 
 #include <infra/components/object_factory.hpp>
-#include <infra/db/postgres_user_repository.hpp>
+#include <infra/db/user/postgres_user_repository.hpp>
 
 #include <userver/components/component.hpp>
 #include <userver/components/component_context.hpp>

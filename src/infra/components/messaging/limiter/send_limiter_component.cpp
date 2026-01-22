@@ -22,9 +22,9 @@ TObjectFactory<NApp::ISendLimiter> TSendLimiterComponent::GetLimiterFactory() {
   limiter_factory.Register("ShardedMap", [](const auto& config, const auto& context) {
     const auto shards_amount = config["shards-amount"].template As<std::size_t>(256);
     auto config_source = context.template FindComponent<userver::components::DynamicConfig>().GetSource();
-    auto& limiter_stats =
-        context.template FindComponent<userver::components::StatisticsStorage>().GetMetricsStorage()->GetMetric(
-            kLimiterTag);
+    auto& limiter_stats = context.template FindComponent<userver::components::StatisticsStorage>()
+                              .GetMetricsStorage()
+                              ->GetMetric(kLimiterTag);
 
     return std::make_unique<TSendLimiter>(shards_amount, config_source, limiter_stats);
   });

@@ -28,12 +28,12 @@ NDto::TUserUpdateResult TUpdateUserUseCase::Execute(const NDto::TUserUpdateReque
   }
 
   auto new_username = request.NewUsername.has_value() ? std::optional<TUsername>(request.NewUsername) : std::nullopt;
-  auto new_raw_password =
-      request.NewPassword.has_value() ? std::optional<TRawPassword>(request.NewPassword) : std::nullopt;
-  auto new_biography =
-      request.NewBiography.has_value() ? std::optional<TBiography>(request.NewBiography) : std::nullopt;
-  auto new_display_name =
-      request.NewDisplayName.has_value() ? std::optional<TDisplayName>(request.NewDisplayName) : std::nullopt;
+  auto new_raw_password = request.NewPassword.has_value() ? std::optional<TRawPassword>(request.NewPassword)
+                                                          : std::nullopt;
+  auto new_biography = request.NewBiography.has_value() ? std::optional<TBiography>(request.NewBiography)
+                                                        : std::nullopt;
+  auto new_display_name = request.NewDisplayName.has_value() ? std::optional<TDisplayName>(request.NewDisplayName)
+                                                             : std::nullopt;
   auto new_password_hash = new_raw_password.has_value()
                                ? std::optional<TPasswordHash>{AuthService_.HashPassword(new_raw_password->Value())}
                                : std::nullopt;

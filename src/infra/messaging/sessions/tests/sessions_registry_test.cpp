@@ -44,8 +44,8 @@ class TSessionRegistryTest : public ::testing::Test {
     Factory = std::make_unique<TestMessageQueueFactory>();
     auto now_fn = []() { return userver::utils::datetime::SteadyNow(); };
 
-    Registry =
-        std::make_unique<TRcuSessionsRegistry>(*Factory, now_fn, userver::dynamic_config::GetDefaultSource(), stats);
+    Registry = std::make_unique<TRcuSessionsRegistry>(*Factory, now_fn, userver::dynamic_config::GetDefaultSource(),
+                                                      stats);
   }
 
   TSessionsStatistics stats{};

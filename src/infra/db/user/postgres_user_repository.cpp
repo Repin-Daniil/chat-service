@@ -42,12 +42,15 @@ void TPostgresUserRepository::DeleteUser(std::string_view username) const {
 
 std::string TPostgresUserRepository::UpdateUser(const TUsername& username_to_update,
                                                 const NCore::IUserRepository::TUserUpdateParams& params) const {
-  std::optional<std::string> username_str =
-      params.Username.has_value() ? std::optional<std::string>{params.Username->Value()} : std::nullopt;
-  std::optional<std::string> display_name_str =
-      params.DisplayName.has_value() ? std::optional<std::string>{params.DisplayName->Value()} : std::nullopt;
-  std::optional<std::string> biography_str =
-      params.Biography.has_value() ? std::optional<std::string>{params.Biography->Value()} : std::nullopt;
+  std::optional<std::string> username_str = params.Username.has_value()
+                                                ? std::optional<std::string>{params.Username->Value()}
+                                                : std::nullopt;
+  std::optional<std::string> display_name_str = params.DisplayName.has_value()
+                                                    ? std::optional<std::string>{params.DisplayName->Value()}
+                                                    : std::nullopt;
+  std::optional<std::string> biography_str = params.Biography.has_value()
+                                                 ? std::optional<std::string>{params.Biography->Value()}
+                                                 : std::nullopt;
 
   std::optional<std::string> hash_hex = std::nullopt;
   std::optional<std::string> salt_hex = std::nullopt;
@@ -78,8 +81,8 @@ std::optional<TUserId> TPostgresUserRepository::FindByUsername(std::string_view 
     return TUserId{it->second.UserId};
   }
 
-  auto result =
-      PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kFindUserByUsername, username);
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kFindUserByUsername,
+                                    username);
   if (result.IsEmpty()) {
     return std::nullopt;
   }
@@ -111,8 +114,8 @@ std::optional<TUserTinyProfile> TPostgresUserRepository::GetProfileById(const TU
 }
 
 std::unique_ptr<TUser> TPostgresUserRepository::GetUserByUsername(std::string_view username) const {
-  auto result =
-      PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetUserByUsername, username);
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetUserByUsername,
+                                    username);
   if (result.IsEmpty()) {
     return nullptr;
   }

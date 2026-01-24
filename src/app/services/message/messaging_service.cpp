@@ -5,7 +5,8 @@ TMessagingService::TMessagingService(NCore::IMailboxRegistry& registry, ISendLim
                                      NCore::IUserRepository& repository)
     : SendMessageUseCase_(registry, limiter, repository),
       PollMessagesUseCase_(registry, repository),
-      StartSessionUseCase_(registry) {}
+      StartSessionUseCase_(registry) {
+}
 
 void TMessagingService::SendMessage(NDto::TSendMessageRequest request) {
   SendMessageUseCase_.Execute(std::move(request));

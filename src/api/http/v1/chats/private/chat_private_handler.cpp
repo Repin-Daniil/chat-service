@@ -15,7 +15,8 @@ namespace NChat::NInfra::NHandlers {
 TPrivateChatHandler::TPrivateChatHandler(const userver::components::ComponentConfig& config,
                                          const userver::components::ComponentContext& context)
     : HttpHandlerJsonBase(config, context),
-      ChatService_(context.FindComponent<NComponents::TChatServiceComponent>().GetService()) {}
+      ChatService_(context.FindComponent<NComponents::TChatServiceComponent>().GetService()) {
+}
 
 userver::formats::json::Value TPrivateChatHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& request_json,

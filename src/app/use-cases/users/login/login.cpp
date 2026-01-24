@@ -12,7 +12,8 @@ using NCore::NDomain::TUser;
 using NCore::NDomain::TUsername;
 
 TLoginUseCase::TLoginUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service)
-    : UserRepo_(user_repo), AuthService_(auth_service) {}
+    : UserRepo_(user_repo), AuthService_(auth_service) {
+}
 
 NDto::TUserLoginResult TLoginUseCase::Execute(const NDto::TUserLoginRequest& request) const {
   TUsername username{request.Username};

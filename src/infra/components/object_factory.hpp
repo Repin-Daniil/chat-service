@@ -16,7 +16,9 @@ class TObjectFactory {
   using Creator = std::function<std::unique_ptr<Interface>(const userver::yaml_config::YamlConfig&,
                                                            const userver::components::ComponentContext&)>;
 
-  void Register(const std::string& type_name, Creator creator) { creators_[type_name] = std::move(creator); }
+  void Register(const std::string& type_name, Creator creator) {
+    creators_[type_name] = std::move(creator);
+  }
 
   std::unique_ptr<Interface> Create(const userver::yaml_config::YamlConfig& config,
                                     const userver::components::ComponentContext& context,

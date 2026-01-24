@@ -29,6 +29,8 @@ TMessagingServiceComponent::TMessagingServiceComponent(const userver::components
   MessageService_ = std::make_unique<NApp::NServices::TMessagingService>(mailbox_registry, limiter, user_repo);
 }
 
-NApp::NServices::TMessagingService& TMessagingServiceComponent::GetService() { return *MessageService_; }
+NApp::NServices::TMessagingService& TMessagingServiceComponent::GetService() {
+  return *MessageService_;
+}
 
 }  // namespace NChat::NInfra::NComponents

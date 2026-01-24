@@ -15,9 +15,13 @@ TEST(TUsername, ValidUsername_Simple) {
   EXPECT_NO_THROW(TUsername("my-username"));
 }
 
-TEST(TUsername, ValidUsername_MinLength) { EXPECT_NO_THROW(TUsername(std::string(kMinUsernameLength, 'a'))); }
+TEST(TUsername, ValidUsername_MinLength) {
+  EXPECT_NO_THROW(TUsername(std::string(kMinUsernameLength, 'a')));
+}
 
-TEST(TUsername, ValidUsername_MaxLength) { EXPECT_NO_THROW(TUsername(std::string(kMaxUsernameLength, 'a'))); }
+TEST(TUsername, ValidUsername_MaxLength) {
+  EXPECT_NO_THROW(TUsername(std::string(kMaxUsernameLength, 'a')));
+}
 
 TEST(TUsername, ValidUsername_MixedCase) {
   EXPECT_NO_THROW(TUsername("UserName"));
@@ -79,9 +83,13 @@ TEST(TUsername, EdgeCase_OnlyLetters) {
   EXPECT_NO_THROW(TUsername("ABCDEFGH"));
 }
 
-TEST(TUsername, EdgeCase_OnlyNumbers_ExceptFirst) { EXPECT_NO_THROW(TUsername("a123456789")); }
+TEST(TUsername, EdgeCase_OnlyNumbers_ExceptFirst) {
+  EXPECT_NO_THROW(TUsername("a123456789"));
+}
 
-TEST(TUsername, EdgeCase_AllAllowedChars) { EXPECT_NO_THROW(TUsername("aZ0_9-")); }
+TEST(TUsername, EdgeCase_AllAllowedChars) {
+  EXPECT_NO_THROW(TUsername("aZ0_9-"));
+}
 
 TEST(TUsername, EdgeCase_SpecialCharAtEnd) {
   EXPECT_NO_THROW(TUsername("user_"));

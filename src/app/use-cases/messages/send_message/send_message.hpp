@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/messaging/router/message_router.hpp>
 #include <core/messaging/mailbox/mailbox_registry.hpp>
 #include <core/users/user_repo.hpp>
 
@@ -9,6 +10,7 @@
 
 namespace NChat::NApp {
 
+// fixme Эта штука должна видоизмениться?
 class TRecipientTemporaryUnavailable : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
@@ -17,6 +19,7 @@ class TTooManyRequests : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
 
+// fixme Эта штука должна видоизмениться?
 class TRecipientNotFound : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
@@ -37,11 +40,7 @@ class TSendMessageUseCase final {
   void Execute(NDto::TSendMessageRequest request);
 
  private:
-  TMessage ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id, TMessageText text,
-                            TTimePoint sent_at);
-
- private:
-  NCore::IMailboxRegistry& Registry_;
+  NCore::TMessageRouter& Router_;
   NCore::IUserRepository& UserRepo_;
   ISendLimiter& Limiter_;
 };

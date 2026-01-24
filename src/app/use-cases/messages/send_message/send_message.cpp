@@ -4,44 +4,37 @@ namespace NChat::NApp {
 
 TSendMessageUseCase::TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter,
                                          NCore::IUserRepository& user_repo)
-    : Registry_(registry), UserRepo_(user_repo), Limiter_(limiter) {}
+    : Router_(registry), UserRepo_(user_repo), Limiter_(limiter) {
+}
 
 void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
   if (!Limiter_.TryAcquire(request.SenderId)) {
     throw TTooManyRequests("Enhance your calm!");
   };
 
-  NCore::NDomain::TUsername recipient_username(std::move(request.RecipientUsername));
   TMessageText text(std::move(request.Text));
+  // Кэш по идее можно отрубить уже? Который by username
 
-  // todo В будущем когда будут chat_id провести ACL, а пока резолвим в базе через КЭШ user_id
-  auto recipient_id = UserRepo_.FindByUsername(recipient_username.Value());
-  if (!recipient_id.has_value()) {
-    throw TRecipientNotFound("Recipient Not Found");
-  }
-  // Тут надо будет просто передать в Channel/Router что нить такое
-  auto mailbox = Registry_.GetMailbox(*recipient_id);
+  // todo ChatRepo надо получить IChat по ChatId и узнать можно ли туда писать вообще
+  // fixme Помни что тут hot path, тут нельзя тяжеловесные структурки перкладывать, кэшами максимально обкладываемся
 
-  if (!mailbox) {
-    throw TRecipientOffline(fmt::format("User {} is offline", recipient_username.Value()));
-  }
+  // По идее тут надо вызвать CanPost()
+  auto message = NCore::NDomain::TMessage::Create(request.ChatId, request.SenderId, std::move(text), request.SentAt);
 
-  auto message = ConstructMessage(*recipient_id, request.SenderId, std::move(text), request.SentAt);
+  // todo наверное GetRecipients,  автор не должен получить сам уведомление
+  auto recipients = ParticipantsProvider_.GetParticipants(request.ChatId);
 
-  const bool is_success = mailbox->SendMessage(std::move(message));
+  Router_.Route(std::move(recipients), message);
+  // роутер это же не инфра, просто проходит по recipients и пушит в mailbox
+  // в api router пойдет на нужный хаб
+  // в хабе роутер запушит в нужные grpc стримы
+  // в шлюзе пушит в нужные mailbox
+  // нужно также наверное в отдельную репу выделить либу с компонентами Registry, sessions и тд
 
-  if (!is_success) {
-    throw TRecipientTemporaryUnavailable(
-        fmt::format("User {} is temporarily unable to accept new messages", recipient_username.Value()));
-  }
-}
+  // Можно сначала сделать модели каналов, групп, без крудов, а в тестах через постгрю initial_data тестить
 
-NCore::NDomain::TMessage TSendMessageUseCase::ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id,
-                                                               TMessageText text, TTimePoint sent_at) {
-  auto payload = std::make_shared<NCore::NDomain::TMessagePayload>(sender_id, std::move(text));
 
-  NCore::NDomain::TDeliveryContext context{.Get = sent_at};
-  return {.Payload = std::move(payload), .RecipientId = recipient_id, .Context = context};
+  // В будущем по идее шлюз сообщает хабу о своих пользователях по grpc, периодчиски делает full_update
 }
 
 }  // namespace NChat::NApp

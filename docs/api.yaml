@@ -186,15 +186,15 @@ components:
         message:
           type: object
           properties:
-            recipient:
+            chat_id:
               type: string
-              description: Username пользователя, которому отправляется сообщение
+              format: uuid
             payload:
               type: string
               description: Текст сообщения
               example: "Hello, World!"
           required:
-            - recipient
+            - chat_id
             - payload
 
     Message:

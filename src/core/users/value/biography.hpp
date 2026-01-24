@@ -15,7 +15,9 @@ namespace NChat::NCore::NDomain {
 class TBiographyInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
-  std::string GetField() const noexcept override { return "biography"; }
+  std::string GetField() const noexcept override {
+    return "biography";
+  }
 };
 
 inline constexpr int MIN_BIO_LENGTH = 1;
@@ -26,15 +28,25 @@ static_assert(MAX_BIO_LENGTH > MIN_BIO_LENGTH);
 
 class TBiography {
  public:
-  explicit TBiography(const std::string& value) : Value_(value) { Validate(); }
+  explicit TBiography(const std::string& value) : Value_(value) {
+    Validate();
+  }
 
-  const std::string& Value() const { return Value_; }
+  const std::string& Value() const {
+    return Value_;
+  }
 
-  bool IsEmpty() const { return Value_.empty(); }
+  bool IsEmpty() const {
+    return Value_.empty();
+  }
 
-  bool operator==(const TBiography& other) const { return Value_ == other.Value_; }
+  bool operator==(const TBiography& other) const {
+    return Value_ == other.Value_;
+  }
 
-  bool operator!=(const TBiography& other) const { return !(*this == other); }
+  bool operator!=(const TBiography& other) const {
+    return !(*this == other);
+  }
 
  private:
   void Validate() {

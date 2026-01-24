@@ -9,7 +9,8 @@ namespace NChat::NCore {
 
 class TSessionLimitExceeded : public std::runtime_error {
  public:
-  TSessionLimitExceeded() : std::runtime_error("Maximum number of sessions for a single user exceeded") {}
+  TSessionLimitExceeded() : std::runtime_error("Maximum number of sessions for a single user exceeded") {
+  }
 };
 
 class ISessionsRegistry {

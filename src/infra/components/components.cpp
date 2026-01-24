@@ -78,7 +78,9 @@ void RegisterMessagesHandlers(userver::components::ComponentList& list) {
   list.Append<NHandlers::TStartSessionHandler>();
 }
 
-void RegisterChatHandlers(userver::components::ComponentList& list) { list.Append<NHandlers::TPrivateChatHandler>(); }
+void RegisterChatHandlers(userver::components::ComponentList& list) {
+  list.Append<NHandlers::TPrivateChatHandler>();
+}
 
 // Components
 void RegisterServiceComponents(userver::components::ComponentList& list) {

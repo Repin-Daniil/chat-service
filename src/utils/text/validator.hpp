@@ -7,9 +7,13 @@
 
 namespace NUtils {
 
-inline std::string Trim(const std::string& text) { return userver::utils::text::Trim(text); }
+inline std::string Trim(const std::string& text) {
+  return userver::utils::text::Trim(text);
+}
 
-inline bool IsValidUtf8(std::string_view text) { return userver::utils::text::IsUtf8(text); }
+inline bool IsValidUtf8(std::string_view text) {
+  return userver::utils::text::IsUtf8(text);
+}
 
 inline bool IsAllowedChatSymbols(std::string_view text) {
   return std::all_of(text.begin(), text.end(), [](unsigned char c) {
@@ -27,8 +31,12 @@ inline bool HasConsecutiveSpaces(std::string_view text) {
   }
   return false;
 }
-inline std::size_t GetUtf8Length(std::string_view text) { return userver::utils::text::utf8::GetCodePointsCount(text); }
+inline std::size_t GetUtf8Length(std::string_view text) {
+  return userver::utils::text::utf8::GetCodePointsCount(text);
+}
 
-inline bool IsAscii(std::string_view text) { return userver::utils::text::IsAscii(text); }
+inline bool IsAscii(std::string_view text) {
+  return userver::utils::text::IsAscii(text);
+}
 
 }  // namespace NUtils

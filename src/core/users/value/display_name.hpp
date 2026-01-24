@@ -15,7 +15,9 @@ namespace NChat::NCore::NDomain {
 class TDisplayNameInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
-  std::string GetField() const noexcept override { return "display_name"; }
+  std::string GetField() const noexcept override {
+    return "display_name";
+  }
 };
 
 inline constexpr int MIN_DISPLAY_NAME_LENGTH = 2;
@@ -26,13 +28,21 @@ static_assert(MAX_DISPLAY_NAME_LENGTH >= MIN_DISPLAY_NAME_LENGTH);
 
 class TDisplayName {
  public:
-  explicit TDisplayName(const std::string& value) : Value_(value) { Validate(); }
+  explicit TDisplayName(const std::string& value) : Value_(value) {
+    Validate();
+  }
 
-  const std::string& Value() const { return Value_; }
+  const std::string& Value() const {
+    return Value_;
+  }
 
-  bool operator==(const TDisplayName& other) const { return Value_ == other.Value_; }
+  bool operator==(const TDisplayName& other) const {
+    return Value_ == other.Value_;
+  }
 
-  bool operator!=(const TDisplayName& other) const { return !(*this == other); }
+  bool operator!=(const TDisplayName& other) const {
+    return !(*this == other);
+  }
 
  private:
   void Validate() {

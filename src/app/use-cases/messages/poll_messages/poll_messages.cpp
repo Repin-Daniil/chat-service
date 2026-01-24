@@ -3,7 +3,8 @@
 namespace NChat::NApp {
 
 TPollMessagesUseCase::TPollMessagesUseCase(NCore::IMailboxRegistry& registry, NCore::IUserRepository& user_repo)
-    : Registry_(registry), UserRepo_(user_repo) {}
+    : Registry_(registry), UserRepo_(user_repo) {
+}
 
 NDto::TPollMessagesResult TPollMessagesUseCase::Execute(const NDto::TPollMessagesRequest& request,
                                                         const NDto::TPollMessagesSettings& settings) {

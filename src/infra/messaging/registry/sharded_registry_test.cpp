@@ -38,7 +38,9 @@ class TShardedRegistryTest : public ::testing::Test {
 };
 
 // Базовые тесты функциональности
-UTEST_F(TShardedRegistryTest, InitialStateEmpty) { EXPECT_EQ(Registry->GetOnlineAmount(), 0); }
+UTEST_F(TShardedRegistryTest, InitialStateEmpty) {
+  EXPECT_EQ(Registry->GetOnlineAmount(), 0);
+}
 
 UTEST_F(TShardedRegistryTest, GetNonExistentMailbox) {
   TUserId user_id{"42"};

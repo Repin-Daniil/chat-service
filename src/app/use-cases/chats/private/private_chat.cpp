@@ -11,7 +11,8 @@
 namespace NChat::NApp {
 
 TPrivateChatUseCase::TPrivateChatUseCase(NCore::IChatRepository& chat_repo, NCore::IUserRepository& user_repo)
-    : ChatRepo_(chat_repo), UserRepo_(user_repo) {}
+    : ChatRepo_(chat_repo), UserRepo_(user_repo) {
+}
 
 NDto::TPrivateChatResult TPrivateChatUseCase::Execute(const NDto::TPrivateChatRequest& request) const {
   auto target_user_id = UserRepo_.FindByUsername(request.TargetUsername);

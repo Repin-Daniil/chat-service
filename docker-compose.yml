@@ -45,6 +45,10 @@ services:
       - ./configs/config_vars_docker.yaml:/app/configs/config_vars.yaml
       - ./configs/dynamic_config_fallback.json:/app/configs/dynamic_config_fallback.json
       - userver_cache:/app/cache
+    ulimits:
+      nofile:
+        soft: 1048576
+        hard: 1048576
     depends_on:
       postgres:
         condition: service_healthy
@@ -64,9 +68,22 @@ services:
       - prometheus
     volumes:
       - grafana:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - /:/host:ro,rslave
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
 
 
 volumes:

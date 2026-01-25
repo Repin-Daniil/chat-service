@@ -51,7 +51,7 @@ Coverage столько то todo
 
 Забрать можно так
 ```
-curl '127.0.0.1:8081/service/monitor?format=prometheus&labels={}' | grep chat_
+curl --globoff '127.0.0.1:8081/service/monitor?format=prometheus&labels={}' | grep chat_
 ```
 todo картинка после load_test
 
@@ -76,3 +76,7 @@ todo флеймграф
 
 ## Debug
 Add in CMakePresets.json "USERVER_DEBUG_INFO_COMPRESSION": "none"
+
+
+_______
+

@@ -20,6 +20,8 @@ class TVyukovMessageQueue : public NCore::IMessageQueue {
 
   std::size_t GetSizeApproximate() const override;
 
+  bool HasConsumer() const override;
+
   void SetMaxSize(std::size_t max_size) override;
   std::size_t GetMaxSize() const override;
 

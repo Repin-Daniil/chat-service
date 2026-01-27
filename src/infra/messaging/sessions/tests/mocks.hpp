@@ -19,6 +19,7 @@ class MockMessageQueue : public IMessageQueue {
   MOCK_METHOD(std::size_t, GetSizeApproximate, (), (const, override));
   MOCK_METHOD(void, SetMaxSize, (std::size_t), (override));
   MOCK_METHOD(std::size_t, GetMaxSize, (), (const, override));
+  MOCK_METHOD(bool, HasConsumer, (), (const, override));
 };
 
 // Mock фабрика для IMessageQueue

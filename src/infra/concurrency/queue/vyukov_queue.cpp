@@ -46,6 +46,8 @@ std::vector<TMessage> TVyukovMessageQueue::PopBatch(std::size_t max_batch_size, 
 
 std::size_t TVyukovMessageQueue::GetSizeApproximate() const { return Queue_->GetSizeApproximate(); }
 
+bool TVyukovMessageQueue::HasConsumer() const { return HasConsumer_.load(); }
+
 void TVyukovMessageQueue::SetMaxSize(std::size_t max_size) { Queue_->SetSoftMaxSize(max_size); }
 
 std::size_t TVyukovMessageQueue::GetMaxSize() const { return Queue_->GetSoftMaxSize(); }

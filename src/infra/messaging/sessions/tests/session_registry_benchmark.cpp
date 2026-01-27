@@ -24,6 +24,7 @@ class TMockMessageQueue : public IMessageQueue {
   std::size_t GetSizeApproximate() const override { return 0; }
   void SetMaxSize(std::size_t) override {}
   std::size_t GetMaxSize() const override { return 1000; }
+  bool HasConsumer() const override { return false; }
 };
 
 class TMockMessageQueueFactory : public IMessageQueueFactory {

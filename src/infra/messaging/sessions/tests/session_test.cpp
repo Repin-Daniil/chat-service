@@ -150,6 +150,7 @@ TEST_F(SessionTest, ValidScenarioSendAndReceive) {
 TEST_F(SessionTest, GetMessagesUpdatesLastActivity) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*QueueRaw_, PopBatch(_, _)).WillOnce(Return(empty_result));
+  EXPECT_CALL(*QueueRaw_, HasConsumer()).WillOnce(Return(false));
 
   Session_->GetMessages(10, 1s);
 
@@ -234,6 +235,7 @@ TEST_F(SessionTest, GetMessagesWithZeroMaxSize) {
 TEST_F(SessionTest, SessionInactiveAfterIdleThreshold) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*QueueRaw_, PopBatch(_, _)).WillOnce(Return(empty_result));
+  EXPECT_CALL(*QueueRaw_, HasConsumer()).WillOnce(Return(false));
 
   // Делаем poll
   Session_->GetMessages(10, 1s);
@@ -262,6 +264,7 @@ TEST_F(SessionTest, SessionActiveWithinThreshold) {
 TEST_F(SessionTest, ExactThresholdBoundary) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*QueueRaw_, PopBatch(_, _)).WillOnce(Return(empty_result));
+  EXPECT_CALL(*QueueRaw_, HasConsumer()).WillRepeatedly(Return(false));
 
   Session_->GetMessages(10, 1s);
 
@@ -274,9 +277,20 @@ TEST_F(SessionTest, ExactThresholdBoundary) {
   EXPECT_FALSE(Session_->IsActive(5s));
 }
 
+TEST_F(SessionTest, ActiveSessionBecauseOfConsumer) {
+  std::vector<NDomain::TMessage> empty_result;
+  EXPECT_CALL(*QueueRaw_, PopBatch(_, _)).WillOnce(Return(empty_result));
+  EXPECT_CALL(*QueueRaw_, HasConsumer()).WillOnce(Return(true));
+
+  Session_->GetMessages(10, 1s);  // Imagine consumer is active
+  userver::utils::datetime::MockSleep(30s);
+  EXPECT_TRUE(Session_->IsActive(std::chrono::seconds{5}));
+}
+
 TEST_F(SessionTest, MultiplePolls) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*QueueRaw_, PopBatch(_, _)).Times(2).WillRepeatedly(Return(empty_result));
+  EXPECT_CALL(*QueueRaw_, HasConsumer()).WillRepeatedly(Return(false));
 
   // Первый poll
   Session_->GetMessages(10, 1s);
@@ -299,6 +313,7 @@ TEST_F(SessionTest, MultiplePolls) {
 TEST_F(SessionTest, IsActiveWithoutAnyPolls) {
   // IsActive сразу после создания сессии
   // LastConsumerActivity_ инициализирован в конструкторе
+  EXPECT_CALL(*QueueRaw_, HasConsumer()).WillRepeatedly(Return(false));
   EXPECT_TRUE(Session_->IsActive(5s));
 
   // Продвигаем время больше порога
@@ -309,6 +324,7 @@ TEST_F(SessionTest, IsActiveWithoutAnyPolls) {
 TEST_F(SessionTest, IsActiveWithZeroThreshold) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*QueueRaw_, PopBatch(_, _)).WillOnce(Return(empty_result));
+  EXPECT_CALL(*QueueRaw_, HasConsumer()).WillRepeatedly(Return(false));
 
   Session_->GetMessages(10, 1s);
 
@@ -405,6 +421,7 @@ TEST_F(SessionTest, MixedSuccessAndFailure) {
 TEST_F(SessionTest, ConsumerActivityTracking) {
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*QueueRaw_, PopBatch(_, _)).Times(3).WillRepeatedly(Return(empty_result));
+  EXPECT_CALL(*QueueRaw_, HasConsumer()).WillRepeatedly(Return(false));
 
   // Первая активность
   Session_->GetMessages(10, 1s);
@@ -509,6 +526,7 @@ TEST(SessionUServerIntegrationTest, MockSleepIntegration) {
 
   std::vector<NDomain::TMessage> empty_result;
   EXPECT_CALL(*queue_raw, PopBatch(_, _)).WillOnce(Return(empty_result));
+  EXPECT_CALL(*queue_raw, HasConsumer()).WillOnce(Return(false));
 
   // Делаем poll
   session.GetMessages(10, 1s);

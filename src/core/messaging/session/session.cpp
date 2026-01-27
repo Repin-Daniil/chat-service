@@ -8,7 +8,7 @@ TUserSession::TUserSession(NDomain::TSessionId session_id, TQueuePtr queue, std:
     throw std::invalid_argument("TUserSession: session_id, GetNow or message bus is null");
   }
 
-  LastConsumerActivity_ = GetNow_();
+  LastConsumerActivity_.store(GetNow_());
 }
 
 bool TUserSession::PushMessage(NDomain::TMessage message, int max_try_amount) {
@@ -20,18 +20,17 @@ bool TUserSession::PushMessage(NDomain::TMessage message, int max_try_amount) {
   }
 
   // Backpressure due to queue overload
-  MissedMessages_ = true;
+  MissedMessages_.store(true);
 
   return false;
 }
 
 TMessages TUserSession::GetMessages(std::size_t max_size, std::chrono::seconds timeout) {
-  LastConsumerActivity_ = GetNow_();
+  LastConsumerActivity_.store(GetNow_());
   auto result = MessageBus_->PopBatch(max_size, timeout);
-  LastConsumerActivity_ = GetNow_();  // We could sleep in PopBatch
+  LastConsumerActivity_.store(GetNow_());  // We could sleep in PopBatch
 
-  if (MissedMessages_) {
-    MissedMessages_ = false;
+  if (MissedMessages_.exchange(false)) {
     return {result, true};
   }
 
@@ -39,7 +38,7 @@ TMessages TUserSession::GetMessages(std::size_t max_size, std::chrono::seconds t
 }
 
 bool TUserSession::IsActive(std::chrono::seconds idle_threshold) const {
-  return (GetNow_() - LastConsumerActivity_.load()) <= idle_threshold;
+  return MessageBus_->HasConsumer() || ((GetNow_() - LastConsumerActivity_.load()) <= idle_threshold);
 }
 
 std::chrono::seconds TUserSession::GetLifetimeSeconds() const {

@@ -5,7 +5,7 @@
 - Нагрузка подавалась с 8 агентов (4 vCPU, 4 GB RAM, 30 GB Disk каждый)
 - Удалось достичь нагрузки в 30k RPS (сервис не завалили, уперлись в сеть)
 - Характеристики машинки-стенда: 28 vCPU, 110 GB RAM, 256 GB Disk
-- [Отчет о нагрузочном тестировании](https://github.com/Repin-Daniil/chat-service/docs/load-testing-report.pdf)
+- [Отчет о нагрузочном тестировании](https://github.com/Repin-Daniil/chat-service/blob/df3b72326ed78c03cc841ccb74418ecb0c71f425/docs/load-testing-report.pdf)
 - [Флеймграф](https://github.com/user-attachments/assets/3c932757-b4f1-4d54-b918-7c304e283f99)
 
 ### Пушка

@@ -7,7 +7,7 @@ https://github.com/Repin-Daniil/chat-service/actions/workflows/ci.yml/
 
 - Есть три готовых дашборда в grafana. Метрики, скрины дашбордов [тут](docs/metrics.md)
 
-- Проводился [нагрузочный тест](docs/load_testing.md). Тянуло 30 000 RPS (уперлись в сеть ВМ), на 10k RPS 98 квантиль времени отправки был 3мс.
+- Проводился [нагрузочный тест](docs/load-testing.md). Тянуло 30 000 RPS (уперлись в сеть ВМ), на 10k RPS 98 квантиль времени отправки был 3мс.
 
 - Работает через long polling, API [вот](docs/api.yaml), аутентификация по JWT
 

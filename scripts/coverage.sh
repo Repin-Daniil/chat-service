@@ -4,14 +4,12 @@ set -e
 # где будут .profraw
 export LLVM_PROFILE_FILE="coverage-%p.profraw"
 
-make build-release COVERAGE_ENABLED=1
+make test-release COVERAGE_ENABLED=1
 
 if ! cd build-release; then
     echo "build-release not found"
     exit 1
 fi
-
-ctest
 
 # собрать profdata
 llvm-profdata merge -sparse coverage-*.profraw -o coverage.profdata
@@ -32,3 +30,4 @@ llvm-cov export \
   -ignore-filename-regex=".*(_deps|/build(-debug|-release)?/|/usr/|/third_party/).*" \
   > ../coverage.info
 
+genhtml ../coverage.info --output-directory coverage_html

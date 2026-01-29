@@ -17,16 +17,152 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "id": 0,
   "links": [],
   "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 100,
+      "panels": [],
+      "title": "Main KPIs (Status Board)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 7,
+        "x": 0,
+        "y": 1
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "chat_mailbox_opened_current",
+          "refId": "A"
+        }
+      ],
+      "title": "Online Users",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 7,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "chat_sessions_opened_current",
+          "refId": "A"
+        }
+      ],
+      "title": "Active Sessions",
+      "type": "stat"
+    },
     {
       "datasource": {
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Сообщений в секунду",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -50,18 +186,25 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 0
+        "h": 10,
+        "w": 9,
+        "x": 15,
+        "y": 1
       },
-      "id": 23,
+      "id": 104,
       "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "vertical",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -69,35 +212,35 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
       },
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "editorMode": "code",
-          "expr": "sum(rate(chat_sessions_sent_messages_total[$__rate_interval]))",
-          "legendFormat": "__auto",
+          "editorMode": "builder",
+          "expr": "chat_messages_polling_active_current",
+          "legendFormat": "Active pollers",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "builder",
+          "expr": "chat_limiter_opened_current",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "Active limiters",
+          "range": true,
+          "refId": "B"
         }
       ],
-      "title": "Messages/Sec",
-      "type": "stat"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 8
-      },
-      "id": 20,
-      "panels": [],
-      "title": "🚀 Main KPI & Status",
-      "type": "row"
+      "title": "",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -114,146 +257,20 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "purple",
                 "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           },
-          "unit": "short"
+          "unit": "msg/s"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 4,
+        "h": 5,
+        "w": 7,
         "x": 0,
-        "y": 9
-      },
-      "id": 1,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "expr": "chat_mailbox_opened_current",
-          "legendFormat": "__auto",
-          "refId": "A"
-        }
-      ],
-      "title": "Online Users (Mailboxes)",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 4,
-        "y": 9
-      },
-      "id": 2,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "expr": "chat_sessions_opened_current",
-          "legendFormat": "__auto",
-          "refId": "A"
-        }
-      ],
-      "title": "Active Sessions",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "blue",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "pps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 8,
-        "y": 9
+        "y": 6
       },
       "id": 3,
       "options": {
@@ -276,12 +293,17 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "sum(rate(chat_sessions_sent_messages_total[$__rate_interval]))",
-          "legendFormat": "__auto",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(chat_sessions_messages_sent_total[$__rate_interval]))",
+          "range": true,
           "refId": "A"
         }
       ],
-      "title": "Message Out Rate",
+      "title": "Message Send Rate (RPS)",
       "type": "stat"
     },
     {
@@ -304,24 +326,24 @@
               },
               {
                 "color": "red",
-                "value": 1
+                "value": 0.01
               }
             ]
           },
-          "unit": "short"
+          "unit": "reqps"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 12,
-        "y": 9
+        "h": 5,
+        "w": 8,
+        "x": 7,
+        "y": 6
       },
       "id": 4,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
+        "colorMode": "value",
+        "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
         "percentChangeColorMode": "standard",
@@ -339,8 +361,11 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "expr": "sum(rate(chat_limiter_rejected_total[$__rate_interval]))",
-          "legendFormat": "__auto",
           "refId": "A"
         }
       ],
@@ -348,91 +373,16 @@
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 8,
-        "x": 16,
-        "y": 9
-      },
-      "id": 5,
-      "options": {
-        "displayMode": "gradient",
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": false
-        },
-        "maxVizHeight": 300,
-        "minVizHeight": 10,
-        "minVizWidth": 0,
-        "namePlacement": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true,
-        "sizing": "auto",
-        "valueMode": "color"
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "expr": "chat_messages_polling_active_current",
-          "legendFormat": "Waiting for messages",
-          "refId": "A"
-        },
-        {
-          "expr": "chat_limiter_opened_current",
-          "legendFormat": "Active Limiters",
-          "refId": "B"
-        }
-      ],
-      "title": "Active Pollers",
-      "type": "bargauge"
-    },
-    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 11
       },
-      "id": 21,
+      "id": 101,
       "panels": [],
-      "title": "⏱️ Latency & Distribution (Heatmaps)",
+      "title": "Golden Signals (Latency & Distribution)",
       "type": "row"
     },
     {
@@ -457,15 +407,15 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
         "x": 0,
-        "y": 14
+        "y": 12
       },
-      "id": 6,
+      "id": 5,
       "options": {
         "calculate": false,
-        "cellGap": 1,
+        "cellGap": 2,
         "color": {
           "exponent": 0.5,
           "fill": "dark-orange",
@@ -473,18 +423,17 @@
           "reverse": false,
           "scale": "exponential",
           "scheme": "Oranges",
-          "steps": 64
+          "steps": 128
         },
         "exemplars": {
           "color": "rgba(255,0,255,0.7)"
         },
         "filterValues": {
-          "le": 1e-100
+          "le": 1e-9
         },
         "legend": {
           "show": true
         },
-        "rows": false,
         "rowsFrame": {
           "layout": "auto"
         },
@@ -502,13 +451,17 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "sum(rate(chat_messages_queue_wait_latency_sec_hist_bucket[2m])) by (le)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum(rate(chat_messages_queue_wait_latency_sec_hist_bucket[$__rate_interval])) by (le)",
           "format": "heatmap",
           "legendFormat": "{{le}}",
           "refId": "A"
         }
       ],
-      "title": "Message Delivery Wait Latency",
+      "title": "Message Delivery Latency Distribution",
       "type": "heatmap"
     },
     {
@@ -533,34 +486,33 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 12,
         "x": 12,
-        "y": 14
+        "y": 12
       },
-      "id": 7,
+      "id": 6,
       "options": {
         "calculate": false,
-        "cellGap": 1,
+        "cellGap": 2,
         "color": {
           "exponent": 0.5,
-          "fill": "dark-orange",
+          "fill": "dark-blue",
           "mode": "scheme",
           "reverse": false,
           "scale": "exponential",
           "scheme": "Blues",
-          "steps": 64
+          "steps": 128
         },
         "exemplars": {
           "color": "rgba(255,0,255,0.7)"
         },
         "filterValues": {
-          "le": 1e-100
+          "le": 1e-9
         },
         "legend": {
           "show": true
         },
-        "rows": false,
         "rowsFrame": {
           "layout": "auto"
         },
@@ -578,13 +530,17 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "sum(rate(chat_messages_polling_duration_sec_hist_bucket[2m])) by (le)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum(rate(chat_messages_polling_duration_sec_hist_bucket[$__rate_interval])) by (le)",
           "format": "heatmap",
           "legendFormat": "{{le}}",
           "refId": "A"
         }
       ],
-      "title": "Long Polling Duration",
+      "title": "Long Polling Duration Distribution",
       "type": "heatmap"
     },
     {
@@ -593,11 +549,11 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 20
       },
-      "id": 22,
+      "id": 102,
       "panels": [],
-      "title": "⚙️ Internals & Overheads",
+      "title": "Performance & Overheads",
       "type": "row"
     },
     {
@@ -620,7 +576,7 @@
             "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 15,
-            "gradientMode": "opacity",
+            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
@@ -633,7 +589,7 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "showValues": false,
             "spanNulls": true,
             "stacking": {
@@ -662,14 +618,15 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 24
+        "y": 21
       },
-      "id": 8,
+      "id": 7,
       "options": {
         "legend": {
           "calcs": [
-            "mean",
-            "max"
+            "min",
+            "max",
+            "last"
           ],
           "displayMode": "table",
           "placement": "bottom",
@@ -684,18 +641,171 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "expr": "histogram_quantile(0.99, sum(rate(chat_messages_send_overhead_us_hist_bucket[5m])) by (le))",
           "legendFormat": "Send Overhead (P99)",
           "refId": "A"
         },
         {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
           "expr": "histogram_quantile(0.99, sum(rate(chat_messages_polling_overhead_us_hist_bucket[5m])) by (le))",
-          "legendFormat": "Polling Overhead (P99)",
+          "legendFormat": "Poll Overhead (P99)",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "histogram_quantile(0.50, sum(rate(chat_messages_send_overhead_us_hist_bucket[5m])) by (le))",
+          "legendFormat": "Send Overhead (P50)",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "histogram_quantile(0.50, sum(rate(chat_messages_polling_overhead_us_hist_bucket[5m])) by (le))",
+          "legendFormat": "Poll Overhead (P50)",
+          "refId": "D"
+        }
+      ],
+      "title": "System Overhead (P50 & P99)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "histogram_quantile(0.95, sum(rate(chat_sessions_queue_size_hist_bucket[$__rate_interval])) by (le))",
+          "legendFormat": "Queue Size (P95)",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "histogram_quantile(0.50, sum(rate(chat_sessions_queue_size_hist_bucket[$__rate_interval])) by (le))",
+          "legendFormat": "Queue Size (P50)",
           "refId": "B"
         }
       ],
-      "title": "System Overhead (Microseconds P99)",
+      "title": "Message Queue Depth",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "id": 103,
+      "panels": [],
+      "title": "Internal Mechanics & Garbage Collection",
+      "type": "row"
     },
     {
       "datasource": {
@@ -730,12 +840,205 @@
             "scaleDistribution": {
               "type": "linear"
             },
-            "showPoints": "auto",
+            "showPoints": "never",
             "showValues": false,
             "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [
+            "sum",
+            "last"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "rate(chat_sessions_removed_total[5m])",
+          "legendFormat": "Sessions GC",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "rate(chat_mailbox_removed_total[5m])",
+          "legendFormat": "Mailbox GC",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "rate(chat_limiter_removed_total[5m])",
+          "legendFormat": "Limiter GC",
+          "refId": "C"
+        }
+      ],
+      "title": "Garbage Collection Activity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 38
+      },
+      "id": 10,
+      "options": {
+        "calculate": false,
+        "cellGap": 2,
+        "color": {
+          "exponent": 0.5,
+          "fill": "dark-green",
+          "mode": "scheme",
+          "reverse": false,
+          "scale": "exponential",
+          "scheme": "Greens",
+          "steps": 128
+        },
+        "exemplars": {
+          "color": "rgba(255,0,255,0.7)"
+        },
+        "filterValues": {
+          "le": 1e-9
+        },
+        "legend": {
+          "show": true
+        },
+        "rowsFrame": {
+          "layout": "auto"
+        },
+        "tooltip": {
+          "mode": "single",
+          "showColorScale": false,
+          "yHistogram": false
+        },
+        "yAxis": {
+          "axisPlacement": "left",
+          "reverse": false,
+          "unit": "s"
+        }
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "sum(rate(chat_sessions_lifetime_sec_hist_bucket[10m])) by (le)",
+          "format": "heatmap",
+          "legendFormat": "{{le}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Session Lifetime Distribution",
+      "type": "heatmap"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -759,112 +1062,58 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 24
+        "y": 38
       },
-      "id": 9,
+      "id": 11,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "min",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
           "hideZeros": false,
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "expr": "rate(chat_sessions_removed_total[5m])",
-          "legendFormat": "Sessions Removed",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "chat_mailbox_shards_size_hist_sum / chat_mailbox_shards_size_hist_count",
+          "legendFormat": "Mailbox Shards Avg Size",
           "refId": "A"
         },
         {
-          "expr": "rate(chat_mailbox_removed_total[5m])",
-          "legendFormat": "Mailboxes Removed",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "chat_limiter_shards_size_hist_sum / chat_limiter_shards_size_hist_count",
+          "legendFormat": "Limiter Shards Avg Size",
           "refId": "B"
-        },
-        {
-          "expr": "rate(chat_limiter_removed_total[5m])",
-          "legendFormat": "Limiters Removed",
-          "refId": "C"
         }
       ],
-      "title": "Garbage Collection Rate",
+      "title": "Shards Balance",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "footer": {
-              "reducers": []
-            },
-            "inspect": false
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              },
-              {
-                "color": "red",
-                "value": 1000
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 12,
-        "x": 0,
-        "y": 32
-      },
-      "id": 10,
-      "options": {
-        "cellHeight": "sm",
-        "showHeader": true,
-        "sortBy": []
-      },
-      "pluginVersion": "12.3.1",
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, sum(rate(chat_mailbox_shards_size_hist_bucket[5m])) by (le))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "Avg Shard Size",
-          "refId": "A"
-        }
-      ],
-      "title": "Shard Size Check (P95)",
-      "type": "table"
     }
   ],
   "preload": false,
-  "refresh": "5s",
+  "refresh": "10s",
   "schemaVersion": 42,
   "tags": [
     "chat",
-    "service"
+    "messaging",
+    "performance"
   ],
   "templating": {
     "list": [
@@ -888,9 +1137,17 @@
     "from": "now-5m",
     "to": "now"
   },
-  "timepicker": {},
-  "timezone": "",
-  "title": "Chat Service Metrics",
-  "uid": "chat-service-v1",
-  "version": 3
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Chat Service Dashboard",
+  "uid": "chat-service-dashboard",
+  "version": 7
 }

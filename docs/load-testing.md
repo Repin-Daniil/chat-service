@@ -1,6 +1,7 @@
 ### Нагрузочное тестирование
 
-![Флеймграф такой](graph.svg)
+
+[Флеймграф](https://github.com/user-attachments/assets/3c932757-b4f1-4d54-b918-7c304e283f99)
 
 todo Описание теста, своя пушка на пандоре, как делался тест
 
@@ -14,8 +15,6 @@ todo Отчет load testing
 
 ### Статистика по ручкам
 <img width="1397" height="816" alt="Screenshot 2026-01-29 at 17 14 06" src="https://github.com/user-attachments/assets/7aabfaa6-f7da-4328-b28b-8db33bcdcece" />
-![graph](https://github.com/user-attachments/assets/3c932757-b4f1-4d54-b918-7c304e283f99)
-
 
 ### Дашборд Node Exporter
 <img width="1398" height="761" alt="image" src="https://github.com/user-attachments/assets/ea69cc51-a42f-4ed0-8139-5d483edd3ecb" />

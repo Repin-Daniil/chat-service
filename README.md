@@ -21,9 +21,7 @@ https://github.com/Repin-Daniil/chat-service/actions/workflows/ci.yml/
 <img width="642" height="805" alt="image" src="https://github.com/user-attachments/assets/293d3725-a550-4e39-b7eb-4714d5873bfd" />
 
 
-### Тесты
-Отчет по Coverage вот столько то todo
- 
+### Тесты 
 - 104 функциональных тестов на Python (`testsuite`)
 - 382 модульных и интеграционных тестов на `gtest`
 - 3 бенчмарка на шардированную мапу, MPSC-очередь и `rcu<flat_map>` (хранилище сессий)

@@ -30,4 +30,8 @@ std::pair<TChatId, bool> TPostgresChatRepository::GetOrCreatePrivateChat(TUserId
   return {TChatId{result[0]["chat_id"].As<std::string>()}, result[0]["is_new"].As<bool>()};
 }
 
+std::vector<TUserId> GetParticipants() const {
+  
+}
+
 }  // namespace NChat::NInfra::NRepository

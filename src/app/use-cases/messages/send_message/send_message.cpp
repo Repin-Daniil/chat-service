@@ -33,7 +33,6 @@ void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
 
   // Можно сначала сделать модели каналов, групп, без крудов, а в тестах через постгрю initial_data тестить
 
-
   // В будущем по идее шлюз сообщает хабу о своих пользователях по grpc, периодчиски делает full_update
 }
 

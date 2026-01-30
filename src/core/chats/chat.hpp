@@ -16,7 +16,6 @@ class IChat {
   virtual std::vector<TUserId> GetMembers() const = 0;
   // ACL
   //   virtual std::optional<EMemberRole> GetRole(const TUserId& user) const = 0;
-
   virtual bool CanPost(const TUserId& sender_id) const = 0;
 
   virtual ~IChat() = default;

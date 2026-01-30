@@ -18,7 +18,7 @@ class TPostgresChatRepository : public NCore::IChatRepository {
   explicit TPostgresChatRepository(userver::storages::postgres::ClusterPtr pg_cluster);
 
   std::pair<TChatId, bool> GetOrCreatePrivateChat(TUserId user_1, TUserId user_2) const override;
-
+  std::vector<TUserId> GetParticipants() const override;
  private:
   userver::storages::postgres::ClusterPtr PgCluster_;
 };

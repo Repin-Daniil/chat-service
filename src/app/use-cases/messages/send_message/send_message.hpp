@@ -1,7 +1,7 @@
 #pragma once
 
-#include <core/messaging/router/message_router.hpp>
 #include <core/messaging/mailbox/mailbox_registry.hpp>
+#include <core/messaging/router/message_router.hpp>
 #include <core/users/user_repo.hpp>
 
 #include <app/dto/messages/send_message_dto.hpp>
@@ -35,13 +35,12 @@ class TSendMessageUseCase final {
   using TUserId = NCore::NDomain::TUserId;
   using TMessageText = NCore::NDomain::TMessageText;
 
-  TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter, NCore::IUserRepository& user_repo);
+  TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter);
 
   void Execute(NDto::TSendMessageRequest request);
 
  private:
   NCore::TMessageRouter& Router_;
-  NCore::IUserRepository& UserRepo_;
   ISendLimiter& Limiter_;
 };
 

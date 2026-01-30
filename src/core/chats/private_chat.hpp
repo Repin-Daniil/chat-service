@@ -6,7 +6,6 @@
 namespace NChat::NCore::NDomain {
 
 /*
-Личный чат
 @invariant User1 <= User2
 */
 class TPrivateChat : public IChat {

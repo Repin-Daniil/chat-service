@@ -13,7 +13,9 @@ namespace NChat::NCore::NDomain {
 class TPasswordInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
-  std::string GetField() const noexcept override { return "password"; }
+  std::string GetField() const noexcept override {
+    return "password";
+  }
 };
 
 inline constexpr int MIN_PASSWORD_LENGTH = 8;
@@ -24,13 +26,21 @@ static_assert(MAX_PASSWORD_LENGTH >= MIN_PASSWORD_LENGTH);
 
 class TRawPassword {
  public:
-  explicit TRawPassword(const std::string& value) : Value_(value) { Validate(); }
+  explicit TRawPassword(const std::string& value) : Value_(value) {
+    Validate();
+  }
 
-  const std::string& Value() const { return Value_; }
+  const std::string& Value() const {
+    return Value_;
+  }
 
-  bool operator==(const TRawPassword& other) const { return Value_ == other.Value_; }
+  bool operator==(const TRawPassword& other) const {
+    return Value_ == other.Value_;
+  }
 
-  bool operator!=(const TRawPassword& other) const { return !(*this == other); }
+  bool operator!=(const TRawPassword& other) const {
+    return !(*this == other);
+  }
 
  private:
   void Validate() {

@@ -11,7 +11,8 @@ using NCore::NDomain::TPasswordHash;
 using NCore::NDomain::TUserId;
 
 TAuthServiceImpl::TAuthServiceImpl(int expiry_duration_hours, std::size_t salt_length)
-    : ExpiryDuration_(expiry_duration_hours), SaltLength_(salt_length) {}
+    : ExpiryDuration_(expiry_duration_hours), SaltLength_(salt_length) {
+}
 
 TPasswordHash TAuthServiceImpl::HashPassword(std::string_view password) {
   auto salt = userver::crypto::GenerateRandomBlock(SaltLength_);

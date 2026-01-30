@@ -75,6 +75,7 @@ CREATE TABLE chat.group_members (
     joined_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (chat_id, user_id)
 );
+-- todo нужен обратный индекс user_id, chat_id для формирования чатов пользователя
 
 -- ===========================
 --  FOR MAPPERS

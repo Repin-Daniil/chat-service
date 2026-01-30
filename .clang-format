@@ -3,6 +3,8 @@ DerivePointerAlignment: false
 ColumnLimit: 120
 InsertNewlineAtEOF: true
 
+AllowShortFunctionsOnASingleLine: None
+
 BreakBeforeBinaryOperators: None
 PenaltyBreakAssignment: 1000
 AllowAllArgumentsOnNextLine: false

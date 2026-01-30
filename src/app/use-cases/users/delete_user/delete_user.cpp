@@ -8,7 +8,8 @@ namespace NChat::NApp {
 
 using NCore::NDomain::TUsername;
 
-TDeleteUserUseCase::TDeleteUserUseCase(NCore::IUserRepository& user_repo) : UserRepo_(user_repo) {}
+TDeleteUserUseCase::TDeleteUserUseCase(NCore::IUserRepository& user_repo) : UserRepo_(user_repo) {
+}
 
 void TDeleteUserUseCase::Execute(const NDto::TUserDeleteRequest& request) const {
   TUsername username_to_delete{request.UsernameToDelete};

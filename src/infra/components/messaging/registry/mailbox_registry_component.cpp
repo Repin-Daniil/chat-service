@@ -36,7 +36,9 @@ TObjectFactory<NCore::IMailboxRegistry> TMailboxRegistryComponent::GetRegistryFa
   return registry_factory;
 }
 
-NCore::IMailboxRegistry& TMailboxRegistryComponent::GetRegistry() { return *Registry_; }
+NCore::IMailboxRegistry& TMailboxRegistryComponent::GetRegistry() {
+  return *Registry_;
+}
 
 userver::yaml_config::Schema TMailboxRegistryComponent::GetStaticConfigSchema() {
   return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(

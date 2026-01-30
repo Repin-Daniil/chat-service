@@ -20,7 +20,8 @@ using NCore::NDomain::TUsername;
 }  // namespace
 
 TRegistrationUseCase::TRegistrationUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service)
-    : UserRepo_(user_repo), AuthService_(auth_service) {}
+    : UserRepo_(user_repo), AuthService_(auth_service) {
+}
 
 NDto::TUserRegistrationResult TRegistrationUseCase::Execute(const NDto::TUserRegistrationRequest& request) const {
   TRawPassword raw_password{request.Password};

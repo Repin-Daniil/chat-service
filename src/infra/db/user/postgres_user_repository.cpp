@@ -18,7 +18,8 @@ TPostgresUserRepository::TPostgresUserRepository(userver::storages::postgres::Cl
                                                  const TProfileByUserIdCache& profile_by_user_id_cache)
     : PgCluster_(pg_cluster),
       ProfileByUsernameCache_(profile_by_username_cache),
-      ProfileByUserIdCache_(profile_by_user_id_cache) {}
+      ProfileByUserIdCache_(profile_by_user_id_cache) {
+}
 
 void TPostgresUserRepository::InsertNewUser(const TUser& user) const {
   try {

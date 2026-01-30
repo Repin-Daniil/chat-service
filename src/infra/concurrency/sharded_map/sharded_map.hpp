@@ -89,8 +89,12 @@ class TShardedMap {
     std::unordered_map<Key, ValuePtr, Hash, Equal> Map;
   };
 
-  TShard& GetShard(const Key& key) { return Shards_[Hash{}(key) & (Shards_.size() - 1)]; }
-  const TShard& GetShard(const Key& key) const { return Shards_[Hash{}(key) & (Shards_.size() - 1)]; }
+  TShard& GetShard(const Key& key) {
+    return Shards_[Hash{}(key) & (Shards_.size() - 1)];
+  }
+  const TShard& GetShard(const Key& key) const {
+    return Shards_[Hash{}(key) & (Shards_.size() - 1)];
+  }
 
   template <typename Predicate>
   std::size_t ProcessShard(TShard& shard, Predicate should_remove_pred) {

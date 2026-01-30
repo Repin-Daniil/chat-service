@@ -14,7 +14,8 @@ namespace NChat::NInfra::NHandlers {
 TDeleteByUsernameHandler::TDeleteByUsernameHandler(const userver::components::ComponentConfig& config,
                                                    const userver::components::ComponentContext& context)
     : HttpHandlerJsonBase(config, context),
-      UserService_(context.FindComponent<NComponents::TUserServiceComponent>().GetService()) {}
+      UserService_(context.FindComponent<NComponents::TUserServiceComponent>().GetService()) {
+}
 
 userver::formats::json::Value TDeleteByUsernameHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& /*request_json*/,

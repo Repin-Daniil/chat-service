@@ -96,7 +96,9 @@ class TSendLimiterTest : public ::testing::Test {
   std::unique_ptr<NChat::NApp::ISendLimiter> Limiter;
 };
 
-UTEST_F(TSendLimiterTest, InitialState) { EXPECT_EQ(Limiter->GetTotalLimiters(), 0); }
+UTEST_F(TSendLimiterTest, InitialState) {
+  EXPECT_EQ(Limiter->GetTotalLimiters(), 0);
+}
 
 UTEST_F(TSendLimiterTest, SingleUserLimiting) {
   TUserId user_id("1");

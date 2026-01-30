@@ -9,7 +9,7 @@ namespace NChat::NApp::NDto {
 
 struct TSendMessageRequest {
   NCore::NDomain::TUserId SenderId;
-  std::string RecipientUsername;
+  NCore::NDomain::TChatId ChatId;
   std::string Text;
   std::chrono::steady_clock::time_point SentAt{};
 };

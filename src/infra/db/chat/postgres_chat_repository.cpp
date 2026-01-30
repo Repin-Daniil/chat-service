@@ -15,7 +15,8 @@ using NCore::NDomain::TUserId;
 }  // namespace
 
 TPostgresChatRepository::TPostgresChatRepository(userver::storages::postgres::ClusterPtr pg_cluster)
-    : PgCluster_(pg_cluster) {}
+    : PgCluster_(pg_cluster) {
+}
 
 std::pair<TChatId, bool> TPostgresChatRepository::GetOrCreatePrivateChat(TUserId user_a, TUserId user_b) const {
   const auto [user_1, user_2] = std::minmax(user_a, user_b);
@@ -27,6 +28,10 @@ std::pair<TChatId, bool> TPostgresChatRepository::GetOrCreatePrivateChat(TUserId
                                     new_chat_id.GetUnderlying(), user_1.GetUnderlying(), user_2.GetUnderlying());
 
   return {TChatId{result[0]["chat_id"].As<std::string>()}, result[0]["is_new"].As<bool>()};
+}
+
+std::vector<TUserId> GetParticipants() const {
+  
 }
 
 }  // namespace NChat::NInfra::NRepository

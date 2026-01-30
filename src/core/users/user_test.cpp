@@ -8,16 +8,20 @@ namespace NChat::NCore::NDomain {
 
 class UserTest : public ::testing::Test {
  protected:
-  TPasswordHash HashPassword(std::string_view password) { return NInfra::TAuthServiceImpl().HashPassword(password); }
+  TPasswordHash HashPassword(std::string_view password) {
+    return NInfra::TAuthServiceImpl().HashPassword(password);
+  }
 
   UserTest()
       : user_id_("user-123"),
         username_("john_doe"),
         display_name_("John Doe"),
         biography_("Software Developer"),
-        password_(HashPassword("password")) {}
+        password_(HashPassword("password")) {
+  }
 
-  void SetUp() override {}
+  void SetUp() override {
+  }
 
   TUserId user_id_;
   TUsername username_;

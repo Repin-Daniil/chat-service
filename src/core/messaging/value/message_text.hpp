@@ -17,19 +17,29 @@ inline constexpr size_t MAX_TEXT_BYTES = MAX_TEXT_CHARS * 4;
 class TMessageTextInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
-  std::string GetField() const noexcept override { return "text"; }
+  std::string GetField() const noexcept override {
+    return "text";
+  }
 };
 
 class TMessageText {
  public:
-  TMessageText() {}
-  explicit TMessageText(std::string value) : Value_(Validate(std::move(value))) {}
-  TMessageText(const TMessageText& other) : Value_(other.Value_) {}
-  TMessageText(TMessageText&& other) : Value_(std::move(other.Value_)) {}
+  TMessageText() {
+  }
+  explicit TMessageText(std::string value) : Value_(Validate(std::move(value))) {
+  }
+  TMessageText(const TMessageText& other) : Value_(other.Value_) {
+  }
+  TMessageText(TMessageText&& other) : Value_(std::move(other.Value_)) {
+  }
 
-  const std::string& Value() const { return Value_; }
+  const std::string& Value() const {
+    return Value_;
+  }
 
-  bool IsEmpty() const { return Value_.empty(); }
+  bool IsEmpty() const {
+    return Value_.empty();
+  }
 
  private:
   std::string Validate(std::string text) {

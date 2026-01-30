@@ -13,7 +13,9 @@ namespace NChat::NCore::NDomain {
 class TUsernameInvalidException : public TValidationException {
  public:
   using TValidationException::TValidationException;
-  std::string GetField() const noexcept override { return "username"; }
+  std::string GetField() const noexcept override {
+    return "username";
+  }
 };
 
 inline constexpr int kMinUsernameLength = 3;
@@ -24,9 +26,13 @@ static_assert(kMaxUsernameLength >= kMinUsernameLength);
 
 class TUsername {
  public:
-  explicit TUsername(const std::string& value) : Value_(ToLower(value)) { Validate(); }
+  explicit TUsername(const std::string& value) : Value_(ToLower(value)) {
+    Validate();
+  }
 
-  const std::string& Value() const noexcept { return Value_; }
+  const std::string& Value() const noexcept {
+    return Value_;
+  }
 
  private:
   static std::string ToLower(const std::string& str) {

@@ -34,12 +34,24 @@ class TUser {
   TUser(const TUser& user) = delete;
 
   // Getters
-  const TUserId& GetId() const { return Id_; }
-  const std::string& GetUsername() const { return Username_; }
-  const std::string& GetDisplayName() const { return DisplayName_; }
-  const std::string& GetPasswordHash() const { return PasswordHash_; }
-  const std::string& GetPasswordSalt() const { return PasswordSalt_; }
-  const std::string& GetBiography() const { return Biography_; }
+  const TUserId& GetId() const {
+    return Id_;
+  }
+  const std::string& GetUsername() const {
+    return Username_;
+  }
+  const std::string& GetDisplayName() const {
+    return DisplayName_;
+  }
+  const std::string& GetPasswordHash() const {
+    return PasswordHash_;
+  }
+  const std::string& GetPasswordSalt() const {
+    return PasswordSalt_;
+  }
+  const std::string& GetBiography() const {
+    return Biography_;
+  }
 
   // Update methods
   void UpdateDisplayName(const TDisplayName& display_name);
@@ -47,8 +59,12 @@ class TUser {
   void UpdatePassword(const TPasswordHash& password);
   void UpdateUsername(const TUsername& username);
 
-  bool operator==(const TUser& other) const { return Id_ == other.Id_; }
-  bool operator!=(const TUser& other) const { return !(*this == other); }
+  bool operator==(const TUser& other) const {
+    return Id_ == other.Id_;
+  }
+  bool operator!=(const TUser& other) const {
+    return !(*this == other);
+  }
 
  private:
   TUser(TUserId user_id, std::string username, std::string display_name, std::string password_hash,

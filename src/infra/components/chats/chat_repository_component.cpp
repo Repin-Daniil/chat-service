@@ -25,7 +25,9 @@ TChatRepoComponent::TChatRepoComponent(const userver::components::ComponentConfi
   ChatRepo_ = repo_factory.Create(config, context, "storage-type");
 }
 
-NCore::IChatRepository& TChatRepoComponent::GetRepository() { return *ChatRepo_; }
+NCore::IChatRepository& TChatRepoComponent::GetRepository() {
+  return *ChatRepo_;
+}
 
 userver::yaml_config::Schema TChatRepoComponent::GetStaticConfigSchema() {
   return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(

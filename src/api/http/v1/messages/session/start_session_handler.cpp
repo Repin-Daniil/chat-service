@@ -28,7 +28,8 @@ namespace NChat::NInfra::NHandlers {
 TStartSessionHandler::TStartSessionHandler(const userver::components::ComponentConfig& config,
                                            const userver::components::ComponentContext& context)
     : HttpHandlerJsonBase(config, context),
-      MessageService_(context.FindComponent<NComponents::TMessagingServiceComponent>().GetService()) {}
+      MessageService_(context.FindComponent<NComponents::TMessagingServiceComponent>().GetService()) {
+}
 
 userver::formats::json::Value TStartSessionHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& /*request_json*/,

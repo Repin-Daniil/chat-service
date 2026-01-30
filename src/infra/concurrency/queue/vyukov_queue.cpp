@@ -4,13 +4,16 @@
 #include <userver/utils/fast_scope_guard.hpp>
 
 namespace {
-std::chrono::steady_clock::time_point GetNowTimePoint() { return userver::utils::datetime::SteadyNow(); }
+std::chrono::steady_clock::time_point GetNowTimePoint() {
+  return userver::utils::datetime::SteadyNow();
+}
 
 }  // namespace
 namespace NChat::NInfra {
 
 TVyukovMessageQueue::TVyukovMessageQueue(std::size_t max_size)
-    : Queue_(TQueue::Create(max_size)), Producer_(Queue_->GetMultiProducer()), Consumer_(Queue_->GetConsumer()) {}
+    : Queue_(TQueue::Create(max_size)), Producer_(Queue_->GetMultiProducer()), Consumer_(Queue_->GetConsumer()) {
+}
 
 bool TVyukovMessageQueue::Push(TMessage&& message) {
   message.Context.Enqueued = GetNowTimePoint();
@@ -44,12 +47,20 @@ std::vector<TMessage> TVyukovMessageQueue::PopBatch(std::size_t max_batch_size, 
   return message_batch;
 }
 
-std::size_t TVyukovMessageQueue::GetSizeApproximate() const { return Queue_->GetSizeApproximate(); }
+std::size_t TVyukovMessageQueue::GetSizeApproximate() const {
+  return Queue_->GetSizeApproximate();
+}
 
-bool TVyukovMessageQueue::HasConsumer() const { return HasConsumer_.load(); }
+bool TVyukovMessageQueue::HasConsumer() const {
+  return HasConsumer_.load();
+}
 
-void TVyukovMessageQueue::SetMaxSize(std::size_t max_size) { Queue_->SetSoftMaxSize(max_size); }
+void TVyukovMessageQueue::SetMaxSize(std::size_t max_size) {
+  Queue_->SetSoftMaxSize(max_size);
+}
 
-std::size_t TVyukovMessageQueue::GetMaxSize() const { return Queue_->GetSoftMaxSize(); }
+std::size_t TVyukovMessageQueue::GetMaxSize() const {
+  return Queue_->GetSoftMaxSize();
+}
 
 }  // namespace NChat::NInfra

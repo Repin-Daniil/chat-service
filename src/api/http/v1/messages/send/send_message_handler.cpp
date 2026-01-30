@@ -17,12 +17,12 @@ TSendMessageRequest Parse(const formats::json::Value& json, formats::parse::To<T
   using NChat::NInfra::NHandlers::TValidationException;
 
   NChat::NApp::NDto::TSendMessageRequest dto{.SenderId{},
-                                             .RecipientUsername = json["recipient"].As<std::string>(""),
+                                             .ChatId = json["chat_id"].As<std::string>(""),
                                              .Text = json["payload"].As<std::string>("")};
 
   // Only Syntax Validation
-  if (dto.RecipientUsername.empty()) {
-    throw TValidationException("recipient", "Field is missing");
+  if (dto.ChatId.empty()) {
+    throw TValidationException("chat_id", "Field is missing");
   }
 
   if (dto.Text.empty()) {
@@ -38,7 +38,8 @@ namespace NChat::NInfra::NHandlers {
 TSendMessageHandler::TSendMessageHandler(const userver::components::ComponentConfig& config,
                                          const userver::components::ComponentContext& context)
     : HttpHandlerJsonBase(config, context),
-      MessageService_(context.FindComponent<NComponents::TMessagingServiceComponent>().GetService()) {}
+      MessageService_(context.FindComponent<NComponents::TMessagingServiceComponent>().GetService()) {
+}
 
 userver::formats::json::Value TSendMessageHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest& request, const userver::formats::json::Value& request_json,

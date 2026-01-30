@@ -3,7 +3,8 @@
 namespace NChat::NApp {
 
 TCheckTokenUseCase::TCheckTokenUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service)
-    : UserRepo_(user_repo), AuthService_(auth_service) {}
+    : UserRepo_(user_repo), AuthService_(auth_service) {
+}
 
 NDto::TCheckTokenResult TCheckTokenUseCase::Execute(const std::string& token, bool is_required) const {
   if (token.empty()) {

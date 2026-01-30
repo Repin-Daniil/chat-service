@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/messaging/mailbox/mailbox_registry.hpp>
+#include <core/messaging/router/message_router.hpp>
 #include <core/users/user_repo.hpp>
 
 #include <app/dto/messages/send_message_dto.hpp>
@@ -9,6 +10,7 @@
 
 namespace NChat::NApp {
 
+// fixme Эта штука должна видоизмениться?
 class TRecipientTemporaryUnavailable : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
@@ -17,6 +19,7 @@ class TTooManyRequests : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
 
+// fixme Эта штука должна видоизмениться?
 class TRecipientNotFound : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
@@ -32,17 +35,12 @@ class TSendMessageUseCase final {
   using TUserId = NCore::NDomain::TUserId;
   using TMessageText = NCore::NDomain::TMessageText;
 
-  TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter, NCore::IUserRepository& user_repo);
+  TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter);
 
   void Execute(NDto::TSendMessageRequest request);
 
  private:
-  TMessage ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id, TMessageText text,
-                            TTimePoint sent_at);
-
- private:
-  NCore::IMailboxRegistry& Registry_;
-  NCore::IUserRepository& UserRepo_;
+  NCore::TMessageRouter& Router_;
   ISendLimiter& Limiter_;
 };
 

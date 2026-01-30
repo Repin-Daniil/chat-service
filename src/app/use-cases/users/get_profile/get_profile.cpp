@@ -12,7 +12,8 @@ namespace NChat::NApp {
 
 using NCore::NDomain::TUser;
 
-TGetProfileByNameUseCase::TGetProfileByNameUseCase(NCore::IUserRepository& user_repo) : UserRepo_(user_repo) {}
+TGetProfileByNameUseCase::TGetProfileByNameUseCase(NCore::IUserRepository& user_repo) : UserRepo_(user_repo) {
+}
 
 std::optional<NDto::TUserProfileResult> TGetProfileByNameUseCase::Execute(const std::string& username_request) const {
   NCore::NDomain::TUsername username{username_request};

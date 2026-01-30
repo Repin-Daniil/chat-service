@@ -6,7 +6,8 @@ namespace benchmark {
 
 // MaybeReenterWithoutASLR appeared in Google benchmark 1.9.3. Do nothing for older versions.
 template <typename... Args>
-static void MaybeReenterWithoutASLR(Args&&...) {}
+static void MaybeReenterWithoutASLR(Args&&...) {
+}
 
 }  // namespace benchmark
 

@@ -71,6 +71,8 @@ void TGarbageCollectorComponent::StartPeriodicTraverse() {
   Task_.Start("gc-background-job", settings, [this] { Traverse(); });
 }
 
-TGarbageCollectorComponent::~TGarbageCollectorComponent() { Task_.Stop(); }
+TGarbageCollectorComponent::~TGarbageCollectorComponent() {
+  Task_.Stop();
+}
 
 }  // namespace NChat::NInfra::NComponents

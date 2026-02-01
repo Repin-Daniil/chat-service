@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/common/ids.hpp"
+
 #include <core/chats/chat_repo.hpp>
 
 #include <userver/components/loggable_component_base.hpp>
@@ -17,8 +19,15 @@ class TPostgresChatRepository : public NCore::IChatRepository {
 
   explicit TPostgresChatRepository(userver::storages::postgres::ClusterPtr pg_cluster);
 
-  std::pair<TChatId, bool> GetOrCreatePrivateChat(TUserId user_1, TUserId user_2) const override;
-  std::vector<TUserId> GetParticipants() const override;
+  std::pair<TChatId, bool> GetOrCreatePrivateChatId(TUserId user_1, TUserId user_2) const override;
+
+  std::unique_ptr<NCore::NDomain::IChat> GetChat(TChatId chat_id) const override;
+
+ private:
+  std::unique_ptr<NCore::NDomain::IChat> GetPrivateChat(TChatId chat_id) const;
+  // std::unique_ptr<NCore::NDomain::IChat> GetGroupChat(TChatId chat_id) const;
+  // std::unique_ptr<NCore::NDomain::IChat> GetChannel(TChatId chat_id) const;
+
  private:
   userver::storages::postgres::ClusterPtr PgCluster_;
 };

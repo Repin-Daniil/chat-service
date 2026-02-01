@@ -1,16 +1,20 @@
 #pragma once
 
-#include "core/messaging/mailbox/mailbox_registry.hpp"
-
+#include <core/messaging/mailbox/mailbox_registry.hpp>
 #include <core/messaging/message.hpp>
 
 namespace NChat::NCore {
 
+struct TSendStatus {
+  std::size_t Successful = 0;
+  std::size_t Dropped = 0;
+  std::size_t Offline = 0;
+};
+
 class TMessageRouter {
  public:
   explicit TMessageRouter(IMailboxRegistry& registry);
-  void Route(std::vector<NDomain::TUserId> recipients, NDomain::TMessage message) const;
-  // fixme по идее не void, нужно вернуть статус отправки, может офлайн он, или никого нет онлайн
+  TSendStatus Route(std::vector<NDomain::TUserId> recipients, NDomain::TMessage message) const;
 
  private:
   IMailboxRegistry& Registry_;

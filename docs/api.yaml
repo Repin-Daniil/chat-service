@@ -572,9 +572,7 @@ paths:
         "401":
           description: Не авторизован
         "404":
-          description: Получатель не найден
-        "409":
-          description: Пользователь офлайн
+          description: Чат не найден
         "413":
           description: "Слишком большой payload"
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/chats/chat_repo.hpp>
 #include <core/messaging/mailbox/mailbox_registry.hpp>
 #include <core/messaging/router/message_router.hpp>
 #include <core/users/user_repo.hpp>
@@ -10,21 +11,15 @@
 
 namespace NChat::NApp {
 
-// fixme Эта штука должна видоизмениться?
-class TRecipientTemporaryUnavailable : public TApplicationException {
-  using TApplicationException::TApplicationException;
-};
-
 class TTooManyRequests : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
 
-// fixme Эта штука должна видоизмениться?
-class TRecipientNotFound : public TApplicationException {
+class TUnknownChat : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
 
-class TRecipientOffline : public TApplicationException {
+class TSendForbidden : public TApplicationException {
   using TApplicationException::TApplicationException;
 };
 
@@ -35,12 +30,13 @@ class TSendMessageUseCase final {
   using TUserId = NCore::NDomain::TUserId;
   using TMessageText = NCore::NDomain::TMessageText;
 
-  TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter);
+  TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCore::IChatRepository& chat_repo, ISendLimiter& limiter);
 
-  void Execute(NDto::TSendMessageRequest request);
+  NDto::TSendMessageResult Execute(NDto::TSendMessageRequest request);
 
  private:
-  NCore::TMessageRouter& Router_;
+  NCore::TMessageRouter Router_;
+  NCore::IChatRepository& ChatRepo_;
   ISendLimiter& Limiter_;
 };
 

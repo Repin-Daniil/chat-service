@@ -1,5 +1,6 @@
 #include "messaging_service_component.hpp"
 
+#include <infra/components/chats/chat_repository_component.hpp>
 #include <infra/components/messaging/limiter/send_limiter_component.hpp>
 #include <infra/components/messaging/registry/mailbox_registry_component.hpp>
 #include <infra/components/users/user_repository_component.hpp>
@@ -25,8 +26,10 @@ TMessagingServiceComponent::TMessagingServiceComponent(const userver::components
   auto& mailbox_registry = context.FindComponent<NComponents::TMailboxRegistryComponent>().GetRegistry();
   auto& limiter = context.FindComponent<NComponents::TSendLimiterComponent>().GetLimiter();
   auto& user_repo = context.FindComponent<NComponents::TUserRepoComponent>().GetRepository();
+  auto& chat_repo = context.FindComponent<NComponents::TChatRepoComponent>().GetRepository();
 
-  MessageService_ = std::make_unique<NApp::NServices::TMessagingService>(mailbox_registry, limiter, user_repo);
+  MessageService_ = std::make_unique<NApp::NServices::TMessagingService>(mailbox_registry, limiter, user_repo,
+                                                                         chat_repo);
 }
 
 NApp::NServices::TMessagingService& TMessagingServiceComponent::GetService() {

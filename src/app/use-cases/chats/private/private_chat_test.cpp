@@ -37,7 +37,7 @@ TEST_F(PrivateChatUseCaseIntegrationTest, GetExistingChat_Success) {
 
   EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
 
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(kRequesterUserId, kTargetUserId))
       .WillOnce(Return(std::make_pair(kExistingChatId, false)));
 
   auto result = UseCase_->Execute(request);
@@ -52,7 +52,7 @@ TEST_F(PrivateChatUseCaseIntegrationTest, CreateNewChat_Success) {
 
   EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
 
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(kRequesterUserId, kTargetUserId))
       .WillOnce(Return(std::make_pair(kNewChatId, true)));
 
   auto result = UseCase_->Execute(request);
@@ -67,7 +67,7 @@ TEST_F(PrivateChatUseCaseIntegrationTest, TargetUserNotFound_ThrowsException) {
 
   EXPECT_CALL(*UserRepo_, FindByUsername(kNonexistentUsername)).WillOnce(Return(std::nullopt));
 
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(_, _)).Times(0);  // Не должен быть вызван
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(_, _)).Times(0);  // Не должен быть вызван
 
   EXPECT_THROW(
       {
@@ -90,7 +90,7 @@ TEST_F(PrivateChatUseCaseIntegrationTest, CreateChatWithSelf_Success) {
 
   EXPECT_CALL(*UserRepo_, FindByUsername(kSelfUsername)).WillOnce(Return(kSelfUserId));
 
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kSelfUserId, kSelfUserId))
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(kSelfUserId, kSelfUserId))
       .WillOnce(Return(std::make_pair(TChatId{"self_chat"}, true)));
 
   auto result = UseCase_->Execute(request);
@@ -117,8 +117,8 @@ TEST_F(PrivateChatUseCaseIntegrationTest, VerifyRepositoryCallOrder) {
   // Сначала должен быть вызван FindByUsername
   EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
 
-  // Затем GetOrCreatePrivateChat с правильными параметрами
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+  // Затем GetOrCreatePrivateChatId с правильными параметрами
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(kRequesterUserId, kTargetUserId))
       .WillOnce(Return(std::make_pair(kNewChatId, true)));
 
   UseCase_->Execute(request);
@@ -134,7 +134,7 @@ TEST_F(PrivateChatUseCaseIntegrationTest, DifferentUserIdFormats_Success) {
 
   EXPECT_CALL(*UserRepo_, FindByUsername(kUsername)).WillOnce(Return(kAlphanumericId));
 
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kNumericId, kAlphanumericId))
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(kNumericId, kAlphanumericId))
       .WillOnce(Return(std::make_pair(TChatId{"chat_123"}, false)));
 
   auto result = UseCase_->Execute(request);
@@ -152,7 +152,7 @@ TEST_F(PrivateChatUseCaseIntegrationTest, SpecialCharactersInUsername_Success) {
 
   EXPECT_CALL(*UserRepo_, FindByUsername(kSpecialUsername)).WillOnce(Return(kSpecialUserId));
 
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kSpecialUserId))
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(kRequesterUserId, kSpecialUserId))
       .WillOnce(Return(std::make_pair(kNewChatId, true)));
 
   auto result = UseCase_->Execute(request);
@@ -167,7 +167,7 @@ TEST_F(PrivateChatUseCaseIntegrationTest, MultipleCallsSamePair_ReturnsExistingC
 
   // Первый вызов - создание нового чата
   EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(kRequesterUserId, kTargetUserId))
       .WillOnce(Return(std::make_pair(kNewChatId, true)));
 
   auto result1 = UseCase_->Execute(request);
@@ -175,7 +175,7 @@ TEST_F(PrivateChatUseCaseIntegrationTest, MultipleCallsSamePair_ReturnsExistingC
 
   // Второй вызов - получение существующего чата
   EXPECT_CALL(*UserRepo_, FindByUsername(kTargetUsername)).WillOnce(Return(kTargetUserId));
-  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChat(kRequesterUserId, kTargetUserId))
+  EXPECT_CALL(*ChatRepo_, GetOrCreatePrivateChatId(kRequesterUserId, kTargetUserId))
       .WillOnce(Return(std::make_pair(kNewChatId, false)));
 
   auto result2 = UseCase_->Execute(request);

@@ -15,13 +15,13 @@ using namespace std::chrono_literals;
 
 namespace {
 // Хелпер для создания сообщений
-NDomain::TMessage CreateTestMessage(const std::string& sender_id, const std::string& recipient_id,
+NDomain::TMessage CreateTestMessage(const std::string& sender_id, const std::string& chat_id,
                                     const std::string& text) {
   auto payload = std::make_shared<NDomain::TMessagePayload>(NDomain::TUserId{sender_id}, NDomain::TMessageText(text));
 
   NDomain::TMessage msg;
   msg.Payload = payload;
-  msg.RecipientId = NDomain::TUserId{recipient_id};
+  msg.ChatId = NDomain::TChatId{chat_id};
 
   return msg;
 }
@@ -38,7 +38,7 @@ class SessionTest : public ::testing::Test {
   }
 
   MockMessageQueue* QueueRaw_;
-  NDomain::TSessionId SessionId_{"user123session"};
+  NDomain::TSessionId SessionId_{"chat123session"};
   std::unique_ptr<TUserSession> Session_;
 };
 
@@ -48,17 +48,17 @@ class SessionTest : public ::testing::Test {
 
 TEST_F(SessionTest, ValidConstruction) {
   auto queue = std::make_unique<NiceMock<MockMessageQueue>>();
-  auto session_id = NDomain::TSessionId{"user123"};
+  auto session_id = NDomain::TSessionId{"chat123"};
   auto now_func = []() { return std::chrono::steady_clock::now(); };
 
   EXPECT_NO_THROW({
     TUserSession session(session_id, std::move(queue), now_func);
-    EXPECT_EQ(session.GetSessionId().GetUnderlying(), "user123");
+    EXPECT_EQ(session.GetSessionId().GetUnderlying(), "chat123");
   });
 }
 
 TEST_F(SessionTest, InvalidConstructionNullQueue) {
-  auto session_id = NDomain::TSessionId{"user123"};
+  auto session_id = NDomain::TSessionId{"chat123"};
   auto now_func = []() { return std::chrono::steady_clock::now(); };
 
   EXPECT_THROW({ TUserSession session(session_id, nullptr, now_func); }, std::invalid_argument);
@@ -74,7 +74,7 @@ TEST_F(SessionTest, InvalidConstructionEmptySessionId) {
 
 TEST_F(SessionTest, InvalidConstructionNullNowFunc) {
   auto queue = std::make_unique<NiceMock<MockMessageQueue>>();
-  auto session_id = NDomain::TSessionId{"user123"};
+  auto session_id = NDomain::TSessionId{"chat123"};
 
   EXPECT_THROW({ TUserSession session(session_id, std::move(queue), nullptr); }, std::invalid_argument);
 }
@@ -86,42 +86,42 @@ TEST_F(SessionTest, InvalidConstructionNullNowFunc) {
 TEST_F(SessionTest, PushMessageSuccessOnFirstAttempt) {
   EXPECT_CALL(*QueueRaw_, Push(_)).WillOnce(Return(true));
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   EXPECT_TRUE(Session_->PushMessage(std::move(msg)));
 }
 
 TEST_F(SessionTest, PushMessageSuccessOnSecondAttempt) {
   EXPECT_CALL(*QueueRaw_, Push(_)).WillOnce(Return(false)).WillOnce(Return(true));
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   EXPECT_TRUE(Session_->PushMessage(std::move(msg)));
 }
 
 TEST_F(SessionTest, PushMessageFailedAfterMaxRetries) {
   EXPECT_CALL(*QueueRaw_, Push(_)).Times(3).WillRepeatedly(Return(false));
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   EXPECT_FALSE(Session_->PushMessage(std::move(msg), 3));
 }
 
 TEST_F(SessionTest, PushMessageCustomRetryAmount) {
   EXPECT_CALL(*QueueRaw_, Push(_)).Times(5).WillRepeatedly(Return(false));
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   EXPECT_FALSE(Session_->PushMessage(std::move(msg), 5));
 }
 
 TEST_F(SessionTest, PushMessageWithZeroRetries) {
   EXPECT_CALL(*QueueRaw_, Push(_)).Times(0);
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   EXPECT_FALSE(Session_->PushMessage(std::move(msg), 0));
 }
 
 TEST_F(SessionTest, PushMessageSingleRetry) {
   EXPECT_CALL(*QueueRaw_, Push(_)).WillOnce(Return(true));
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   EXPECT_TRUE(Session_->PushMessage(std::move(msg), 1));
 }
 
@@ -132,11 +132,11 @@ TEST_F(SessionTest, PushMessageSingleRetry) {
 TEST_F(SessionTest, ValidScenarioSendAndReceive) {
   EXPECT_CALL(*QueueRaw_, Push(_)).WillOnce(Return(true));
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   EXPECT_TRUE(Session_->PushMessage(std::move(msg)));
 
   std::vector<NDomain::TMessage> expected_messages;
-  expected_messages.push_back(CreateTestMessage("sender1", "user123", "Hello"));
+  expected_messages.push_back(CreateTestMessage("sender1", "chat123", "Hello"));
 
   EXPECT_CALL(*QueueRaw_, PopBatch(10, 5000ms)).WillOnce(Return(expected_messages));
 
@@ -164,7 +164,7 @@ TEST_F(SessionTest, GetMessagesUpdatesLastActivity) {
 TEST_F(SessionTest, QueueFullResyncRequired) {
   EXPECT_CALL(*QueueRaw_, Push(_)).Times(3).WillRepeatedly(Return(false));
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   EXPECT_FALSE(Session_->PushMessage(std::move(msg), 3));
 
   std::vector<NDomain::TMessage> empty_result;
@@ -178,7 +178,7 @@ TEST_F(SessionTest, QueueFullResyncRequired) {
 TEST_F(SessionTest, ResyncFlagClearedAfterFirstPoll) {
   EXPECT_CALL(*QueueRaw_, Push(_)).Times(3).WillRepeatedly(Return(false));
 
-  auto msg = CreateTestMessage("sender1", "user123", "Hello");
+  auto msg = CreateTestMessage("sender1", "chat123", "Hello");
   Session_->PushMessage(std::move(msg), 3);
 
   std::vector<NDomain::TMessage> empty_result;
@@ -206,9 +206,9 @@ TEST_F(SessionTest, PollEmptyQueueWithTimeout) {
 
 TEST_F(SessionTest, PollMultipleMessages) {
   std::vector<NDomain::TMessage> messages;
-  messages.push_back(CreateTestMessage("sender1", "user123", "Message1"));
-  messages.push_back(CreateTestMessage("sender2", "user123", "Message2"));
-  messages.push_back(CreateTestMessage("sender3", "user123", "Message3"));
+  messages.push_back(CreateTestMessage("sender1", "chat123", "Message1"));
+  messages.push_back(CreateTestMessage("sender2", "chat123", "Message2"));
+  messages.push_back(CreateTestMessage("sender3", "chat123", "Message3"));
 
   EXPECT_CALL(*QueueRaw_, PopBatch(100, 5000ms)).WillOnce(Return(messages));
 
@@ -365,7 +365,7 @@ TEST_F(SessionTest, GetSizeMultipleCalls) {
 // ============================================================================
 
 TEST_F(SessionTest, GetSessionIdReturnsCorrectId) {
-  EXPECT_EQ(Session_->GetSessionId().GetUnderlying(), "user123session");
+  EXPECT_EQ(Session_->GetSessionId().GetUnderlying(), "chat123session");
 }
 
 TEST_F(SessionTest, GetSessionIdConsistency) {
@@ -382,14 +382,14 @@ TEST_F(SessionTest, GetSessionIdConsistency) {
 TEST_F(SessionTest, MultipleSendsAndSinglePoll) {
   EXPECT_CALL(*QueueRaw_, Push(_)).Times(3).WillRepeatedly(Return(true));
 
-  Session_->PushMessage(CreateTestMessage("s1", "user123", "Msg1"));
-  Session_->PushMessage(CreateTestMessage("s2", "user123", "Msg2"));
-  Session_->PushMessage(CreateTestMessage("s3", "user123", "Msg3"));
+  Session_->PushMessage(CreateTestMessage("s1", "chat123", "Msg1"));
+  Session_->PushMessage(CreateTestMessage("s2", "chat123", "Msg2"));
+  Session_->PushMessage(CreateTestMessage("s3", "chat123", "Msg3"));
 
   std::vector<NDomain::TMessage> messages;
-  messages.push_back(CreateTestMessage("s1", "user123", "Msg1"));
-  messages.push_back(CreateTestMessage("s2", "user123", "Msg2"));
-  messages.push_back(CreateTestMessage("s3", "user123", "Msg3"));
+  messages.push_back(CreateTestMessage("s1", "chat123", "Msg1"));
+  messages.push_back(CreateTestMessage("s2", "chat123", "Msg2"));
+  messages.push_back(CreateTestMessage("s3", "chat123", "Msg3"));
 
   EXPECT_CALL(*QueueRaw_, PopBatch(_, _)).WillOnce(Return(messages));
 
@@ -503,7 +503,7 @@ TEST_F(SessionTest, AlternatingPushAndPoll) {
 
 TEST(SessionUServerIntegrationTest, UServerTimeUsage) {
   auto queue = std::make_unique<NiceMock<MockMessageQueue>>();
-  auto session_id = NDomain::TSessionId{"user123"};
+  auto session_id = NDomain::TSessionId{"chat123"};
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
 
   // Использование реального времени из userver
@@ -511,13 +511,13 @@ TEST(SessionUServerIntegrationTest, UServerTimeUsage) {
 
   EXPECT_NO_THROW({
     TUserSession session(session_id, std::move(queue), now_func);
-    EXPECT_EQ(session.GetSessionId().GetUnderlying(), "user123");
+    EXPECT_EQ(session.GetSessionId().GetUnderlying(), "chat123");
   });
 }
 
 TEST(SessionUServerIntegrationTest, MockSleepIntegration) {
   auto queue_raw = new NiceMock<MockMessageQueue>();
-  auto session_id = NDomain::TSessionId{"user123"};
+  auto session_id = NDomain::TSessionId{"chat123"};
   userver::utils::datetime::MockNowSet(userver::utils::datetime::UtcStringtime("2000-01-01T00:00:00+0000"));
 
   auto now_func = []() { return userver::utils::datetime::SteadyNow(); };

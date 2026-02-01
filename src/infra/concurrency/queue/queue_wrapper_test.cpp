@@ -11,10 +11,10 @@ namespace NChat::NInfra {
 namespace {
 
 TMessage CreateTestMessage(const std::string& text, const std::string& sender_id = "user1",
-                           const std::string& recipient_id = "user2") {
+                           const std::string& chat_id = "chat2") {
   return TMessage{.Payload = std::make_shared<NCore::NDomain::TMessagePayload>(NCore::NDomain::TUserId(sender_id),
                                                                                NCore::NDomain::TMessageText(text)),
-                  .RecipientId = NCore::NDomain::TUserId{recipient_id},
+                  .ChatId = NCore::NDomain::TChatId{chat_id},
                   .Context = {}};
 }
 }  // namespace

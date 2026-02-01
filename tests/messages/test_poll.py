@@ -2,17 +2,18 @@ from http import HTTPStatus
 
 import pytest
 
-from endpoints import poll_messages, send_message, start_session
-from utils import username_generator, get_session_id
-from models import Message, User
+from endpoints import poll_messages, send_message, start_session, get_private_chat
+from utils import get_session_id, get_chat_id
+from models import Message, User, PrivateChat
 from collections import Counter
 from validators import validate_messages
 import asyncio
 
+#todo нужен тест про получение своего же сообщения
 
 async def test_poll_messages_with_pending_messages(service_client, communication, short_polling):
     """Polling сообщений когда есть непрочитанные сообщения"""
-    sender, recipient, message = communication
+    sender, recipient, _, message = communication
 
     await send_message(service_client, message, sender.token)
 
@@ -22,12 +23,11 @@ async def test_poll_messages_with_pending_messages(service_client, communication
 
 
 async def test_poll_messages_with_multiple_messages(service_client, communication, short_polling):
-    sender, recipient, _ = communication
+    sender, recipient, chat_id, _ = communication
     messages = []
 
     for i in range(3):
-        messages.append(
-            Message(recipient=recipient.username, sender=sender.username))
+        messages.append(Message(chat_id=chat_id, sender=sender.username))
         await send_message(service_client, messages[-1], sender.token)
 
     response = await poll_messages(service_client, recipient)
@@ -37,7 +37,7 @@ async def test_poll_messages_with_multiple_messages(service_client, communicatio
 
 async def test_multiple_polling(service_client, communication, short_polling):
     """Двойной поллинг"""
-    sender, recipient, dummy_message = communication
+    sender, recipient, chat_id, dummy_message = communication
     await send_message(service_client, dummy_message, sender.token)
 
     response = await poll_messages(service_client, recipient)
@@ -49,50 +49,12 @@ async def test_multiple_polling(service_client, communication, short_polling):
 
     for i in range(3):
         messages.append(
-            Message(recipient=recipient.username, sender=sender.username))
+            Message(chat_id=chat_id, sender=sender.username))
         await send_message(service_client, messages[-1], sender.token)
 
     response = await poll_messages(service_client, recipient)
     assert response.status == HTTPStatus.OK
     validate_messages(response, messages)
-
-
-async def test_messaging_dialog_flow(service_client, communication):
-    """
-    Тест сценария диалога:
-    1. A -> B (B получает)
-    2. B -> A (A получает)
-    3. A -> B (B получает второй раз)
-    """
-
-    user_a, user_b, _ = communication
-
-    # --- Step 1 ---
-    msg_hello = Message(
-        sender=user_a.username,
-        recipient=user_b.username,
-        text="Hello, world!"
-    )
-    await send_message(service_client, msg_hello, user_a.token)
-
-    # --- Step 2 ---
-    response_b1 = await poll_messages(service_client, user_b)
-
-    assert response_b1.status == HTTPStatus.OK
-    validate_messages(response_b1, [msg_hello])
-
-    # --- Step 3 ---
-    msg_reply = Message(
-        sender=user_b.username,
-        recipient=user_a.username,
-        text="World is here"
-    )
-    await send_message(service_client, msg_reply, user_b.token)
-
-    response_a = await poll_messages(service_client, user_a)
-
-    assert response_a.status == HTTPStatus.OK
-    validate_messages(response_a, [msg_reply])
 
 
 async def test_poll_messages_empty_queue(service_client, single_consumer, short_polling):
@@ -126,29 +88,6 @@ async def test_poll_messages_wrong_token(service_client, token):
     assert response.status == HTTPStatus.UNAUTHORIZED
 
 
-async def test_poll_messages_multiple_users(service_client, communication, short_polling):
-    """Проверка, что каждый пользователь получает только свои сообщения"""
-    sender, recipient, _ = communication
-
-    message = Message(recipient=recipient.username, payload="Test message")
-    await send_message(service_client, message, sender.token)
-
-    sender_response = await poll_messages(service_client, sender)
-    sender_data = sender_response.json()
-
-    recipient_response = await poll_messages(service_client, recipient)
-    recipient_data = recipient_response.json()
-
-    assert sender_response.status == HTTPStatus.OK
-    assert 'messages' in sender_data
-    assert len(sender_data['messages']) == 0
-    assert recipient_response.status == HTTPStatus.OK
-    assert 'messages' in recipient_data
-    assert len(recipient_data['messages']) == 1
-    assert 'text' in recipient_data['messages'][0]
-    assert recipient_data['messages'][0]['text'] == "Test message"
-
-
 @pytest.mark.parametrize("custom_polling", [(3)], indirect=True)
 async def test_poll_messages_long_polling(service_client, single_consumer, custom_polling):
     """Проверка работы long polling (должен вернуться в течение poll_time)"""
@@ -166,13 +105,14 @@ async def test_poll_messages_long_polling(service_client, single_consumer, custo
     assert 'messages' in data
 
 
-async def test_poll_messages_max_size_limit(service_client, communication):
+@pytest.mark.parametrize("custom_polling", [(3, 4)], indirect=True)
+async def test_poll_messages_max_size_limit(service_client, communication, custom_polling):
     """Проверка, что возвращается не больше max_size сообщений"""
-    sender, recipient, base_message = communication
+    sender, recipient, chat_id, _ = communication
 
-    for i in range(105):
+    for i in range(5):
         message = Message(
-            recipient=recipient.username,
+            chat_id=chat_id,
             payload=f"Message {i}"
         )
         await send_message(service_client, message, sender.token)
@@ -182,17 +122,17 @@ async def test_poll_messages_max_size_limit(service_client, communication):
 
     assert response.status == HTTPStatus.OK
     assert 'messages' in data
-    assert len(data['messages']) <= 100
+    assert len(data['messages']) == 4
 
 
 async def test_poll_messages_ordering(service_client, communication):
     """Проверка порядка получения сообщений (FIFO)"""
-    sender, recipient, _ = communication
+    sender, recipient, chat_id, _ = communication
 
     messages_sent = []
     for i in range(5):
         message = Message(
-            recipient=recipient.username,
+            chat_id=chat_id,
             payload=f"Message {i}"
         )
         await send_message(service_client, message, sender.token)
@@ -224,12 +164,12 @@ async def test_poll_messages_resync_required_false(service_client, single_consum
 @pytest.mark.usefixtures("short_polling")
 async def test_poll_messages_resync_required_true(service_client, queue_config, communication):
     """Проверка, что resync_required = true при переполнении очереди"""
-    sender, recipient, message = communication
+    sender, recipient, _, message = communication
 
     response_1 = await send_message(service_client, message, sender.token)
     assert response_1.status == HTTPStatus.ACCEPTED
     response_2 = await send_message(service_client, message, sender.token)
-    assert response_2.status == HTTPStatus.SERVICE_UNAVAILABLE
+    assert response_2.status == HTTPStatus.ACCEPTED
 
     response = await poll_messages(service_client, recipient)
     assert response.status == HTTPStatus.OK
@@ -241,7 +181,7 @@ async def test_poll_messages_resync_required_true(service_client, queue_config, 
 @pytest.mark.usefixtures("short_polling")
 async def test_poll_messages_structure(service_client, communication):
     """Проверка структуры возвращаемых сообщений"""
-    sender, recipient, message = communication
+    sender, recipient, _, message = communication
 
     await send_message(service_client, message, sender.token)
 
@@ -267,9 +207,14 @@ async def test_poll_messages_multiple_senders_concurrent(service_client, multipl
 
     async def send_messages_from_sender(sender, count=3):
         tasks = []
+        private_chat = PrivateChat(target_username=recipient.username)
+        response = await get_private_chat(service_client, private_chat, sender.token)
+        assert response.status == HTTPStatus.CREATED
+        chat_id = get_chat_id(response)
+
         for i in range(count):
             message = Message(
-                recipient=recipient.username,
+                chat_id=chat_id,
                 payload=f"Message {i} from {sender.username}"
             )
             tasks.append(send_message(service_client, message, sender.token))
@@ -301,7 +246,7 @@ async def test_poll_messages_multiple_senders_concurrent(service_client, multipl
 async def test_poll_messages_immediate_delivery(
     service_client, communication, custom_polling
 ):
-    sender, recipient, message = communication
+    sender, recipient, _, message = communication
 
     async def delayed_send():
         await asyncio.sleep(0.2)  # даём poll реально уйти
@@ -330,20 +275,25 @@ async def test_poll_messages_immediate_delivery(
 async def test_poll_messages_multiple_recipients_one_sender(service_client, multiple_users):
     """Проверка поллинга сообщений несколькими получателями от одного отправителя"""
     sender = multiple_users[0]
-    recipient1 = multiple_users[1]
-    recipient2 = multiple_users[2]
+    chat_ids = []
+
+    for i in range(1,3):
+        private_chat = PrivateChat(target_username=multiple_users[i].username)
+        response = await get_private_chat(service_client, private_chat, sender.token)
+        assert response.status == HTTPStatus.CREATED
+        chat_ids.append(get_chat_id(response))
 
     messages_to_recipient1 = [
-        Message(recipient=recipient1.username,
+        Message(chat_id=chat_ids[0],
                 payload=f"Hello recipient1, message 0"),
-        Message(recipient=recipient1.username,
+        Message(chat_id=chat_ids[0],
                 payload=f"Sending message 1 to recipient1")
     ]
 
     messages_to_recipient2 = [
-        Message(recipient=recipient2.username,
+        Message(chat_id=chat_ids[1],
                 payload=f"Hello recipient2, message 0"),
-        Message(recipient=recipient2.username,
+        Message(chat_id=chat_ids[1],
                 payload=f"Sending message 1 to recipient2")
     ]
 
@@ -356,8 +306,8 @@ async def test_poll_messages_multiple_recipients_one_sender(service_client, mult
     await asyncio.gather(*send_tasks)
 
     response1, response2 = await asyncio.gather(
-        poll_messages(service_client, recipient1),
-        poll_messages(service_client, recipient2)
+        poll_messages(service_client, multiple_users[1]),
+        poll_messages(service_client, multiple_users[2])
     )
 
     data1 = response1.json()
@@ -402,7 +352,7 @@ async def test_poll_messages_multiple_recipients_one_sender(service_client, mult
 async def test_garbage_collection(
     service_client, communication, gc_config, sessions_config, mocked_time, short_polling
 ):
-    sender, recipient, message = communication
+    sender, recipient, _, message = communication
 
     await send_message(service_client, message, sender.token)
 
@@ -433,7 +383,7 @@ async def test_reset(service_client, single_consumer, short_polling, testpoint):
 
 
 async def test_polling_anothers_session(service_client, communication):
-    sender, recipient, _ = communication
+    sender, recipient, _, _ = communication
     sender.session_id = recipient.session_id
 
     response = await poll_messages(service_client, sender)

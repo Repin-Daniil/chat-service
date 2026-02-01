@@ -4,25 +4,27 @@ import pytest
 
 from endpoints import send_message, start_session, poll_messages
 from models import Message
-from utils import Routes, username_generator, get_session_id
+from utils import Routes, get_session_id, get_chat_id
 from validators import validate_user_reg, validate_messages
 
 
 async def test_send_message(service_client, communication, monitor_client):
-    sender, recipient, message = communication
+    sender, recipient, chat_id, message = communication
     response = await send_message(service_client, message, sender.token)
     assert response.status == HTTPStatus.ACCEPTED
 
 
-async def test_send_yourself(service_client, registered_user):
-    message = Message(recipient=registered_user.username)
-    session_id = get_session_id(await start_session(service_client, registered_user.token))
-    response = await send_message(service_client, message, registered_user.token)
+async def test_send_yourself(service_client, self_chat):
+    user, chat_id = self_chat
+    
+    message = Message(chat_id=chat_id)
+    session_id = get_session_id(await start_session(service_client, user.token))
+    response = await send_message(service_client, message, user.token)
     assert response.status == HTTPStatus.ACCEPTED
 
 
 async def test_session_fanout(service_client, communication):
-    sender, recipient, message = communication
+    sender, recipient, chat_id, message = communication
     recipient_sessions = [recipient.session_id]
 
     for i in range(3):
@@ -41,25 +43,24 @@ async def test_session_fanout(service_client, communication):
 
 
 @pytest.mark.parametrize('queue_config', [1], indirect=True)
-async def test_queue_overloaded(service_client, registered_user, queue_config):
-    registered_user.session_id = get_session_id(await start_session(service_client, registered_user.token))
-    message = Message(recipient=registered_user.username,
-                      sender=registered_user.username)
+async def test_queue_overloaded(service_client, queue_config, self_chat):
+    user, chat_id = self_chat
 
-    response_1 = await send_message(service_client, message, registered_user.token)
+    message = Message(chat_id=chat_id,
+                      sender=user.username)
+
+    response_1 = await send_message(service_client, message, user.token)
     assert response_1.status == HTTPStatus.ACCEPTED
-    response_2 = await send_message(service_client, message, registered_user.token)
-    assert response_2.status == HTTPStatus.SERVICE_UNAVAILABLE
+    response_2 = await send_message(service_client, message, user.token)
+    assert response_2.status == HTTPStatus.ACCEPTED # fixme
 
-
-async def test_send_offline(service_client, registered_user):
-    message = Message(recipient=registered_user.username)
-    response = await send_message(service_client, message, registered_user.token)
-    assert response.status == HTTPStatus.CONFLICT
+    polling_response = await poll_messages(service_client, user)
+    data = polling_response.json()
+    assert data['resync_required'] is True
 
 
 async def test_wrong_recipient(service_client, registered_user):
-    message = Message(recipient=username_generator())
+    message = Message(chat_id="pc:random_chat_id()")
     response = await send_message(service_client, message, registered_user.token)
 
     assert response.status == HTTPStatus.NOT_FOUND
@@ -70,7 +71,7 @@ async def test_wrong_recipient(service_client, registered_user):
     'wrong_token',
 ])
 async def test_wrong_token(service_client, communication, token):
-    sender, recipient, message = communication
+    sender, recipient, _, message = communication
     response = await send_message(service_client, message, token)
 
     assert response.status == HTTPStatus.UNAUTHORIZED

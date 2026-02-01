@@ -12,9 +12,10 @@ namespace NChat::NApp::NServices {
 
 class TMessagingService {
  public:
-  TMessagingService(NCore::IMailboxRegistry& registry, ISendLimiter& limiter, NCore::IUserRepository& repository);
+  TMessagingService(NCore::IMailboxRegistry& registry, ISendLimiter& limiter, NCore::IUserRepository& user_repo,
+                    NCore::IChatRepository& chat_repo);
 
-  void SendMessage(NDto::TSendMessageRequest request);
+  NDto::TSendMessageResult SendMessage(NDto::TSendMessageRequest request);
 
   NDto::TStartSessionResult StartSession(const NDto::TStartSessionRequest& request);
   NDto::TPollMessagesResult PollMessages(const NDto::TPollMessagesRequest& request,

@@ -29,6 +29,5 @@ class TPrivateChat : public IChat {
   TChatId Id_;
   std::pair<TUserId, TUserId> Users_;
 };
-// todo тесты на эту штуку
 
 }  // namespace NChat::NCore::NDomain

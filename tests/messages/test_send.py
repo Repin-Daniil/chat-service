@@ -7,6 +7,8 @@ from models import Message
 from utils import Routes, get_session_id, get_chat_id
 from validators import validate_user_reg, validate_messages
 
+#todo надо разбить более логично по файлам
+#todo надо протестить штуку с отклонением по overflow через метрички
 
 async def test_send_message(service_client, communication, monitor_client):
     sender, recipient, chat_id, message = communication
@@ -59,7 +61,7 @@ async def test_queue_overloaded(service_client, queue_config, self_chat):
     assert data['resync_required'] is True
 
 
-async def test_wrong_recipient(service_client, registered_user):
+async def test_chat_not_found(service_client, registered_user):
     message = Message(chat_id="pc:random_chat_id()")
     response = await send_message(service_client, message, registered_user.token)
 

@@ -7,9 +7,13 @@ namespace NChat::NCore::NDomain {
 
 enum class EChatType { Private, Group, Channel };
 enum class EMemberRole { Member, Admin, Owner };
-
-inline constexpr char kChatIdDelimiter = ':';
 // todo в будущем еще banned, reader
+
+constexpr inline char kChatIdDelimiter = ':';
+
+constexpr inline std::string_view kPrivateChatPrefix = "pc";
+constexpr inline std::string_view kGroupPrefix = "gc";
+constexpr inline std::string_view kChannelPrefix = "ch";
 
 class TChatIdWrongFormatException : public TDomainException {
  public:
@@ -24,7 +28,7 @@ class IChat {
   virtual std::vector<TUserId> GetMembers() const = 0;
   virtual std::vector<TUserId> GetRecipients(const TUserId& sender_id) const = 0;
   // ACL
-  //   virtual std::optional<EMemberRole> GetRole(const TUserId& user) const = 0;
+  // virtual std::optional<EMemberRole> GetRole(const TUserId& user) const = 0;
   virtual bool CanPost(const TUserId& sender_id) const = 0;
 
   virtual ~IChat() = default;

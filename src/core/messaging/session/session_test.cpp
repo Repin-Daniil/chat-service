@@ -1,32 +1,17 @@
-#include "mocks.hpp"
-
 #include <core/messaging/session/session.hpp>
 #include <core/messaging/value/message_text.hpp>
+
+#include <core/messaging/mocks.hpp>
 
 #include <gtest/gtest.h>
 #include <userver/utils/datetime.hpp>
 #include <userver/utils/datetime/steady_coarse_clock.hpp>
 #include <userver/utils/mock_now.hpp>
 
-#include <atomic>
 #include <chrono>
 
 using namespace std::chrono_literals;
 
-namespace {
-// Хелпер для создания сообщений
-NDomain::TMessage CreateTestMessage(const std::string& sender_id, const std::string& chat_id,
-                                    const std::string& text) {
-  auto payload = std::make_shared<NDomain::TMessagePayload>(NDomain::TUserId{sender_id}, NDomain::TMessageText(text));
-
-  NDomain::TMessage msg;
-  msg.Payload = payload;
-  msg.ChatId = NDomain::TChatId{chat_id};
-
-  return msg;
-}
-
-}  // namespace
 
 class SessionTest : public ::testing::Test {
  protected:

@@ -1,14 +1,5 @@
 #include "chat_utils.hpp"
 
-namespace {
-
-constexpr inline std::string_view kPrivateChatPrefix = "pc";
-constexpr inline std::string_view kGroupPrefix = "gc";
-constexpr inline std::string_view kChannelPrefix = "ch";
-// fixme протестить префиксы в функциональных тестах
-
-}  // namespace
-
 namespace NChat::NCore::NDomain {
 
 std::pair<std::string_view, std::string_view> ParseChatId(std::string_view chat_id) {

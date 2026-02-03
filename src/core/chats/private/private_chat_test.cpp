@@ -34,10 +34,23 @@ TEST_F(TPrivateChatTest, ConstructorStoresId) {
   EXPECT_EQ(chat.GetId(), chat_id_);
 }
 
-TEST_F(TPrivateChatTest, GetTypeReturnsPrivate) {
+TEST_F(TPrivateChatTest, ConstructorMakeCorrectId) {
+  std::string uuid = "very_unique_id";
+  TPrivateChat chat(uuid, user1_, user2_);
+
+  EXPECT_EQ(chat.GetId(), TChatId{fmt::format("{}{}{}", kPrivateChatPrefix, kChatIdDelimiter, uuid)});
+}
+
+TEST_F(TPrivateChatTest, GetTypeIsPrivate) {
   TPrivateChat chat(chat_id_, user1_, user2_);
 
   EXPECT_EQ(chat.GetType(), EChatType::Private);
+}
+
+TEST_F(TPrivateChatTest, IsSoloChat) {
+  TPrivateChat chat(chat_id_, user1_, user1_);
+
+  EXPECT_TRUE(chat.IsSoloChat());
 }
 
 // ============================================================================
@@ -90,6 +103,46 @@ TEST_F(TPrivateChatTest, GetMembersReturnsSortedUsers) {
   ASSERT_EQ(members.size(), 2);
   EXPECT_EQ(members[0], user1_);
   EXPECT_EQ(members[1], user2_);
+}
+
+// ============================================================================
+// GetRecipients
+// ============================================================================
+
+TEST_F(TPrivateChatTest, GetRecipientsBasic) {
+  TPrivateChat chat(chat_id_, user1_, user2_);
+
+  auto recipients = chat.GetRecipients(user2_);
+
+  ASSERT_EQ(recipients.size(), 2);
+  EXPECT_EQ(recipients[0], user1_);
+  EXPECT_EQ(recipients[1], user2_);
+}
+
+TEST_F(TPrivateChatTest, GetRecipientsOther) {
+  TPrivateChat chat(chat_id_, user1_, user2_);
+  TUserId alien{"Alien"};
+
+  auto recipients = chat.GetRecipients(alien);
+
+  ASSERT_EQ(recipients.size(), 0);
+}
+
+TEST_F(TPrivateChatTest, GetRecipientsSoloChatOther) {
+  TPrivateChat chat(chat_id_, user1_, user1_);
+
+  auto recipients = chat.GetRecipients(user2_);
+
+  ASSERT_EQ(recipients.size(), 0);
+}
+
+TEST_F(TPrivateChatTest, GetRecipientsSoloChatSelf) {
+  TPrivateChat chat(chat_id_, user1_, user1_);
+
+  auto recipients = chat.GetRecipients(user1_);
+
+  ASSERT_EQ(recipients.size(), 1);
+  EXPECT_EQ(recipients[0], user1_);
 }
 
 // ============================================================================

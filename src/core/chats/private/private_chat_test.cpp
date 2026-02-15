@@ -1,6 +1,7 @@
 #include "private_chat.hpp"
 
 #include <core/chats/utils/chat_utils.hpp>
+#include <core/chats/value/chat_id_format.hpp>
 
 #include <gtest/gtest.h>
 

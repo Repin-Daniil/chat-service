@@ -1,5 +1,7 @@
 #include "chat_utils.hpp"
 
+#include <core/chats/value/chat_id_format.hpp>
+
 namespace NChat::NCore::NDomain {
 
 std::pair<std::string_view, std::string_view> ParseChatId(std::string_view chat_id) {

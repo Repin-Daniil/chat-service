@@ -14,7 +14,8 @@ namespace NChat::NInfra::NComponents {
 
 TSendLimiterComponent::TSendLimiterComponent(const userver::components::ComponentConfig& config,
                                              const userver::components::ComponentContext& context)
-    : LoggableComponentBase(config, context), Limiter_(GetLimiterFactory().Create(config, context, "type")) {}
+    : LoggableComponentBase(config, context), Limiter_(GetLimiterFactory().Create(config, context, "type")) {
+}
 
 TObjectFactory<NApp::ISendLimiter> TSendLimiterComponent::GetLimiterFactory() {
   TObjectFactory<NApp::ISendLimiter> limiter_factory;
@@ -35,7 +36,9 @@ TObjectFactory<NApp::ISendLimiter> TSendLimiterComponent::GetLimiterFactory() {
   return limiter_factory;
 }
 
-NApp::ISendLimiter& TSendLimiterComponent::GetLimiter() { return *Limiter_; }
+NApp::ISendLimiter& TSendLimiterComponent::GetLimiter() {
+  return *Limiter_;
+}
 
 userver::yaml_config::Schema TSendLimiterComponent::GetStaticConfigSchema() {
   return userver::yaml_config::MergeSchemas<userver::components::LoggableComponentBase>(

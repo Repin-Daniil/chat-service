@@ -7,11 +7,13 @@
 namespace NChat::NInfra {
 
 TLimiterWrapper::TLimiterWrapper()
-    : Bucket_(userver::utils::TokenBucket::MakeUnbounded()), LastAccess_(userver::utils::datetime::SteadyNow()) {}
+    : Bucket_(userver::utils::TokenBucket::MakeUnbounded()), LastAccess_(userver::utils::datetime::SteadyNow()) {
+}
 
 TLimiterWrapper::TLimiterWrapper(std::size_t max_rps, std::size_t token_refill_amount, TDuration token_refill_interval)
     : Bucket_(max_rps, {token_refill_amount, token_refill_interval}),
-      LastAccess_(userver::utils::datetime::SteadyNow()) {}
+      LastAccess_(userver::utils::datetime::SteadyNow()) {
+}
 
 bool TLimiterWrapper::TryAcquire() {
   LastAccess_.store(userver::utils::datetime::SteadyNow(), std::memory_order_relaxed);
@@ -22,7 +24,9 @@ TLimiterWrapper::TTimePoint TLimiterWrapper::GetLastAccess() const {
   return LastAccess_.load(std::memory_order_relaxed);
 }
 
-TLimiterWrapper::TTokenBucket& TLimiterWrapper::GetBucket() { return Bucket_; }
+TLimiterWrapper::TTokenBucket& TLimiterWrapper::GetBucket() {
+  return Bucket_;
+}
 
 TSendLimiter::TSendLimiter(std::size_t shard_amount, userver::dynamic_config::Source config_source,
                            TLimiterStatistics& stats)
@@ -82,5 +86,7 @@ void TSendLimiter::TraverseLimiters() {
   LOG_INFO() << fmt::format("Limiter GC: removed {}", removed_amount);
 }
 
-std::int64_t TSendLimiter::GetTotalLimiters() const { return LimiterCounter_.load(std::memory_order_relaxed); }
+std::int64_t TSendLimiter::GetTotalLimiters() const {
+  return LimiterCounter_.load(std::memory_order_relaxed);
+}
 }  // namespace NChat::NInfra

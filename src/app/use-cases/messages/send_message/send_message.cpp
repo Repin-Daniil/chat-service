@@ -2,46 +2,40 @@
 
 namespace NChat::NApp {
 
-TSendMessageUseCase::TSendMessageUseCase(NCore::IMailboxRegistry& registry, ISendLimiter& limiter,
-                                         NCore::IUserRepository& user_repo)
-    : Registry_(registry), UserRepo_(user_repo), Limiter_(limiter) {}
+TSendMessageUseCase::TSendMessageUseCase(NCore::IMailboxRegistry& registry, NCore::IChatRepository& chat_repo,
+                                         ISendLimiter& limiter)
+    : Router_(registry), ChatRepo_(chat_repo), Limiter_(limiter) {
+}
 
-void TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
+NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest request) {
   if (!Limiter_.TryAcquire(request.SenderId)) {
     throw TTooManyRequests("Enhance your calm!");
   };
 
-  NCore::NDomain::TUsername recipient_username(std::move(request.RecipientUsername));
   TMessageText text(std::move(request.Text));
+  auto message = NCore::NDomain::TMessage::Create(request.ChatId, request.SenderId, std::move(text), request.SentAt);
+  // todo Нужны кэши!
+  //fixme Нужно поменять спеку
 
-  // todo В будущем когда будут chat_id провести ACL, а пока резолвим в базе через КЭШ user_id
-  auto recipient_id = UserRepo_.FindByUsername(recipient_username.Value());
-  if (!recipient_id.has_value()) {
-    throw TRecipientNotFound("Recipient Not Found");
-  }
-  // Тут надо будет просто передать в Channel/Router что нить такое
-  auto mailbox = Registry_.GetMailbox(*recipient_id);
-
-  if (!mailbox) {
-    throw TRecipientOffline(fmt::format("User {} is offline", recipient_username.Value()));
+  auto chat = ChatRepo_.GetChat(request.ChatId);
+  if (!chat) {
+    throw TUnknownChat(fmt::format("Chat {} doesn't exist", request.ChatId));
   }
 
-  auto message = ConstructMessage(*recipient_id, request.SenderId, std::move(text), request.SentAt);
-
-  const bool is_success = mailbox->SendMessage(std::move(message));
-
-  if (!is_success) {
-    throw TRecipientTemporaryUnavailable(
-        fmt::format("User {} is temporarily unable to accept new messages", recipient_username.Value()));
+  if (!chat->CanPost(request.SenderId)) {
+    throw TSendForbidden(fmt::format("User {} can't send to chat {}", request.SenderId, request.ChatId));
   }
-}
 
-NCore::NDomain::TMessage TSendMessageUseCase::ConstructMessage(const TUserId& recipient_id, const TUserId& sender_id,
-                                                               TMessageText text, TTimePoint sent_at) {
-  auto payload = std::make_shared<NCore::NDomain::TMessagePayload>(sender_id, std::move(text));
+  auto recipients = chat->GetRecipients(request.SenderId);
 
-  NCore::NDomain::TDeliveryContext context{.Get = sent_at};
-  return {.Payload = std::move(payload), .RecipientId = recipient_id, .Context = context};
+  auto result = Router_.Route(std::move(recipients), std::move(message));
+
+  return {result.Successful, result.Dropped, result.Offline};
+  // todo Можно сначала сделать модели каналов, групп, без крудов, а в тестах через постгрю initial_data тестить
+
+  // В будущем по идее шлюз сообщает хабу о своих пользователях по grpc, периодчиски делает full_update
+  // todo Нужны ключи идемпотентности клиентские
+  // todo проблема отправки отправителю не решена
 }
 
 }  // namespace NChat::NApp

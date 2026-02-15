@@ -2,13 +2,14 @@
 
 namespace NChat::NApp::NServices {
 TMessagingService::TMessagingService(NCore::IMailboxRegistry& registry, ISendLimiter& limiter,
-                                     NCore::IUserRepository& repository)
-    : SendMessageUseCase_(registry, limiter, repository),
-      PollMessagesUseCase_(registry, repository),
-      StartSessionUseCase_(registry) {}
+                                     NCore::IUserRepository& user_repo, NCore::IChatRepository& chat_repo)
+    : SendMessageUseCase_(registry, chat_repo, limiter),
+      PollMessagesUseCase_(registry, user_repo),
+      StartSessionUseCase_(registry) {
+}
 
-void TMessagingService::SendMessage(NDto::TSendMessageRequest request) {
-  SendMessageUseCase_.Execute(std::move(request));
+NDto::TSendMessageResult TMessagingService::SendMessage(NDto::TSendMessageRequest request) {
+  return SendMessageUseCase_.Execute(std::move(request));
 }
 
 NDto::TStartSessionResult TMessagingService::StartSession(const NDto::TStartSessionRequest& request) {

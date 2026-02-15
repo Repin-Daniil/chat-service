@@ -186,15 +186,15 @@ components:
         message:
           type: object
           properties:
-            recipient:
+            chat_id:
               type: string
-              description: Username пользователя, которому отправляется сообщение
+              format: uuid
             payload:
               type: string
               description: Текст сообщения
               example: "Hello, World!"
           required:
-            - recipient
+            - chat_id
             - payload
 
     Message:
@@ -572,9 +572,7 @@ paths:
         "401":
           description: Не авторизован
         "404":
-          description: Получатель не найден
-        "409":
-          description: Пользователь офлайн
+          description: Чат не найден
         "413":
           description: "Слишком большой payload"
 

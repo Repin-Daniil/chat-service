@@ -17,7 +17,9 @@ TShardedRegistry::TShardedRegistry(std::size_t shard_amount, NCore::ISessionsFac
   LOG_INFO() << fmt::format("Start Registry on Sharded Map with {} shards", shard_amount);
 }
 
-NCore::TMailboxPtr TShardedRegistry::GetMailbox(const TUserId& user_id) const { return Registry_.Get(user_id); }
+NCore::TMailboxPtr TShardedRegistry::GetMailbox(const TUserId& user_id) const {
+  return Registry_.Get(user_id);
+}
 
 NCore::TMailboxPtr TShardedRegistry::CreateOrGetMailbox(const TUserId& user_id) {
   if (auto existing_mailbox = Registry_.Get(user_id)) {
@@ -49,7 +51,9 @@ void TShardedRegistry::RemoveMailbox(const TUserId& user_id) {
   OnlineCounter_.fetch_sub(1, std::memory_order_relaxed);
 }
 
-std::int64_t TShardedRegistry::GetOnlineAmount() const { return OnlineCounter_.load(std::memory_order_relaxed); }
+std::int64_t TShardedRegistry::GetOnlineAmount() const {
+  return OnlineCounter_.load(std::memory_order_relaxed);
+}
 
 void TShardedRegistry::TraverseRegistry(std::chrono::milliseconds inter_pause) {
   auto is_expired = [](const NCore::TMailboxPtr& mailbox) {
@@ -71,6 +75,8 @@ void TShardedRegistry::TraverseRegistry(std::chrono::milliseconds inter_pause) {
   LOG_INFO() << fmt::format("Mailbox Registry GC: removed {}", removed_amount);
 }
 
-void TShardedRegistry::Clear() { Registry_.Clear(); }
+void TShardedRegistry::Clear() {
+  Registry_.Clear();
+}
 
 }  // namespace NChat::NInfra

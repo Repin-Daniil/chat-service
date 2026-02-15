@@ -9,7 +9,9 @@ TUserMailbox::TUserMailbox(NDomain::TUserId user_id, TSessions sessions)
   }
 }
 
-bool TUserMailbox::SendMessage(NDomain::TMessage&& message) { return Sessions_->FanOutMessage(std::move(message)); }
+bool TUserMailbox::SendMessage(NDomain::TMessage&& message) {
+  return Sessions_->FanOutMessage(std::move(message));
+}
 
 TMessages TUserMailbox::PollMessages(NDomain::TSessionId session_id, std::size_t max_size,
                                      std::chrono::seconds timeout) {
@@ -26,10 +28,16 @@ bool TUserMailbox::CreateSession(NDomain::TSessionId session_id) {
   return Sessions_->CreateSession(session_id) != nullptr;
 }
 
-bool TUserMailbox::HasNoConsumer() const { return Sessions_->HasNoConsumer(); }
+bool TUserMailbox::HasNoConsumer() const {
+  return Sessions_->HasNoConsumer();
+}
 
-std::size_t TUserMailbox::CleanIdle() { return Sessions_->CleanIdle(); }
+std::size_t TUserMailbox::CleanIdle() {
+  return Sessions_->CleanIdle();
+}
 
-NDomain::TUserId TUserMailbox::GetUserId() const { return UserId_; }
+NDomain::TUserId TUserMailbox::GetUserId() const {
+  return UserId_;
+}
 
 }  // namespace NChat::NCore

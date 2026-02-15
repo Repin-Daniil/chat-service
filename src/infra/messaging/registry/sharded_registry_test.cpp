@@ -1,11 +1,11 @@
 #include "sharded_registry.hpp"
 
-#include "infra/messaging/sessions/rcu_sessions_registry.hpp"
+#include <infra/messaging/sessions/rcu_sessions_registry.hpp>
 
 #include <core/common/ids.hpp>
 
 #include <infra/messaging/registry/config/registry_config.hpp>
-#include <infra/messaging/sessions/tests/mocks.hpp>
+#include <core/messaging/mocks.hpp>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -38,7 +38,9 @@ class TShardedRegistryTest : public ::testing::Test {
 };
 
 // Базовые тесты функциональности
-UTEST_F(TShardedRegistryTest, InitialStateEmpty) { EXPECT_EQ(Registry->GetOnlineAmount(), 0); }
+UTEST_F(TShardedRegistryTest, InitialStateEmpty) {
+  EXPECT_EQ(Registry->GetOnlineAmount(), 0);
+}
 
 UTEST_F(TShardedRegistryTest, GetNonExistentMailbox) {
   TUserId user_id{"42"};

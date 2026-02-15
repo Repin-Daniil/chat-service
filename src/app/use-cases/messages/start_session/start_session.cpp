@@ -4,7 +4,8 @@
 
 namespace NChat::NApp {
 
-TStartSessionUseCase::TStartSessionUseCase(NCore::IMailboxRegistry& registry) : Registry_(registry) {}
+TStartSessionUseCase::TStartSessionUseCase(NCore::IMailboxRegistry& registry) : Registry_(registry) {
+}
 
 NDto::TStartSessionResult TStartSessionUseCase::Execute(const NDto::TStartSessionRequest& request) {
   auto mailbox = Registry_.CreateOrGetMailbox(request.ConsumerId);

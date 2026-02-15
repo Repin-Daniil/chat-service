@@ -19,6 +19,8 @@ TChatServiceComponent::TChatServiceComponent(const userver::components::Componen
   ChatService_ = std::make_unique<NApp::NServices::TChatService>(chat_repo, user_repo);
 }
 
-NApp::NServices::TChatService& TChatServiceComponent::GetService() { return *ChatService_; }
+NApp::NServices::TChatService& TChatServiceComponent::GetService() {
+  return *ChatService_;
+}
 
 }  // namespace NChat::NInfra::NComponents

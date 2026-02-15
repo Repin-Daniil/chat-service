@@ -59,7 +59,8 @@ namespace NChat::NInfra::NHandlers {
 TRegisterUserHandler::TRegisterUserHandler(const userver::components::ComponentConfig& config,
                                            const userver::components::ComponentContext& context)
     : HttpHandlerJsonBase(config, context),
-      UserService_(context.FindComponent<NComponents::TUserServiceComponent>().GetService()) {}
+      UserService_(context.FindComponent<NComponents::TUserServiceComponent>().GetService()) {
+}
 
 userver::formats::json::Value TRegisterUserHandler::HandleRequestJsonThrow(
     const userver::server::http::HttpRequest&, const userver::formats::json::Value& request_json,

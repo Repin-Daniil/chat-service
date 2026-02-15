@@ -16,7 +16,8 @@ using NCore::NDomain::TRawPassword;
 using NCore::NDomain::TUsername;
 
 TUpdateUserUseCase::TUpdateUserUseCase(NCore::IUserRepository& user_repo, NCore::IAuthService& auth_service)
-    : UserRepo_(user_repo), AuthService_(auth_service) {}
+    : UserRepo_(user_repo), AuthService_(auth_service) {
+}
 
 NDto::TUserUpdateResult TUpdateUserUseCase::Execute(const NDto::TUserUpdateRequest& request) const {
   TUsername username_to_update{request.UsernameToUpdate};

@@ -45,6 +45,8 @@ def get_user_token(response):
 def get_session_id(response):
     return response.json()['session_id']
 
+def get_chat_id(response):
+    return response.json()['chat_id']
 
 def generate_string(min_length: int, max_length: int, generator: callable, fill_char: str = "x") -> str:
     value = generator()

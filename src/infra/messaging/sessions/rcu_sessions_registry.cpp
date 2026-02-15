@@ -7,7 +7,8 @@ namespace NChat::NInfra {
 TRcuSessionsRegistry::TRcuSessionsRegistry(const NCore::IMessageQueueFactory& queue_factory,
                                            std::function<TTimePoint()> now,
                                            userver::dynamic_config::Source config_source, TSessionsStatistics& stats)
-    : QueueFactory_(queue_factory), GetNow_(now), ConfigSource_(std::move(config_source)), Stats_(stats) {}
+    : QueueFactory_(queue_factory), GetNow_(now), ConfigSource_(std::move(config_source)), Stats_(stats) {
+}
 
 bool TRcuSessionsRegistry::FanOutMessage(TMessage message) {
   auto sessions_ptr = Sessions_.Read();

@@ -17,19 +17,34 @@ namespace {
 // Mock реализация IMessageQueue для бенчмарков
 class TMockMessageQueue : public IMessageQueue {
  public:
-  bool Push(TMessage&&) override { return true; }
+  bool Push(TMessage&&) override {
+    return true;
+  }
 
-  std::vector<TMessage> PopBatch(std::size_t /*max_batch_size*/, std::chrono::milliseconds) override { return {}; }
+  std::vector<TMessage> PopBatch(std::size_t /*max_batch_size*/, std::chrono::milliseconds) override {
+    return {};
+  }
 
-  std::size_t GetSizeApproximate() const override { return 0; }
-  void SetMaxSize(std::size_t) override {}
-  std::size_t GetMaxSize() const override { return 1000; }
-  bool HasConsumer() const override { return false; }
+  std::size_t GetSizeApproximate() const override {
+    return 0;
+  }
+
+  void SetMaxSize(std::size_t) override {
+  }
+
+  std::size_t GetMaxSize() const override {
+    return 1000;
+  }
+  bool HasConsumer() const override {
+    return false;
+  }
 };
 
 class TMockMessageQueueFactory : public IMessageQueueFactory {
  public:
-  std::unique_ptr<IMessageQueue> Create() const override { return std::make_unique<TMockMessageQueue>(); }
+  std::unique_ptr<IMessageQueue> Create() const override {
+    return std::make_unique<TMockMessageQueue>();
+  }
 };
 
 // Создание тестового сообщения

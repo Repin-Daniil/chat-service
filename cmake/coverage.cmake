@@ -14,6 +14,16 @@ PRIVATE
 -fprofile-instr-generate
 -fcoverage-mapping)
 
+
+target_compile_options(${PROJECT_NAME}_unittest PRIVATE
+    -fprofile-instr-generate
+    -fcoverage-mapping)
+
+target_link_options(${PROJECT_NAME}_unittest PRIVATE
+    -fprofile-instr-generate
+    -fcoverage-mapping)
+
+
 add_custom_target(
 coverage
 COMMAND ../scripts/coverage.sh

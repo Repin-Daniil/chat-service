@@ -10,7 +10,8 @@ namespace NUtils::NId {
 
 class UuidGenerator {
  public:
-  UuidGenerator() : Generator_() {}
+  UuidGenerator() : Generator_() {
+  }
 
   std::string Generate() {
     auto uuid = Generator_();

@@ -10,7 +10,8 @@ namespace NChat::NInfra {
 
 class TVyukovQueueFactory : public NCore::IMessageQueueFactory {
  public:
-  TVyukovQueueFactory(userver::dynamic_config::Source config_source) : ConfigSource_(std::move(config_source)) {}
+  TVyukovQueueFactory(userver::dynamic_config::Source config_source) : ConfigSource_(std::move(config_source)) {
+  }
 
   std::unique_ptr<NCore::IMessageQueue> Create() const override {
     const auto snapshot = ConfigSource_.GetSnapshot();

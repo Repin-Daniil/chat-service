@@ -45,7 +45,11 @@ std::chrono::seconds TUserSession::GetLifetimeSeconds() const {
   return std::chrono::seconds{(GetNow_() - LastConsumerActivity_.load()).count()};
 }
 
-NDomain::TSessionId TUserSession::GetSessionId() const { return SessionId_; }
+NDomain::TSessionId TUserSession::GetSessionId() const {
+  return SessionId_;
+}
 
-std::size_t TUserSession::GetSizeApproximate() const { return MessageBus_->GetSizeApproximate(); }
+std::size_t TUserSession::GetSizeApproximate() const {
+  return MessageBus_->GetSizeApproximate();
+}
 }  // namespace NChat::NCore

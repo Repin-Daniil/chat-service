@@ -1,0 +1,1 @@
+SELECT user_id_1, user_id_2 FROM chat.private_chats WHERE chat_id = $1;

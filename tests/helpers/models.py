@@ -15,7 +15,7 @@ class User(BaseModel):
 
 
 class Message(BaseModel):
-    recipient: str = Field(default="")
+    chat_id: str = Field(default="")
     payload: str = Field(default_factory=fake.paragraph)
     sender: str = Field(default=None, exclude=True)
 

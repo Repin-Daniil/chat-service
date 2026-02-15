@@ -2,6 +2,8 @@
 
 #include <app/services/message/messaging_service.hpp>
 
+#include <api/http/v1/messages/send/metrics/send_stats.hpp>
+
 #include <userver/server/handlers/http_handler_json_base.hpp>
 
 namespace NChat::NInfra::NHandlers {
@@ -17,6 +19,7 @@ class TSendMessageHandler : public userver::server::handlers::HttpHandlerJsonBas
 
  private:
   NApp::NServices::TMessagingService& MessageService_;
+  TSendStatistics& Stats_;
 };
 
 }  // namespace NChat::NInfra::NHandlers

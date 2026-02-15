@@ -11,7 +11,8 @@
 namespace NChat::NApp {
 
 TPrivateChatUseCase::TPrivateChatUseCase(NCore::IChatRepository& chat_repo, NCore::IUserRepository& user_repo)
-    : ChatRepo_(chat_repo), UserRepo_(user_repo) {}
+    : ChatRepo_(chat_repo), UserRepo_(user_repo) {
+}
 
 NDto::TPrivateChatResult TPrivateChatUseCase::Execute(const NDto::TPrivateChatRequest& request) const {
   auto target_user_id = UserRepo_.FindByUsername(request.TargetUsername);
@@ -20,7 +21,7 @@ NDto::TPrivateChatResult TPrivateChatUseCase::Execute(const NDto::TPrivateChatRe
     throw TUserNotFound{fmt::format("User '{}' not found", request.TargetUsername)};
   }
 
-  auto [chat_id, is_new] = ChatRepo_.GetOrCreatePrivateChat(request.RequesterUserId, target_user_id.value());
+  auto [chat_id, is_new] = ChatRepo_.GetOrCreatePrivateChatId(request.RequesterUserId, target_user_id.value());
 
   return {.ChatId = chat_id, .IsNewChat = is_new};
 }

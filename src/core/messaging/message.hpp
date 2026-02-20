@@ -28,6 +28,6 @@ struct TMessage {
   static TMessage Create(const TChatId& chat_id, const TUserId& sender_id, TMessageText text,
                          std::chrono::steady_clock::time_point sent_at);
 };
-//todo небольшой тест на Create
+// todo небольшой тест на Create
 
 }  // namespace NChat::NCore::NDomain

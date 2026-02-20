@@ -6,7 +6,6 @@ void DumpMetric(userver::utils::statistics::Writer& writer, const TSendStatistic
   writer["successful"]["total"] = stats.successfull_sent;
   writer["dropped"]["overflow"]["total"] = stats.dropped_overflow_total;
   writer["dropped"]["offline"]["total"] = stats.dropped_offline_total;
-
 }
 
 void ResetMetric(TSendStatistics& stats) {

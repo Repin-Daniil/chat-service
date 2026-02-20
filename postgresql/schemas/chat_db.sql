@@ -9,7 +9,7 @@ SET
 --  ENUM TYPES
 -- ===========================
 CREATE TYPE chat.chat_type AS ENUM ('PRIVATE', 'GROUP', 'CHANNEL');
-
+-- todo в базе не должно быть по идее никаких каналов, это та же группа, просто by default участник reader
 CREATE TYPE chat.member_role AS ENUM ('MEMBER', 'ADMIN', 'OWNER');
 
 -- ===========================

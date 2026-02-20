@@ -1,11 +1,10 @@
 #include "sharded_registry.hpp"
 
-#include <infra/messaging/sessions/rcu_sessions_registry.hpp>
-
 #include <core/common/ids.hpp>
+#include <core/messaging/mocks.hpp>
 
 #include <infra/messaging/registry/config/registry_config.hpp>
-#include <core/messaging/mocks.hpp>
+#include <infra/messaging/sessions/rcu_sessions_registry.hpp>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>

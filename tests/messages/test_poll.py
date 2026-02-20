@@ -9,7 +9,6 @@ from collections import Counter
 from validators import validate_messages
 import asyncio
 
-#todo нужен тест про получение своего же сообщения
 
 async def test_poll_messages_with_pending_messages(service_client, communication, short_polling):
     """Polling сообщений когда есть непрочитанные сообщения"""
@@ -18,6 +17,19 @@ async def test_poll_messages_with_pending_messages(service_client, communication
     await send_message(service_client, message, sender.token)
 
     response = await poll_messages(service_client, recipient)
+    assert response.status == HTTPStatus.OK
+    validate_messages(response, [message])
+
+
+async def test_poll_self_message(service_client, self_chat):
+    user, chat_id = self_chat
+
+    message = Message(chat_id=chat_id)
+    session_id = get_session_id(await start_session(service_client, user.token))
+    response = await send_message(service_client, message, user.token)
+    assert response.status == HTTPStatus.ACCEPTED
+
+    response = await poll_messages(service_client, user)
     assert response.status == HTTPStatus.OK
     validate_messages(response, [message])
 
@@ -277,7 +289,7 @@ async def test_poll_messages_multiple_recipients_one_sender(service_client, mult
     sender = multiple_users[0]
     chat_ids = []
 
-    for i in range(1,3):
+    for i in range(1, 3):
         private_chat = PrivateChat(target_username=multiple_users[i].username)
         response = await get_private_chat(service_client, private_chat, sender.token)
         assert response.status == HTTPStatus.CREATED

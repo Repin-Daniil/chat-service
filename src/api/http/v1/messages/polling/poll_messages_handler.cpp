@@ -23,7 +23,7 @@ using NChat::NCore::NDomain::TUserId;
 namespace NChat::NInfra::NHandlers {
 
 TPollMessageHandler::TPollMessageHandler(const userver::components::ComponentConfig& config,
-    const userver::components::ComponentContext& context)
+                                         const userver::components::ComponentContext& context)
     : HttpHandlerJsonBase(config, context),
       MessageService_(context.FindComponent<NComponents::TMessagingServiceComponent>().GetService()),
       ConfigSource_(context.FindComponent<userver::components::DynamicConfig>().GetSource()),
@@ -79,7 +79,7 @@ userver::formats::json::Value TPollMessageHandler::HandleRequestJsonThrow(
 }
 
 void TPollMessageHandler::ExportMessagesMetrics(const NApp::NDto::TPollMessagesResult& messages,
-    const std::chrono::steady_clock::time_point start_polling_tp) const {
+                                                const std::chrono::steady_clock::time_point start_polling_tp) const {
   using period_us = std::chrono::microseconds::period;
   using period_sec = std::chrono::seconds::period;
 

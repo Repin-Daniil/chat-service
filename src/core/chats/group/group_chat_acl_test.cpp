@@ -150,28 +150,32 @@ TEST(PermissionsTest, ToIdxIsConstexpr) {
 // Параметризованные тесты
 // ============================================================================
 
-class RolePermissionTest : public ::testing::TestWithParam std::tuple < EMemberRole, EPermission, bool >> {};
+using RolePermissionParam = std::tuple<EMemberRole, EPermission, bool>;
+
+class RolePermissionTest : public ::testing::TestWithParam<RolePermissionParam> {};
 
 TEST_P(RolePermissionTest, CheckExpectedPermissions) {
   auto [role, permission, expected] = GetParam();
   EXPECT_EQ(HasPermission(role, permission), expected);
 }
 
-INSTANTIATE_TEST_SUITE_P(AllRolesAndPermissions, RolePermissionTest,
-                         ::testing::Values(
-                             // Reader
-                             std::make_tuple(EMemberRole::Reader, EPermission::PostMessage, false),
-                             std::make_tuple(EMemberRole::Reader, EPermission::GrantUsers, false),
+INSTANTIATE_TEST_SUITE_P(
+    AllRolesAndPermissions,
+    RolePermissionTest,
+    ::testing::Values(
+        // Reader
+        RolePermissionParam{EMemberRole::Reader, EPermission::PostMessage, false},
+        RolePermissionParam{EMemberRole::Reader, EPermission::GrantUsers,  false},
 
-                             // Member
-                             std::make_tuple(EMemberRole::Member, EPermission::PostMessage, true),
-                             std::make_tuple(EMemberRole::Member, EPermission::ChangeMembers, false),
+        // Member
+        RolePermissionParam{EMemberRole::Member, EPermission::PostMessage,    true},
+        RolePermissionParam{EMemberRole::Member, EPermission::ChangeMembers, false},
 
-                             // Admin
-                             std::make_tuple(EMemberRole::Admin, EPermission::PostMessage, true),
-                             std::make_tuple(EMemberRole::Admin, EPermission::ChangeMembers, true),
-                             std::make_tuple(EMemberRole::Admin, EPermission::GrantUsers, false),
+        // Admin
+        RolePermissionParam{EMemberRole::Admin, EPermission::PostMessage,    true},
+        RolePermissionParam{EMemberRole::Admin, EPermission::ChangeMembers,  true},
+        RolePermissionParam{EMemberRole::Admin, EPermission::GrantUsers,    false},
 
-                             // Owner
-                             std::make_tuple(EMemberRole::Owner, EPermission::PostMessage, true),
-                             std::make_tuple(EMemberRole::Owner, EPermission::GrantUsers, true)));
+        // Owner
+        RolePermissionParam{EMemberRole::Owner, EPermission::PostMessage, true},
+        RolePermissionParam{EMemberRole::Owner, EPermission::GrantUsers,  true}));

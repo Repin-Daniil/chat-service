@@ -7,8 +7,9 @@ from models import Message
 from utils import Routes, get_session_id, get_chat_id
 from validators import validate_user_reg, validate_messages
 
-#todo надо разбить более логично по файлам
-#todo надо протестить штуку с отклонением по overflow через метрички
+# todo надо разбить более логично по файлам
+# todo надо протестить штуку с отклонением по overflow через метрички
+
 
 async def test_send_message(service_client, communication, monitor_client):
     sender, recipient, chat_id, message = communication
@@ -18,7 +19,7 @@ async def test_send_message(service_client, communication, monitor_client):
 
 async def test_send_yourself(service_client, self_chat):
     user, chat_id = self_chat
-    
+
     message = Message(chat_id=chat_id)
     session_id = get_session_id(await start_session(service_client, user.token))
     response = await send_message(service_client, message, user.token)
@@ -54,7 +55,7 @@ async def test_queue_overloaded(service_client, queue_config, self_chat):
     response_1 = await send_message(service_client, message, user.token)
     assert response_1.status == HTTPStatus.ACCEPTED
     response_2 = await send_message(service_client, message, user.token)
-    assert response_2.status == HTTPStatus.ACCEPTED # fixme
+    assert response_2.status == HTTPStatus.ACCEPTED  # fixme
 
     polling_response = await poll_messages(service_client, user)
     data = polling_response.json()

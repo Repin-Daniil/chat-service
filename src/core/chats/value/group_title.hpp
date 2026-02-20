@@ -2,6 +2,6 @@
 
 namespace NChat::NCore::NDomain {
 
-    //todo
+// todo
 class TGroupTitle {};
 }  // namespace NChat::NCore::NDomain

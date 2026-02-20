@@ -1,7 +1,7 @@
 #pragma once
 
 namespace NChat::NCore::NDomain {
-    //todo
+// todo
 
 class TGroupDescription {};
 }  // namespace NChat::NCore::NDomain

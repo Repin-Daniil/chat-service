@@ -19,7 +19,7 @@ class IChat {
 
   virtual std::vector<TUserId> GetMembers() const = 0;
   virtual std::vector<TUserId> GetRecipients(const TUserId& sender_id) const = 0;
-  
+
   virtual bool CanPost(const TUserId& sender_id) const = 0;
 
   virtual ~IChat() = default;

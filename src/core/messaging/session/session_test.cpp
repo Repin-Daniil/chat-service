@@ -1,7 +1,6 @@
+#include <core/messaging/mocks.hpp>
 #include <core/messaging/session/session.hpp>
 #include <core/messaging/value/message_text.hpp>
-
-#include <core/messaging/mocks.hpp>
 
 #include <gtest/gtest.h>
 #include <userver/utils/datetime.hpp>
@@ -11,7 +10,6 @@
 #include <chrono>
 
 using namespace std::chrono_literals;
-
 
 class SessionTest : public ::testing::Test {
  protected:

@@ -15,7 +15,7 @@ NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest 
   TMessageText text(std::move(request.Text));
   auto message = NCore::NDomain::TMessage::Create(request.ChatId, request.SenderId, std::move(text), request.SentAt);
   // todo Нужны кэши!
-  //fixme Нужно поменять спеку
+  // fixme Нужно поменять спеку
 
   auto chat = ChatRepo_.GetChat(request.ChatId);
   if (!chat) {

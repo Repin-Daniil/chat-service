@@ -68,6 +68,7 @@ async def single_consumer(service_client, registered_user):
     registered_user.session_id = get_session_id(response)
     return registered_user
 
+
 @pytest.fixture
 async def self_chat(service_client, single_consumer):
     private_chat = PrivateChat(target_username=single_consumer.username)
@@ -77,18 +78,19 @@ async def self_chat(service_client, single_consumer):
 
     return single_consumer, chat_id
 
+
 @pytest.fixture
 async def communication(service_client, multiple_users):
     """Two users with opened sessions and dummy message"""
     sender, recipient = multiple_users
-    
+
     private_chat = PrivateChat(target_username=recipient.username)
     response = await get_private_chat(service_client, private_chat, sender.token)
     assert response.status == HTTPStatus.CREATED
 
     chat_id = get_chat_id(response)
     message = Message(chat_id=chat_id, sender=sender.username)
-    
+
     return sender, recipient, chat_id, message
 
 

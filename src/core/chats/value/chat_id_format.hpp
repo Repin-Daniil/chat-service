@@ -3,7 +3,7 @@
 #include <string_view>
 
 namespace NChat::NCore::NDomain {
-    
+
 constexpr inline char kChatIdDelimiter = ':';
 
 constexpr inline std::string_view kPrivateChatPrefix = "pc";

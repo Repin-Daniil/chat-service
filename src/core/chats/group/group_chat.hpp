@@ -46,4 +46,5 @@ class TGroupChat : public IChat {
   std::vector<TUserId> Members_;
   std::unordered_map<TUserId, EMemberRole> Roles_;
 };
+
 }  // namespace NChat::NCore::NDomain

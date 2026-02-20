@@ -12,7 +12,7 @@ class IChatRepository {
                                                                      NDomain::TUserId user_2) const = 0;
   virtual std::unique_ptr<NCore::NDomain::IChat> GetChat(NDomain::TChatId chat_id) const = 0;
 
-  virtual std::unique_ptr<NDomain::IChat> CreateGroup(NDomain::TGroupChatData) const = 0;
+  // virtual std::unique_ptr<NDomain::IChat> CreateGroup(NDomain::TGroupChatData) const = 0;
   virtual ~IChatRepository() = default;
 };
 

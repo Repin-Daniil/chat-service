@@ -42,11 +42,11 @@ std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetChat(TChatId 
 
   if (chat_type == NCore::NDomain::EChatType::Private) {
     return GetPrivateChat(chat_id);
-  }
-  // todo
-  //  else if (chat_type == NCore::NDomain::EChatType::Group) {
-  // } else if (chat_type == NCore::NDomain::EChatType::Channel) {
-  // }
+  } else if (chat_type == NCore::NDomain::EChatType::Group) {
+    return GetGroupChat(chat_id);
+  } 
+  // else if (chat_type == NCore::NDomain::EChatType::Channel) {
+  //todo }
   return nullptr;
 }
 
@@ -60,6 +60,11 @@ std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetPrivateChat(T
   auto [user_id_1, user_id_2] = result[0].As<std::string, std::string>();
 
   return std::make_unique<NCore::NDomain::TPrivateChat>(chat_id, TUserId{user_id_1}, TUserId{user_id_2});
+}
+
+std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetGroupChat(TChatId chat_id) const {
+  //todo
+  return nullptr;
 }
 
 }  // namespace NChat::NInfra::NRepository

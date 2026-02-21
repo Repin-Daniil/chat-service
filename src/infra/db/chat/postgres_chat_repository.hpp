@@ -16,10 +16,11 @@ class TPostgresChatRepository : public NCore::IChatRepository {
  public:
   using TUserId = NCore::NDomain::TUserId;
   using TChatId = NCore::NDomain::TChatId;
+  using TPrivateChat = NCore::NDomain::TPrivateChat;
 
   explicit TPostgresChatRepository(userver::storages::postgres::ClusterPtr pg_cluster);
 
-  std::pair<TChatId, bool> GetOrCreatePrivateChatId(TUserId user_1, TUserId user_2) const override;
+  std::pair<TChatId, bool> SavePrivateChat(TPrivateChat chat) const override;
 
   std::unique_ptr<NCore::NDomain::IChat> GetChat(TChatId chat_id) const override;
 

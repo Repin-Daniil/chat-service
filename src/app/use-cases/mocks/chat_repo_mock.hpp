@@ -9,7 +9,6 @@ using namespace NChat::NCore;
 
 class TMockChatRepository : public IChatRepository {
  public:
-  MOCK_METHOD((std::pair<NDomain::TChatId, bool>), GetOrCreatePrivateChatId, (NDomain::TUserId, NDomain::TUserId),
-              (const, override));
+  MOCK_METHOD((std::pair<NDomain::TChatId, bool>), SavePrivateChat, (NDomain::TPrivateChat), (const, override));
   MOCK_METHOD((std::unique_ptr<NDomain::IChat>), GetChat, (NDomain::TChatId), (const, override));
 };

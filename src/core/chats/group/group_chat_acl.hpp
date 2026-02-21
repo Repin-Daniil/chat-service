@@ -1,53 +1,65 @@
 #pragma once
 
-#include <array>
-#include <bitset>
+#include <map>
+#include <set>
+#include <stdexcept>
 
 namespace NChat::NCore::NDomain {
 
-enum class EMemberRole : size_t { Reader, Member, Admin, Owner, _Count };
+enum class EMemberRole {
+  Reader,
+  Writer,
+  Admin,
+  Owner,
+};
 
-enum class EPermission : size_t { PostMessage, ChangeMembers, ChangeData, GrantUsers, _Count };
+enum class EPermission {
+  PostMessage,
+  ChangeMembers,
+  ChangeData,
+  GrantUsers,
+};
 
-// todo в будущем еще banned надо сделать
+using TPermissionSet = std::set<EPermission>;
 
-template <typename E>
-constexpr std::size_t ToIdx(E e) noexcept {
-  return static_cast<std::size_t>(e);
-}
+inline const std::map<EMemberRole, TPermissionSet> RolePermissions = {
+    {EMemberRole::Reader, {}},
 
-inline constexpr std::size_t RolesCount = ToIdx(EMemberRole::_Count);
-inline constexpr std::size_t PermissionsCount = ToIdx(EPermission::_Count);
+    {EMemberRole::Writer,
+     {
+         EPermission::PostMessage,
+     }},
 
-using TPermissionSet = std::bitset<PermissionsCount>;
+    {EMemberRole::Admin,
+     {
+         EPermission::PostMessage,
+         EPermission::ChangeMembers,
+         EPermission::ChangeData,
+     }},
 
-constexpr TPermissionSet MakePermissions(auto... perms) {
-  TPermissionSet set;
-  (set.set(ToIdx(perms)), ...);
-  return set;
-}
-
-const std::array<TPermissionSet, RolesCount> RolePermissions = {
-    /* Reader */
-    MakePermissions(),
-
-    /* Member */
-    MakePermissions(EPermission::PostMessage),
-
-    /* Admin */
-    MakePermissions(EPermission::PostMessage, EPermission::ChangeMembers, EPermission::ChangeData),
-
-    /* Owner (grant all) */
-    TPermissionSet{}.set()};
-
-static_assert(RolePermissions.size() == RolesCount);
+    {EMemberRole::Owner,
+     {
+         EPermission::PostMessage,
+         EPermission::ChangeMembers,
+         EPermission::ChangeData,
+         EPermission::GrantUsers,
+     }},
+};
 
 inline bool HasPermission(EMemberRole role, EPermission permission) {
-  if (ToIdx(role) >= RolesCount || ToIdx(permission) >= PermissionsCount) {
+  const auto it = RolePermissions.find(role);
+  if (it == RolePermissions.end()) {
     return false;
   }
+  return it->second.contains(permission);
+}
 
-  return RolePermissions[ToIdx(role)].test(ToIdx(permission));
+inline const TPermissionSet& GetPermissions(EMemberRole role) {
+  const auto it = RolePermissions.find(role);
+  if (it == RolePermissions.end()) {
+    throw std::out_of_range("Unknown role");
+  }
+  return it->second;
 }
 
 }  // namespace NChat::NCore::NDomain

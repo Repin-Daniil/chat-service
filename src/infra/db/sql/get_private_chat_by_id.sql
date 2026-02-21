@@ -1,1 +1,2 @@
-SELECT user_id_1, user_id_2 FROM chat.private_chats WHERE chat_id = $1;
+SELECT user_id FROM chat.channel_members WHERE channel_id = $1;
+-- todo check!

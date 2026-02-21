@@ -12,6 +12,11 @@ class TChatIdWrongFormatException : public TDomainException {
   using TDomainException::TDomainException;
 };
 
+class TChatInvariantViolation : public TDomainException {
+ public:
+  using TDomainException::TDomainException;
+};
+
 class IChat {
  public:
   virtual TChatId GetId() const = 0;

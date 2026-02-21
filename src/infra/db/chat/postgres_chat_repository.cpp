@@ -12,6 +12,7 @@ namespace NChat::NInfra::NRepository {
 
 namespace {
 using NCore::NDomain::TChatId;
+using NCore::NDomain::TPrivateChat;
 using NCore::NDomain::TUserId;
 }  // namespace
 
@@ -19,16 +20,14 @@ TPostgresChatRepository::TPostgresChatRepository(userver::storages::postgres::Cl
     : PgCluster_(pg_cluster) {
 }
 
-std::pair<TChatId, bool> TPostgresChatRepository::GetOrCreatePrivateChatId(TUserId user_a, TUserId user_b) const {
-  NUtils::NId::UuidGenerator generator;
-  NCore::NDomain::TPrivateChat chat(generator.Generate(), user_a, user_b);
+std::pair<TChatId, bool> TPostgresChatRepository::SavePrivateChat(TPrivateChat chat) const {
   auto [user_1, user_2] = chat.GetUsers();
 
   auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster,
                                     sql::kGetOrCreatePrivateChatId, chat.GetId().GetUnderlying(),
                                     user_1.GetUnderlying(), user_2.GetUnderlying());
 
-  return {TChatId{result[0]["chat_id"].As<std::string>()}, result[0]["is_new"].As<bool>()};
+  return {TChatId{result[0]["channel_id"].As<std::string>()}, result[0]["is_new"].As<bool>()};
 }
 
 std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetChat(TChatId chat_id) const {
@@ -57,9 +56,9 @@ std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetPrivateChat(T
     return nullptr;
   }
 
-  auto [user_id_1, user_id_2] = result[0].As<std::string, std::string>();
+  auto members = result.AsContainer<std::vector<TUserId>>();
 
-  return std::make_unique<NCore::NDomain::TPrivateChat>(chat_id, TUserId{user_id_1}, TUserId{user_id_2});
+  return std::make_unique<NCore::NDomain::TPrivateChat>(chat_id, members);
 }
 
 std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetGroupChat(TChatId chat_id) const {

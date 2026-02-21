@@ -8,10 +8,11 @@ SET
 -- ===========================
 --  ENUM TYPES
 -- ===========================
-CREATE TYPE chat.chat_type AS ENUM ('PRIVATE', 'GROUP', 'CHANNEL');
--- todo в базе не должно быть по идее никаких каналов, это та же группа, просто by default участник reader
-CREATE TYPE chat.member_role AS ENUM ('MEMBER', 'ADMIN', 'OWNER');
+CREATE TYPE chat.channel_type AS ENUM ('DIRECT', 'GROUP', 'BROADCAST');
 
+CREATE TYPE chat.member_role AS ENUM ('READER', 'WRITER', 'ADMIN', 'OWNER');
+
+-- CREATE TYPE chat.member_status AS ENUM ('ACTIVE', 'LEFT', 'BANNED')
 -- ===========================
 --  FUNCTIONS
 -- ===========================
@@ -42,40 +43,31 @@ CREATE TABLE chat.users (
 );
 
 -- ===========================
---  CHATS
+--  CHANNELS
 -- ===========================
-CREATE TABLE chat.chats (
-    chat_id TEXT PRIMARY KEY,
-    type chat.chat_type NOT NULL,
+CREATE TABLE chat.channels (
+    channel_id TEXT PRIMARY KEY,
+    type chat.channel_type NOT NULL,
+    title TEXT, -- NULL for DIRECT channel
+    description TEXT, -- NULL for DIRECT channel
     is_deleted BOOLEAN NOT NULL DEFAULT false,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE TABLE chat.groups (
-    chat_id TEXT PRIMARY KEY REFERENCES chat.chats(chat_id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    description TEXT,
-    owner_id TEXT NOT NULL REFERENCES chat.users(user_id),
-    max_members INT DEFAULT 200000,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- last message time
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE chat.private_chats (
-    chat_id TEXT PRIMARY KEY REFERENCES chat.chats(chat_id) ON DELETE CASCADE,
-    user_id_1 TEXT NOT NULL,
-    user_id_2 TEXT NOT NULL,
-    CHECK (user_id_1 <= user_id_2),
-    UNIQUE (user_id_1, user_id_2)
+
+CREATE TABLE chat.channel_members (
+    channel_id TEXT NOT NULL REFERENCES chat.channels(channel_id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES chat.users(user_id),
+    role chat.member_role NOT NULL DEFAULT 'READER',
+    -- status chat.member_status NOT NULL DEFAULT 'ACTIVE'
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    -- last_read_message_id BIGINT
+    PRIMARY KEY (channel_id, user_id)
 );
 
-CREATE TABLE chat.group_members (
-    chat_id TEXT NOT NULL REFERENCES chat.groups(chat_id) ON DELETE CASCADE,
-    user_id TEXT NOT NULL REFERENCES chat.users(user_id),
-    role chat.member_role NOT NULL DEFAULT 'MEMBER',
-    joined_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    PRIMARY KEY (chat_id, user_id)
-);
--- todo нужен обратный индекс user_id, chat_id для формирования чатов пользователя
+CREATE INDEX idx_channel_members_user_id ON chat.channel_members(user_id);
 
 -- ===========================
 --  FOR MAPPERS
@@ -98,4 +90,4 @@ UPDATE
 
 CREATE TRIGGER chats_set_updated_at BEFORE
 UPDATE
-    ON chat.chats FOR EACH ROW EXECUTE FUNCTION chat.set_updated_at();
+    ON chat.channels FOR EACH ROW EXECUTE FUNCTION chat.set_updated_at();

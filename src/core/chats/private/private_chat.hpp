@@ -7,11 +7,12 @@ namespace NChat::NCore::NDomain {
 
 /*
 @invariant User1 <= User2
+chat_id = pc:sha256(User1_id:User2_id)
 */
 class TPrivateChat : public IChat {
  public:
-  TPrivateChat(TChatId chat_id, TUserId user_1, TUserId user_2);
-  TPrivateChat(std::string uuid, TUserId user_1, TUserId user_2);
+  TPrivateChat(std::vector<TUserId> users);
+  TPrivateChat(TChatId chat_id, std::vector<TUserId> users);
 
   // IChat API
   TChatId GetId() const override;
@@ -24,6 +25,8 @@ class TPrivateChat : public IChat {
   std::pair<TUserId, TUserId> GetUsers() const;
   bool IsParticipant(const TUserId& user_id) const;
   bool IsSoloChat() const;
+
+  bool operator==(TPrivateChat other) const;
 
  private:
   TChatId Id_;

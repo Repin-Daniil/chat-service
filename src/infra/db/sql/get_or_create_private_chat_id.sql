@@ -1,29 +1,28 @@
-WITH params AS (
-    SELECT 
-        $1::text AS input_chat_id,
-        $2 AS u1,
-        $3 AS u2
+WITH inserted_channel AS (
+    INSERT INTO chat.channels (channel_id, type)
+    VALUES ($1, 'DIRECT')
+    ON CONFLICT (channel_id) DO NOTHING
+    RETURNING channel_id
 ),
-existing AS (
-    SELECT chat_id 
-    FROM chat.private_chats p
-    JOIN params par ON p.user_id_1 = par.u1 AND p.user_id_2 = par.u2
-),
-insert_chat AS (
-    INSERT INTO chat.chats (chat_id, type)
-    SELECT input_chat_id, 'PRIVATE'
-    FROM params
-    WHERE NOT EXISTS (SELECT 1 FROM existing)
-    RETURNING chat_id
-),
-insert_private AS (
-    INSERT INTO chat.private_chats (chat_id, user_id_1, user_id_2)
-    SELECT ic.chat_id, p.u1, p.u2
-    FROM insert_chat ic
-    CROSS JOIN params p
-    RETURNING chat_id
+inserted_members AS (
+
+    INSERT INTO chat.channel_members (channel_id, user_id, role)
+    VALUES 
+        ($1, $2, 'OWNER'),
+        ($1, $3, 'OWNER')
+    ON CONFLICT (channel_id, user_id) DO NOTHING
 )
 
-SELECT chat_id, true as is_new FROM insert_private
+SELECT 
+    channel_id, 
+    TRUE AS is_new 
+FROM inserted_channel
+
 UNION ALL
-SELECT chat_id, false as is_new FROM existing;
+
+SELECT 
+    channel_id, 
+    FALSE AS is_new 
+FROM chat.channels 
+WHERE channel_id = $1 
+  AND NOT EXISTS (SELECT 1 FROM inserted_channel);

@@ -21,7 +21,7 @@ NDto::TPrivateChatResult TPrivateChatUseCase::Execute(const NDto::TPrivateChatRe
     throw TUserNotFound{fmt::format("User '{}' not found", request.TargetUsername)};
   }
 
-  auto [chat_id, is_new] = ChatRepo_.GetOrCreatePrivateChatId(request.RequesterUserId, target_user_id.value());
+  auto [chat_id, is_new] = ChatRepo_.SavePrivateChat({{request.RequesterUserId, target_user_id.value()}});
 
   return {.ChatId = chat_id, .IsNewChat = is_new};
 }

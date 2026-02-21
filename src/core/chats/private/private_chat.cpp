@@ -2,14 +2,36 @@
 
 #include <core/chats/utils/chat_utils.hpp>
 
-namespace NChat::NCore::NDomain {
+#include <userver/crypto/hash.hpp>
 
-TPrivateChat::TPrivateChat(TChatId chat_id, TUserId user_1, TUserId user_2)
-    : Id_(chat_id), Users_(std::minmax(user_1, user_2)) {
+namespace {
+using NChat::NCore::NDomain::TUserId;
+
+std::string GenerateDetermenisticId(std::pair<TUserId, TUserId> users) {
+  return userver::crypto::hash::Sha256(fmt::format("{}:{}", users.first, users.second));
 }
 
-TPrivateChat::TPrivateChat(std::string uuid, TUserId user_1, TUserId user_2)
-    : Id_(MakeChatId(EChatType::Private, uuid)), Users_(std::minmax(user_1, user_2)) {
+}  // namespace
+
+namespace NChat::NCore::NDomain {
+
+TPrivateChat::TPrivateChat(std::vector<TUserId> users) {
+  if (users.size() == 1) {
+    Users_ = std::make_pair(users[0], users[0]);
+  } else if (users.size() == 2) {
+    Users_ = std::minmax(users[0], users[1]);
+  } else {
+    throw TChatInvariantViolation(fmt::format("Private chat: wrong size {}. Must be 1 or 2", users.size()));
+  }
+
+  Id_ = MakeChatId(EChatType::Private, GenerateDetermenisticId(Users_));
+}
+
+TPrivateChat::TPrivateChat(TChatId chat_id, std::vector<TUserId> users) : TPrivateChat(users) {
+  if (chat_id != Id_) {
+    throw TChatIdWrongFormatException(
+        fmt::format("Private channel {} does not match the expected id for users", chat_id));
+  }
 }
 
 TChatId TPrivateChat::GetId() const {
@@ -51,6 +73,10 @@ std::vector<TUserId> TPrivateChat::GetRecipients(const TUserId& sender_id) const
   }
 
   return GetMembers();
+}
+
+bool TPrivateChat::operator==(TPrivateChat other) const {
+  return Id_ == other.Id_;
 }
 
 }  // namespace NChat::NCore::NDomain

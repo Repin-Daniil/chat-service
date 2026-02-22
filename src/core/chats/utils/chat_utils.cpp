@@ -1,6 +1,6 @@
 #include "chat_utils.hpp"
 
-#include <core/chats/value/chat_id_format.hpp>
+#include <core/chats/chat_id_format.hpp>
 
 namespace NChat::NCore::NDomain {
 

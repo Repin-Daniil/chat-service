@@ -1,4 +1,4 @@
-#include "group_chat_acl.hpp"
+#include "chat_acl.hpp"
 
 #include <gtest/gtest.h>
 

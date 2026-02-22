@@ -2,8 +2,9 @@
 
 namespace NChat::NCore::NDomain {
 
-// TGroupChat(TChatId chat_id, TGroupChatData data, TGroupChatMembers members);
-//   TGroupChat(std::string uuid, TGroupChatData data, TGroupChatMembers members);
+// TGroupChat(TChatId chat_id, TGroupTitle title, TGroupDescription description, std::vector<TMember> members) {}
+
+// TGroupChat(std::string uuid, TGroupTitle title, TGroupDescription description, std::vector<TMember> members);
 
 TChatId TGroupChat::GetId() const {
   return Id_;
@@ -35,13 +36,13 @@ bool TGroupChat::CanPost(const TUserId& sender_id) const {
   return HasPermission(it->second, EPermission::PostMessage);
 }
 
-bool TGroupChat::AddMember(TUserId requester, TUserId target_user) {
-}
+// bool TGroupChat::AddMember(TUserId requester, TUserId target_user) {
+// }
 
-bool TGroupChat::DeleteMember(TUserId requester, TUserId target_user) {
-}
+// bool TGroupChat::DeleteMember(TUserId requester, TUserId target_user) {
+// }
 
-bool TGroupChat::GrantUser(TUserId requester, TUserId target_user, EMemberRole role) {
-}
+// bool TGroupChat::GrantUser(TUserId requester, TUserId target_user, EMemberRole role) {
+// }
 
 }  // namespace NChat::NCore::NDomain

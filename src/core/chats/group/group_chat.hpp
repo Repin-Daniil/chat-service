@@ -1,25 +1,18 @@
 #pragma once
 
+#include <core/chats/access_control/chat_acl.hpp>
 #include <core/chats/chat.hpp>
-#include <core/chats/group/group_chat_acl.hpp>
 #include <core/chats/value/group_description.hpp>
 #include <core/chats/value/group_title.hpp>
 
 namespace NChat::NCore::NDomain {
 
-struct TGroupChatData {
-  TGroupTitle Title;
-  TGroupDescription Description;
-  TUserId OwnerId;
-};
-// Для восстановления из БД можно сделать RawGroupData
-
 class TGroupChat : public IChat {
  public:
-  using TGroupChatMembers = std::vector<std::pair<TUserId, EMemberRole>>;
+  using TMember = std::pair<TUserId, EMemberRole>;
 
-  TGroupChat(TChatId chat_id, TGroupChatData data, TGroupChatMembers members);
-  TGroupChat(std::string uuid, TGroupChatData data, TGroupChatMembers members);
+  TGroupChat(TChatId chat_id, TGroupTitle title, TGroupDescription description, std::vector<TMember> members);
+  TGroupChat(std::string uuid, TGroupTitle title, TGroupDescription description, std::vector<TMember> members);
 
   // Common
   TChatId GetId() const override;
@@ -30,9 +23,6 @@ class TGroupChat : public IChat {
 
   bool CanPost(const TUserId& sender_id) const override;
 
-  // todo ACL
-  // virtual std::optional<EMemberRole> GetRole(const TUserId& user) const = 0;
-
   // Group specific
   bool AddMember(TUserId requester, TUserId target_user);
   bool DeleteMember(TUserId requester, TUserId target_user);
@@ -40,7 +30,8 @@ class TGroupChat : public IChat {
 
  private:
   const TChatId Id_;
-  TGroupChatData Data_;
+  TGroupTitle Title;
+  TGroupDescription Description;
 
   std::vector<TUserId> Members_;
   std::unordered_map<TUserId, EMemberRole> Roles_;

@@ -14,10 +14,8 @@ NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest 
 
   TMessageText text(std::move(request.Text));
   auto message = NCore::NDomain::TMessage::Create(request.ChatId, request.SenderId, std::move(text), request.SentAt);
-  // todo Нужны кэши!
-  // fixme Нужно поменять спеку
 
-  auto chat = ChatRepo_.GetChat(request.ChatId);
+  auto chat = ChatRepo_.GetChat(request.ChatId);  // Тут кэш конечно бы не помешал
   if (!chat) {
     throw TUnknownChat(fmt::format("Chat {} doesn't exist", request.ChatId));
   }
@@ -31,11 +29,7 @@ NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest 
   auto result = Router_.Route(std::move(recipients), std::move(message));
 
   return {result.Successful, result.Dropped, result.Offline};
-  // todo Можно сначала сделать модели каналов, групп, без крудов, а в тестах через постгрю initial_data тестить
-
-  // В будущем по идее шлюз сообщает хабу о своих пользователях по grpc, периодчиски делает full_update
   // todo Нужны ключи идемпотентности клиентские
-  // todo проблема отправки отправителю не решена
 }
 
 }  // namespace NChat::NApp

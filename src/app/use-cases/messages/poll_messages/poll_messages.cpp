@@ -19,12 +19,15 @@ NDto::TPollMessagesResult TPollMessagesUseCase::Execute(const NDto::TPollMessage
   NDto::TPollMessagesResult result;
   result.ResyncRequired = messages.ResyncRequired;
 
-  // todo вынести этот код куда-нибудь
   for (auto& message : messages.Messages) {
     std::optional<NCore::NDomain::TUserTinyProfile> profile;
 
+    if (!message.Payload) {
+      LOG_WARNING() << fmt::format("Dropping message: no payload in chat_id {}", message.ChatId);
+      continue;
+    }
+
     try {
-      // todo проверить, что message.Payload не nullptr
       profile = UserRepo_.GetProfileById(message.Payload->Sender);
     } catch (const std::exception& e) {
       LOG_ERROR() << fmt::format("Failed to get username of sender with id: {}", message.Payload->Sender);

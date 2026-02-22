@@ -1,7 +1,7 @@
 #pragma once
 
+#include <core/users/profile.hpp>
 #include <core/users/user.hpp>
-#include <core/users/value/profile.hpp>
 
 #include <optional>
 

@@ -50,14 +50,14 @@ std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetChat(TChatId 
 }
 
 std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetPrivateChat(TChatId chat_id) const {
-  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kGetPrivateChatById,
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kMaster, sql::kGetMembersByChannelId,
                                     chat_id.GetUnderlying());
   if (result.IsEmpty()) {
     return nullptr;
   }
 
   auto members = result.AsContainer<std::vector<TUserId>>();
-
+  // todo тут по хитрее надо сделать, members нужны везде, но где-то нужна и другая инфа, например роль
   return std::make_unique<NCore::NDomain::TPrivateChat>(chat_id, members);
 }
 

@@ -11,7 +11,6 @@ struct TGroupChatData {
   TGroupTitle Title;
   TGroupDescription Description;
   TUserId OwnerId;
-  std::size_t MaxMembers;  // todo проверить > 0
 };
 // Для восстановления из БД можно сделать RawGroupData
 

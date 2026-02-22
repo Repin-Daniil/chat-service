@@ -29,7 +29,6 @@ class TPrivateChatTest : public ::testing::Test {
 // Constructor and basic getters
 // ============================================================================
 
-// todo Надо протестить что создание от одного работает, пустое и больше ломает
 TEST_F(TPrivateChatTest, ConstructorCreateId) {
   TPrivateChat chat({user1_, user2_});
 

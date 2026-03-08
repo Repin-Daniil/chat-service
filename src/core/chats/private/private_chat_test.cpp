@@ -198,23 +198,19 @@ TEST_F(TPrivateChatTest, IsParticipantWorksRegardlessOfConstructorOrder) {
 // CanPost
 // ============================================================================
 
-TEST_F(TPrivateChatTest, CanPostReturnsTrueForFirstUser) {
+TEST_F(TPrivateChatTest, CanPostReturnsTrueForWriterRole) {
   TPrivateChat chat({user1_, user2_});
-
-  EXPECT_TRUE(chat.CanPost(user1_));
+  EXPECT_TRUE(chat.CanPost(EMemberRole::Writer));
 }
 
-TEST_F(TPrivateChatTest, CanPostReturnsTrueForSecondUser) {
+TEST_F(TPrivateChatTest, CanPostReturnsTrueForOwnerRole) {
   TPrivateChat chat({user1_, user2_});
-
-  EXPECT_TRUE(chat.CanPost(user2_));
+  EXPECT_TRUE(chat.CanPost(EMemberRole::Owner));
 }
 
-TEST_F(TPrivateChatTest, CanPostReturnsFalseForNonMember) {
+TEST_F(TPrivateChatTest, CanPostReturnsFalseForReaderRole) {
   TPrivateChat chat({user1_, user2_});
-  TUserId stranger = MakeTestUserId("stranger-uuid");
-
-  EXPECT_FALSE(chat.CanPost(stranger));
+  EXPECT_FALSE(chat.CanPost(EMemberRole::Reader));
 }
 
 // ============================================================================

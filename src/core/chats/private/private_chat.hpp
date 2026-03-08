@@ -17,8 +17,7 @@ class TPrivateChat : public IChat {
   // IChat API
   TChatId GetId() const override;
   EChatType GetType() const override;
-  bool CanPost(const TUserId& sender_id) const override;
-  std::vector<TUserId> GetMembers() const override;
+  bool CanPost(EMemberRole sender_role) const override;
   std::vector<TUserId> GetRecipients(const TUserId& sender_id) const override;
 
   // Private chat

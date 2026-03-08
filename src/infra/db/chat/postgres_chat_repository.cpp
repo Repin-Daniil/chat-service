@@ -57,7 +57,7 @@ std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetPrivateChat(T
   }
 
   auto members = result.AsContainer<std::vector<TUserId>>();
-  // todo тут по хитрее надо сделать, members нужны везде, но где-то нужна и другая инфа, например роль
+
   return std::make_unique<NCore::NDomain::TPrivateChat>(chat_id, members);
 }
 

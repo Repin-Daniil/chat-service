@@ -15,15 +15,17 @@ NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest 
   TMessageText text(std::move(request.Text));
   auto message = NCore::NDomain::TMessage::Create(request.ChatId, request.SenderId, std::move(text), request.SentAt);
 
-  auto chat = ChatRepo_.GetChat(request.ChatId);  // Тут кэш конечно бы не помешал
+  auto chat = ChatRepo_.GetChat(request.ChatId);
   if (!chat) {
     throw TUnknownChat(fmt::format("Chat {} doesn't exist", request.ChatId));
   }
-
-  if (!chat->CanPost(request.SenderId)) {
+  //todo надо зарезолвить роль пользователя в канале
+  const auto sender_role = NCore::NDomain::ResolveSenderRole(*chat, request.SenderId);
+  if (!chat->CanPost(sender_role)) {
     throw TSendForbidden(fmt::format("User {} can't send to chat {}", request.SenderId, request.ChatId));
   }
-
+  
+  //todo В будущем это надо будет делать через Resolver, передать туда chat и SenderId, оно внутри уже достанет либо из личек
   auto recipients = chat->GetRecipients(request.SenderId);
 
   auto result = Router_.Route(std::move(recipients), std::move(message));

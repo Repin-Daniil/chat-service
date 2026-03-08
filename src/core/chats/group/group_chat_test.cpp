@@ -1,390 +1,246 @@
-#include <gtest/gtest.h>
 #include "group_chat.hpp"
+
+
+#include <gtest/gtest.h>
 
 using namespace NChat::NCore::NDomain;
 
+
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-static TUserId MakeUser(std::string id) { return TUserId{std::move(id)}; }
+static TUserId MakeUser(std::string id) {
+  return TUserId{std::move(id)};
+}
 
-static TGroupChat MakeChat(std::vector<TGroupChat::TMember> members) {
-  return TGroupChat(
-      "test-uuid-1234",
-      TGroupTitle::Create("Test Group"),
-      TGroupDescription::Create("Test Description"),
-      std::move(members)
-  );
+static TGroupChat MakeChat() {
+  return TGroupChat("test-uuid-1234", TGroupTitle::Create("Test Group"), TGroupDescription::Create("Test Description"));
 }
 
 // ─── Construction ───────────────────────────────────────────────────────────
 
-TEST(TGroupChatConstruction, TypeIsGroup) {
-  auto chat = MakeChat({});
-  EXPECT_EQ(chat.GetType(), EChatType::Group);
-}
-
-TEST(TGroupChatConstruction, MembersArePopulated) {
-  auto owner = MakeUser("owner");
-  auto writer = MakeUser("writer");
-
-  auto chat = MakeChat({
-      {owner, EMemberRole::Owner},
-      {writer, EMemberRole::Writer},
-  });
-
-  auto members = chat.GetMembers();
-  EXPECT_EQ(members.size(), 2u);
-  EXPECT_TRUE(std::find(members.begin(), members.end(), owner) != members.end());
-  EXPECT_TRUE(std::find(members.begin(), members.end(), writer) != members.end());
-}
-
-TEST(TGroupChatConstruction, TitleAndDescription) {
-  auto chat = MakeChat({});
+TEST(TGroupChatConstruction, HasIdTitleDescription) {
+  auto chat = MakeChat();
   EXPECT_EQ(chat.GetTitle().Value(), "Test Group");
   EXPECT_EQ(chat.GetDescription().Value(), "Test Description");
-}
-
-TEST(TGroupChatConstruction, EmptyChat) {
-  auto chat = MakeChat({});
-  EXPECT_TRUE(chat.GetMembers().empty());
-}
-
-// ─── GetMember ──────────────────────────────────────────────────────────────
-
-TEST(TGroupChatGetMember, ExistingMemberHasCorrectRole) {
-  auto owner = MakeUser("owner");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}});
-
-  auto member = chat.GetMember(owner);
-  ASSERT_TRUE(member.has_value());
-  EXPECT_EQ(member->first, owner);
-  EXPECT_EQ(member->second, EMemberRole::Owner);
-}
-
-TEST(TGroupChatGetMember, NonExistingMemberReturnsNullopt) {
-  auto chat = MakeChat({});
-  EXPECT_FALSE(chat.GetMember(MakeUser("ghost")).has_value());
 }
 
 // ─── CanPost ─────────────────────────────────────────────────────────────────
 
 TEST(TGroupChatCanPost, ReaderCannotPost) {
-  auto reader = MakeUser("reader");
-  auto chat = MakeChat({{reader, EMemberRole::Reader}});
-  EXPECT_FALSE(chat.CanPost(reader));
+  auto chat = MakeChat();
+  EXPECT_FALSE(chat.CanPost(EMemberRole::Reader));
 }
 
 TEST(TGroupChatCanPost, WriterCanPost) {
-  auto writer = MakeUser("writer");
-  auto chat = MakeChat({{writer, EMemberRole::Writer}});
-  EXPECT_TRUE(chat.CanPost(writer));
+  auto chat = MakeChat();
+  EXPECT_TRUE(chat.CanPost(EMemberRole::Writer));
 }
 
 TEST(TGroupChatCanPost, AdminCanPost) {
-  auto admin = MakeUser("admin");
-  auto chat = MakeChat({{admin, EMemberRole::Admin}});
-  EXPECT_TRUE(chat.CanPost(admin));
+  auto chat = MakeChat();
+  EXPECT_TRUE(chat.CanPost(EMemberRole::Admin));
 }
 
 TEST(TGroupChatCanPost, OwnerCanPost) {
+  auto chat = MakeChat();
+  EXPECT_TRUE(chat.CanPost(EMemberRole::Owner));
+}
+
+
+
+// ─── ValidateAddMember ───────────────────────────────────────────────────────
+
+TEST(TGroupChatValidateAddMember, OwnerCanAddNewMember) {
+  auto delta = TGroupChat::ValidateAddMember(EMemberRole::Owner, false, MakeUser("newbie"));
+  EXPECT_EQ(delta.UserId, MakeUser("newbie"));
+  EXPECT_EQ(delta.Role, EMemberRole::Writer);
+}
+
+TEST(TGroupChatValidateAddMember, AdminCanAddNewMember) {
+  auto delta = TGroupChat::ValidateAddMember(EMemberRole::Admin, false, MakeUser("newbie"));
+  EXPECT_EQ(delta.UserId, MakeUser("newbie"));
+}
+
+TEST(TGroupChatValidateAddMember, WriterThrowsWhenAdding) {
+  EXPECT_THROW(TGroupChat::ValidateAddMember(EMemberRole::Writer, false, MakeUser("newbie")), TPermissionDenied);
+}
+
+TEST(TGroupChatValidateAddMember, ReaderThrowsWhenAdding) {
+  EXPECT_THROW(TGroupChat::ValidateAddMember(EMemberRole::Reader, false, MakeUser("newbie")), TPermissionDenied);
+}
+
+TEST(TGroupChatValidateAddMember, ThrowsWhenTargetAlreadyMember) {
+  EXPECT_THROW(TGroupChat::ValidateAddMember(EMemberRole::Owner, true, MakeUser("existing")), TPermissionDenied);
+}
+
+TEST(TGroupChatValidateAddMember, NewMemberGetsWriterRole) {
+  auto delta = TGroupChat::ValidateAddMember(EMemberRole::Owner, false, MakeUser("newbie"));
+  EXPECT_EQ(delta.Role, EMemberRole::Writer);
+}
+
+// ─── ValidateDeleteMember ────────────────────────────────────────────────────
+
+TEST(TGroupChatValidateDeleteMember, OwnerThrowsCannotLeave) {
   auto owner = MakeUser("owner");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}});
-  EXPECT_TRUE(chat.CanPost(owner));
+  EXPECT_THROW(TGroupChat::ValidateDeleteMember(EMemberRole::Owner, EMemberRole::Owner, owner, owner),
+               TChatInvariantViolation);
 }
 
-TEST(TGroupChatCanPost, NonMemberCannotPost) {
-  auto chat = MakeChat({});
-  EXPECT_FALSE(chat.CanPost(MakeUser("stranger")));
-}
-
-// ─── GetRecipients ───────────────────────────────────────────────────────────
-
-TEST(TGroupChatGetRecipients, WriterGetsAllMembers) {
+TEST(TGroupChatValidateDeleteMember, AdminCanDeleteWriter) {
   auto writer = MakeUser("writer");
-  auto other = MakeUser("other");
-  auto chat = MakeChat({{writer, EMemberRole::Writer}, {other, EMemberRole::Reader}});
-
-  auto recipients = chat.GetRecipients(writer);
-  EXPECT_EQ(recipients.size(), 2u);
+  auto delta = TGroupChat::ValidateDeleteMember(EMemberRole::Admin, EMemberRole::Writer, MakeUser("admin"), writer);
+  EXPECT_EQ(delta.UserId, writer);
 }
 
-TEST(TGroupChatGetRecipients, ReaderGetsEmptyList) {
+TEST(TGroupChatValidateDeleteMember, OwnerCanDeleteWriter) {
+  auto writer = MakeUser("writer");
+  auto delta = TGroupChat::ValidateDeleteMember(EMemberRole::Owner, EMemberRole::Writer, MakeUser("owner"), writer);
+  EXPECT_EQ(delta.UserId, writer);
+}
+
+TEST(TGroupChatValidateDeleteMember, AdminThrowsWhenDeletingOwner) {
+  auto owner = MakeUser("owner");
+  EXPECT_THROW(TGroupChat::ValidateDeleteMember(EMemberRole::Admin, EMemberRole::Owner, MakeUser("admin"), owner),
+               TPermissionDenied);
+}
+
+TEST(TGroupChatValidateDeleteMember, WriterThrowsWhenDeletingAnyone) {
   auto reader = MakeUser("reader");
-  auto chat = MakeChat({{reader, EMemberRole::Reader}});
-  EXPECT_TRUE(chat.GetRecipients(reader).empty());
+  EXPECT_THROW(TGroupChat::ValidateDeleteMember(EMemberRole::Writer, EMemberRole::Reader, MakeUser("writer"), reader),
+               TPermissionDenied);
 }
 
-TEST(TGroupChatGetRecipients, NonMemberGetsEmptyList) {
-  auto owner = MakeUser("owner");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}});
-  EXPECT_TRUE(chat.GetRecipients(MakeUser("stranger")).empty());
+TEST(TGroupChatValidateDeleteMember, ThrowsWhenTargetNotMember) {
+  EXPECT_THROW(TGroupChat::ValidateDeleteMember(EMemberRole::Owner, std::nullopt, MakeUser("owner"), MakeUser("ghost")),
+               TUserIsNotGroupMember);
 }
 
-// ─── AddMember ──────────────────────────────────────────────────────────────
-
-TEST(TGroupChatAddMember, OwnerCanAddNewMember) {
-  auto owner = MakeUser("owner");
-  auto newbie = MakeUser("newbie");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}});
-
-  // BUG: ожидаем true, но сейчас вернёт false (баг в реализации)
-  bool result = chat.AddMember(owner, newbie);
-  EXPECT_TRUE(result);  // FAILS until bug is fixed
-
-  auto members = chat.GetMembers();
-  EXPECT_EQ(members.size(), 2u);
-  EXPECT_TRUE(std::find(members.begin(), members.end(), newbie) != members.end());
+TEST(TGroupChatValidateDeleteMember, NonMemberRequesterThrowsWhenTargetNotMember) {
+  EXPECT_THROW(
+      TGroupChat::ValidateDeleteMember(EMemberRole::Writer, std::nullopt, MakeUser("ghost"), MakeUser("writer")),
+      TUserIsNotGroupMember);
 }
 
-TEST(TGroupChatAddMember, AdminCanAddNewMember) {
-  auto admin = MakeUser("admin");
-  auto newbie = MakeUser("newbie");
-  auto chat = MakeChat({{admin, EMemberRole::Admin}});
-
-  chat.AddMember(admin, newbie);
-
-  auto members = chat.GetMembers();
-  EXPECT_EQ(members.size(), 2u);
-}
-
-TEST(TGroupChatAddMember, WriterCannotAddMember) {
+TEST(TGroupChatValidateDeleteMember, WriterCanDeleteSelf) {
   auto writer = MakeUser("writer");
-  auto newbie = MakeUser("newbie");
-  auto chat = MakeChat({{writer, EMemberRole::Writer}});
-
-  bool result = chat.AddMember(writer, newbie);
-  EXPECT_FALSE(result);
-  EXPECT_EQ(chat.GetMembers().size(), 1u);
+  auto delta = TGroupChat::ValidateDeleteMember(EMemberRole::Writer, EMemberRole::Writer, writer, writer);
+  EXPECT_EQ(delta.UserId, writer);
 }
 
-TEST(TGroupChatAddMember, ReaderCannotAddMember) {
+TEST(TGroupChatValidateDeleteMember, ReaderCanDeleteSelf) {
   auto reader = MakeUser("reader");
-  auto newbie = MakeUser("newbie");
-  auto chat = MakeChat({{reader, EMemberRole::Reader}});
-
-  chat.AddMember(reader, newbie);
-  EXPECT_EQ(chat.GetMembers().size(), 1u);
+  auto delta = TGroupChat::ValidateDeleteMember(EMemberRole::Reader, EMemberRole::Reader, reader, reader);
+  EXPECT_EQ(delta.UserId, reader);
 }
 
-TEST(TGroupChatAddMember, CannotAddExistingMember) {
-  auto owner = MakeUser("owner");
-  auto existing = MakeUser("existing");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {existing, EMemberRole::Writer}});
+// ─── ValidateGrantUser ──────────────────────────────────────────────────────
 
-  chat.AddMember(owner, existing);
-  EXPECT_EQ(chat.GetMembers().size(), 2u);  // не должно дублироваться
-}
-
-TEST(TGroupChatAddMember, NonMemberCannotAddMember) {
-  auto outsider = MakeUser("outsider");
-  auto newbie = MakeUser("newbie");
-  auto chat = MakeChat({});
-
-  chat.AddMember(outsider, newbie);
-  EXPECT_TRUE(chat.GetMembers().empty());
-}
-
-TEST(TGroupChatAddMember, NewMemberGetsDefaultWriterRole) {
-  auto owner = MakeUser("owner");
-  auto newbie = MakeUser("newbie");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}});
-
-  chat.AddMember(owner, newbie);
-
-  auto member = chat.GetMember(newbie);
-  ASSERT_TRUE(member.has_value());
-  EXPECT_EQ(member->second, EMemberRole::Writer);
-}
-
-// ─── DeleteMember ────────────────────────────────────────────────────────────
-
-TEST(TGroupChatDeleteMember, OwnerCanDeleteWriter) {
-  auto owner = MakeUser("owner");
+TEST(TGroupChatValidateGrantUser, OwnerCanPromoteWriterToAdmin) {
   auto writer = MakeUser("writer");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {writer, EMemberRole::Writer}});
-
-  bool result = chat.DeleteMember(owner, writer);
-  EXPECT_TRUE(result);
-
-  auto members = chat.GetMembers();
-  EXPECT_EQ(members.size(), 1u);
-  EXPECT_FALSE(chat.GetMember(writer).has_value());
+  auto delta = TGroupChat::ValidateGrantUser(EMemberRole::Owner, EMemberRole::Writer, EMemberRole::Admin, writer);
+  EXPECT_EQ(delta.UserId, writer);
+  EXPECT_EQ(delta.NewRole, EMemberRole::Admin);
 }
 
-TEST(TGroupChatDeleteMember, AdminCanDeleteWriter) {
+TEST(TGroupChatValidateGrantUser, OwnerCanDemoteAdminToReader) {
   auto admin = MakeUser("admin");
+  auto delta = TGroupChat::ValidateGrantUser(EMemberRole::Owner, EMemberRole::Admin, EMemberRole::Reader, admin);
+  EXPECT_EQ(delta.NewRole, EMemberRole::Reader);
+}
+
+TEST(TGroupChatValidateGrantUser, AdminThrowsWhenGrantingAdmin) {
   auto writer = MakeUser("writer");
-  auto chat = MakeChat({{admin, EMemberRole::Admin}, {writer, EMemberRole::Writer}});
-
-  EXPECT_TRUE(chat.DeleteMember(admin, writer));
-  EXPECT_EQ(chat.GetMembers().size(), 1u);
+  EXPECT_THROW(TGroupChat::ValidateGrantUser(EMemberRole::Admin, EMemberRole::Writer, EMemberRole::Admin, writer),
+               TPermissionDenied);
 }
 
-TEST(TGroupChatDeleteMember, AdminCannotDeleteOwner) {
-  auto owner = MakeUser("owner");
-  auto admin = MakeUser("admin");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {admin, EMemberRole::Admin}});
-
-  EXPECT_FALSE(chat.DeleteMember(admin, owner));
-  EXPECT_EQ(chat.GetMembers().size(), 2u);
-}
-
-TEST(TGroupChatDeleteMember, WriterCannotDeleteAnyone) {
+TEST(TGroupChatValidateGrantUser, OwnerThrowsWhenGrantingOwner) {
   auto writer = MakeUser("writer");
-  auto reader = MakeUser("reader");
-  auto chat = MakeChat({{writer, EMemberRole::Writer}, {reader, EMemberRole::Reader}});
-
-  EXPECT_FALSE(chat.DeleteMember(writer, reader));
-  EXPECT_EQ(chat.GetMembers().size(), 2u);
+  EXPECT_THROW(TGroupChat::ValidateGrantUser(EMemberRole::Owner, EMemberRole::Writer, EMemberRole::Owner, writer),
+               TPermissionDenied);
 }
 
-TEST(TGroupChatDeleteMember, CannotDeleteNonMember) {
-  auto owner = MakeUser("owner");
-  auto ghost = MakeUser("ghost");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}});
-
-  EXPECT_FALSE(chat.DeleteMember(owner, ghost));
+TEST(TGroupChatValidateGrantUser, ThrowsWhenTargetNotMember) {
+  EXPECT_THROW(TGroupChat::ValidateGrantUser(EMemberRole::Owner, std::nullopt, EMemberRole::Writer, MakeUser("ghost")),
+               TUserIsNotGroupMember);
 }
 
-TEST(TGroupChatDeleteMember, NonMemberRequesterReturnsFalse) {
-  auto ghost = MakeUser("ghost");
+TEST(TGroupChatValidateGrantUser, AdminThrowsWhenGrantingHigherRole) {
   auto writer = MakeUser("writer");
-  auto chat = MakeChat({{writer, EMemberRole::Writer}});
-
-  EXPECT_FALSE(chat.DeleteMember(ghost, writer));
-  EXPECT_EQ(chat.GetMembers().size(), 1u);
+  EXPECT_THROW(TGroupChat::ValidateGrantUser(EMemberRole::Admin, EMemberRole::Writer, EMemberRole::Owner, writer),
+               TPermissionDenied);
 }
 
-TEST(TGroupChatDeleteMember, CanDeleteSelf) {
-  auto owner = MakeUser("owner");
-  auto reader = MakeUser("reader");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {reader, EMemberRole::Reader}});
+// ─── ValidateChangeOwner ─────────────────────────────────────────────────────
 
-  // Owner должен сначала передать права
-  EXPECT_FALSE(chat.DeleteMember(owner, owner));
-  EXPECT_TRUE(chat.DeleteMember(reader, reader));
-  EXPECT_EQ(chat.GetMembers().size(), 1u);
+TEST(TGroupChatValidateChangeOwner, OwnerCanTransferOwnership) {
+  auto new_owner = MakeUser("new_owner");
+  auto delta = TGroupChat::ValidateChangeOwner(EMemberRole::Owner, EMemberRole::Admin, new_owner);
+  EXPECT_EQ(delta.NewOwnerId, new_owner);
 }
 
-//todo тест на передачу ownership
-TEST(TGroupChatDeleteMember, MemberRemovedFromRolesAndMembers) {
-  auto owner = MakeUser("owner");
-  auto writer = MakeUser("writer");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {writer, EMemberRole::Writer}});
-
-  chat.DeleteMember(owner, writer);
-
-  EXPECT_FALSE(chat.GetMember(writer).has_value());
-  auto members = chat.GetMembers();
-  EXPECT_TRUE(std::find(members.begin(), members.end(), writer) == members.end());
+TEST(TGroupChatValidateChangeOwner, NonOwnerThrows) {
+  EXPECT_THROW(TGroupChat::ValidateChangeOwner(EMemberRole::Admin, EMemberRole::Writer, MakeUser("writer")),
+               TPermissionDenied);
 }
 
-// ─── GrantUser ──────────────────────────────────────────────────────────────
-
-TEST(TGroupChatGrantUser, OwnerCanPromoteWriterToAdmin) {
-  auto owner = MakeUser("owner");
-  auto writer = MakeUser("writer");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {writer, EMemberRole::Writer}});
-
-  bool result = chat.GrantUser(owner, writer, EMemberRole::Admin);
-  EXPECT_TRUE(result);
-
-  auto member = chat.GetMember(writer);
-  ASSERT_TRUE(member.has_value());
-  EXPECT_EQ(member->second, EMemberRole::Admin);
+TEST(TGroupChatValidateChangeOwner, ThrowsWhenTargetNotMember) {
+  EXPECT_THROW(TGroupChat::ValidateChangeOwner(EMemberRole::Owner, std::nullopt, MakeUser("ghost")),
+               TUserIsNotGroupMember);
 }
 
-TEST(TGroupChatGrantUser, OwnerCanDemoteAdminToReader) {
-  auto owner = MakeUser("owner");
-  auto admin = MakeUser("admin");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {admin, EMemberRole::Admin}});
+// ─── ChangeTitle ─────────────────────────────────────────────────────
 
-  EXPECT_TRUE(chat.GrantUser(owner, admin, EMemberRole::Reader));
-  EXPECT_EQ(chat.GetMember(admin)->second, EMemberRole::Reader);
+TEST(TGroupChatChangeTitle, OwnerCanChangeTitle) {
+  auto chat = MakeChat();
+  auto new_title = TGroupTitle::Create("New Group Name");
+  auto delta = chat.ChangeTitle(EMemberRole::Owner, new_title);
+  EXPECT_EQ(delta.NewTitle, new_title);
+  EXPECT_EQ(chat.GetTitle(), new_title);
 }
 
-TEST(TGroupChatGrantUser, AdminCannotGrantAdmin) {
-  // Admin не имеет EPermission::GrantUsers
-  auto admin = MakeUser("admin");
-  auto writer = MakeUser("writer");
-  auto chat = MakeChat({{admin, EMemberRole::Admin}, {writer, EMemberRole::Writer}});
-
-  EXPECT_FALSE(chat.GrantUser(admin, writer, EMemberRole::Admin));
-  EXPECT_EQ(chat.GetMember(writer)->second, EMemberRole::Writer);
+TEST(TGroupChatChangeTitle, AdminCanChangeTitle) {
+  auto chat = MakeChat();
+  auto new_title = TGroupTitle::Create("Admin Renamed");
+  auto delta = chat.ChangeTitle(EMemberRole::Admin, new_title);
+  EXPECT_EQ(delta.NewTitle, new_title);
+  EXPECT_EQ(chat.GetTitle(), new_title);
 }
 
-TEST(TGroupChatGrantUser, OwnerCannotGrantEqualOrHigherRole) {
-  // BUG: текущая реализация это допускает — тест документирует баг
-  auto owner = MakeUser("owner");
-  auto writer = MakeUser("writer");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {writer, EMemberRole::Writer}});
-
-  // Пытаемся повысить writer до Owner — не должно быть возможным
-  bool result = chat.GrantUser(owner, writer, EMemberRole::Owner);
-  // Ожидаемое поведение: false. Текущее поведение: true (баг)
-  EXPECT_FALSE(result);  // FAILS until bug is fixed
+TEST(TGroupChatChangeTitle, WriterThrowsWhenChangingTitle) {
+  auto chat = MakeChat();
+  auto new_title = TGroupTitle::Create("Writer Tries");
+  EXPECT_THROW(chat.ChangeTitle(EMemberRole::Writer, new_title), TPermissionDenied);
 }
 
-TEST(TGroupChatGrantUser, CannotGrantNonMember) {
-  auto owner = MakeUser("owner");
-  auto ghost = MakeUser("ghost");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}});
-
-  EXPECT_FALSE(chat.GrantUser(owner, ghost, EMemberRole::Writer));
+TEST(TGroupChatChangeTitle, ReaderThrowsWhenChangingTitle) {
+  auto chat = MakeChat();
+  auto new_title = TGroupTitle::Create("Reader Tries");
+  EXPECT_THROW(chat.ChangeTitle(EMemberRole::Reader, new_title), TPermissionDenied);
 }
 
-TEST(TGroupChatGrantUser, NonMemberRequesterReturnsFalse) {
-  auto ghost = MakeUser("ghost");
-  auto writer = MakeUser("writer");
-  auto chat = MakeChat({{writer, EMemberRole::Writer}});
+// ─── ChangeDescription ───────────────────────────────────────────────
 
-  EXPECT_FALSE(chat.GrantUser(ghost, writer, EMemberRole::Admin));
+TEST(TGroupChatChangeDescription, OwnerCanChangeDescription) {
+  auto chat = MakeChat();
+
+  auto new_desc = TGroupDescription::Create("New description text");
+  auto delta = chat.ChangeDescription(EMemberRole::Owner, new_desc);
+  EXPECT_EQ(delta.NewDescription, new_desc);
+  EXPECT_EQ(chat.GetDescription(), new_desc);
 }
 
-TEST(TGroupChatGrantUser, CannotGrantHigherRoleThanSelf) {
-  auto admin = MakeUser("admin");
-  auto writer = MakeUser("writer");
-  auto chat = MakeChat({{admin, EMemberRole::Admin}, {writer, EMemberRole::Writer}});
+TEST(TGroupChatChangeDescription, AdminCanChangeDescription) {
+  auto chat = MakeChat();
 
-  // даже если у Admin есть GrantUsers — его нет, но гипотетически нельзя давать > своей роли
-  EXPECT_FALSE(chat.GrantUser(admin, writer, EMemberRole::Owner));
+  auto new_desc = TGroupDescription::Create("Admin updated");
+  auto delta = chat.ChangeDescription(EMemberRole::Admin, new_desc);
+  EXPECT_EQ(delta.NewDescription, new_desc);
+  EXPECT_EQ(chat.GetDescription(), new_desc);
 }
 
-// ─── Invariants ──────────────────────────────────────────────────────────────
-
-TEST(TGroupChatInvariants, MembersAndRolesStayInSync) {
-  auto owner = MakeUser("owner");
-  auto writer = MakeUser("writer");
-  auto newbie = MakeUser("newbie");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}, {writer, EMemberRole::Writer}});
-
-  chat.AddMember(owner, newbie);
-  chat.DeleteMember(owner, writer);
-
-  auto members = chat.GetMembers();
-  EXPECT_EQ(members.size(), 2u);
-
-  for (const auto& user_id : members) {
-    EXPECT_TRUE(chat.GetMember(user_id).has_value())
-        << "Member in Members_ has no entry in Roles_";
-  }
-
-  EXPECT_FALSE(chat.GetMember(writer).has_value());
-}
-
-TEST(TGroupChatInvariants, GetMembersCountMatchesAfterOperations) {
-  auto owner = MakeUser("owner");
-  auto a = MakeUser("a");
-  auto b = MakeUser("b");
-  auto c = MakeUser("c");
-  auto chat = MakeChat({{owner, EMemberRole::Owner}});
-
-  chat.AddMember(owner, a);
-  chat.AddMember(owner, b);
-  chat.AddMember(owner, c);
-  EXPECT_EQ(chat.GetMembers().size(), 4u);
-
-  chat.DeleteMember(owner, a);
-  chat.DeleteMember(owner, b);
-  EXPECT_EQ(chat.GetMembers().size(), 2u);
+TEST(TGroupChatChangeDescription, WriterThrowsWhenChangingDescription) {
+  auto chat = MakeChat();
+  auto new_desc = TGroupDescription::Create("Writer tries");
+  EXPECT_THROW(chat.ChangeDescription(EMemberRole::Writer, new_desc), TPermissionDenied);
 }

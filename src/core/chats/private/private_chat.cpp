@@ -1,5 +1,6 @@
 #include "private_chat.hpp"
 
+#include <core/chats/access_control/chat_acl.hpp>
 #include <core/chats/utils/chat_utils.hpp>
 
 #include <userver/crypto/hash.hpp>
@@ -45,8 +46,8 @@ EChatType TPrivateChat::GetType() const {
   return EChatType::Private;
 }
 
-bool TPrivateChat::CanPost(const TUserId& sender_id) const {
-  return IsParticipant(sender_id);
+bool TPrivateChat::CanPost(EMemberRole sender_role) const {
+  return HasPermission(sender_role, EPermission::PostMessage);
 }
 
 std::vector<TUserId> TPrivateChat::GetMembers() const {

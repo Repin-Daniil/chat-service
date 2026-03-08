@@ -22,7 +22,6 @@ enum class EPermission {
 };
 
 using TPermissionSet = std::set<EPermission>;
-// todo Для каждой группы должны быть свои настройки прав, но это в далеком будущем
 
 inline const std::map<EMemberRole, TPermissionSet> RolePermissions = {
     {EMemberRole::Reader, {}},

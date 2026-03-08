@@ -19,13 +19,14 @@ NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest 
   if (!chat) {
     throw TUnknownChat(fmt::format("Chat {} doesn't exist", request.ChatId));
   }
-  //todo надо зарезолвить роль пользователя в канале
-  const auto sender_role = NCore::NDomain::ResolveSenderRole(*chat, request.SenderId);
-  if (!chat->CanPost(sender_role)) {
+
+  const auto sender_role = ChatRepo_.GetRole(chat->GetId(), request.SenderId);
+
+  if (!sender_role.has_value() || !chat->CanPost(sender_role.value())) {
     throw TSendForbidden(fmt::format("User {} can't send to chat {}", request.SenderId, request.ChatId));
   }
-  
-  //todo В будущем это надо будет делать через Resolver, передать туда chat и SenderId, оно внутри уже достанет либо из личек
+
+  // todo Resolver, для групп сейчас вылетит исключение
   auto recipients = chat->GetRecipients(request.SenderId);
 
   auto result = Router_.Route(std::move(recipients), std::move(message));

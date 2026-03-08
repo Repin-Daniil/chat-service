@@ -50,10 +50,6 @@ bool TPrivateChat::CanPost(EMemberRole sender_role) const {
   return HasPermission(sender_role, EPermission::PostMessage);
 }
 
-std::vector<TUserId> TPrivateChat::GetMembers() const {
-  return {Users_.first, Users_.second};
-}
-
 std::pair<TUserId, TUserId> TPrivateChat::GetUsers() const {
   return Users_;
 }
@@ -67,7 +63,7 @@ bool TPrivateChat::IsSoloChat() const {
 }
 
 std::vector<TUserId> TPrivateChat::GetRecipients(const TUserId& sender_id) const {
-  if (!CanPost(sender_id)) {
+  if (!IsParticipant(sender_id)) {
     return {};
   }
 
@@ -76,7 +72,7 @@ std::vector<TUserId> TPrivateChat::GetRecipients(const TUserId& sender_id) const
     return {sender_id};
   }
 
-  return GetMembers();
+  return {Users_.first, Users_.second};
 }
 
 bool TPrivateChat::operator==(TPrivateChat other) const {

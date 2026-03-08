@@ -24,6 +24,9 @@ class TPostgresChatRepository : public NCore::IChatRepository {
 
   std::unique_ptr<NCore::NDomain::IChat> GetChat(TChatId chat_id) const override;
 
+  std::optional<NCore::NDomain::EMemberRole> GetRole(NCore::NDomain::TChatId chat_id,
+                                                     NCore::NDomain::TUserId user_id) const override;
+
  private:
   std::unique_ptr<NCore::NDomain::IChat> GetPrivateChat(TChatId chat_id) const;
   std::unique_ptr<NCore::NDomain::IChat> GetGroupChat(TChatId chat_id) const;

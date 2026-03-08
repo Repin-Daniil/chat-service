@@ -6,11 +6,12 @@
 
 namespace NChat::NCore::NDomain {
 
-enum class EMemberRole {
+enum class EMemberRole : int {
   Reader = 0,
   Writer = 1,
   Admin = 2,
   Owner = 3,
+  Count
 };
 
 enum class EPermission {

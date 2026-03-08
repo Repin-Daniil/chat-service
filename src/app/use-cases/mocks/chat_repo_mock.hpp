@@ -11,4 +11,5 @@ class TMockChatRepository : public IChatRepository {
  public:
   MOCK_METHOD((std::pair<NDomain::TChatId, bool>), SavePrivateChat, (NDomain::TPrivateChat), (const, override));
   MOCK_METHOD((std::unique_ptr<NDomain::IChat>), GetChat, (NDomain::TChatId), (const, override));
+  MOCK_METHOD((std::optional<NDomain::EMemberRole>), GetRole, (NDomain::TChatId, NDomain::TUserId), (const, override));
 };

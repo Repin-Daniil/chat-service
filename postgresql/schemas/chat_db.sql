@@ -12,6 +12,14 @@ CREATE TYPE chat.channel_type AS ENUM ('DIRECT', 'GROUP', 'BROADCAST');
 
 CREATE TYPE chat.member_role AS ENUM ('READER', 'WRITER', 'ADMIN', 'OWNER');
 
+CREATE OR REPLACE FUNCTION chat.member_role_to_int(role chat.member_role)
+RETURNS int
+LANGUAGE sql
+IMMUTABLE
+AS $$
+    SELECT array_position(enum_range(NULL::chat.member_role), role) - 1;
+$$;
+
 -- CREATE TYPE chat.member_status AS ENUM ('ACTIVE', 'LEFT', 'BANNED')
 -- ===========================
 --  FUNCTIONS
@@ -60,7 +68,7 @@ CREATE TABLE chat.channels (
 CREATE TABLE chat.channel_members (
     channel_id TEXT NOT NULL REFERENCES chat.channels(channel_id) ON DELETE CASCADE,
     user_id TEXT NOT NULL REFERENCES chat.users(user_id),
-    role chat.member_role NOT NULL DEFAULT 'READER',
+    role SMALLINT NOT NULL DEFAULT 0,
     -- status chat.member_status NOT NULL DEFAULT 'ACTIVE'
     joined_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     -- last_read_message_id BIGINT

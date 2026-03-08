@@ -8,8 +8,8 @@ inserted_members AS (
 
     INSERT INTO chat.channel_members (channel_id, user_id, role)
     VALUES 
-        ($1, $2, 'OWNER'),
-        ($1, $3, 'OWNER')
+        ($1, $2, chat.member_role_to_int('OWNER')),
+        ($1, $3, chat.member_role_to_int('OWNER'))
     ON CONFLICT (channel_id, user_id) DO NOTHING
 )
 

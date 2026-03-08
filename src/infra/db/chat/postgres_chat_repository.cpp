@@ -66,4 +66,25 @@ std::unique_ptr<NCore::NDomain::IChat> TPostgresChatRepository::GetGroupChat(TCh
   return nullptr;
 }
 
+std::optional<NCore::NDomain::EMemberRole> TPostgresChatRepository::GetRole(NCore::NDomain::TChatId chat_id,
+                                                                            NCore::NDomain::TUserId user_id) const {
+  auto result = PgCluster_->Execute(userver::storages::postgres::ClusterHostType::kSlave, sql::kGetMemberRole,
+                                    chat_id.GetUnderlying(), user_id.GetUnderlying());
+
+  if (result.IsEmpty()) {
+    return std::nullopt;
+  }
+  
+  auto role_int = result.AsSingleRow<int>();
+  LOG_DEBUG() << "Вот твоя роль " << role_int;
+  
+  if (role_int < 0 || role_int >= static_cast<int>(NCore::NDomain::EMemberRole::Count)) {
+    return std::nullopt;
+  }
+
+  auto role = static_cast<NCore::NDomain::EMemberRole>(role_int);
+
+  return role;
+}
+
 }  // namespace NChat::NInfra::NRepository

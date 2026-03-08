@@ -7,20 +7,22 @@
 namespace NChat::NCore::NDomain {
 
 enum class EMemberRole {
-  Reader,
-  Writer,
-  Admin,
-  Owner,
+  Reader = 0,
+  Writer = 1,
+  Admin = 2,
+  Owner = 3,
 };
 
 enum class EPermission {
   PostMessage,
-  ChangeMembers,
+  AddMembers,
+  DeleteMembers,
   ChangeData,
   GrantUsers,
 };
 
 using TPermissionSet = std::set<EPermission>;
+// todo Для каждой группы должны быть свои настройки прав, но это в далеком будущем
 
 inline const std::map<EMemberRole, TPermissionSet> RolePermissions = {
     {EMemberRole::Reader, {}},
@@ -33,14 +35,16 @@ inline const std::map<EMemberRole, TPermissionSet> RolePermissions = {
     {EMemberRole::Admin,
      {
          EPermission::PostMessage,
-         EPermission::ChangeMembers,
+         EPermission::AddMembers,
+         EPermission::DeleteMembers,
          EPermission::ChangeData,
      }},
 
     {EMemberRole::Owner,
      {
          EPermission::PostMessage,
-         EPermission::ChangeMembers,
+         EPermission::AddMembers,
+         EPermission::DeleteMembers,
          EPermission::ChangeData,
          EPermission::GrantUsers,
      }},

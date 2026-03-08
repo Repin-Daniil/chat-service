@@ -29,8 +29,8 @@ class TPrivateChat : public IChat {
   bool operator==(TPrivateChat other) const;
 
  private:
-  TChatId Id_;
   std::pair<TUserId, TUserId> Users_;
+  const TChatId Id_;
 };
 
 }  // namespace NChat::NCore::NDomain

@@ -11,7 +11,8 @@ TEST(ReaderPermissions, CannotPostMessage) {
 }
 
 TEST(ReaderPermissions, CannotChangeMembers) {
-  EXPECT_FALSE(HasPermission(EMemberRole::Reader, EPermission::ChangeMembers));
+  EXPECT_FALSE(HasPermission(EMemberRole::Reader, EPermission::DeleteMembers));
+  EXPECT_FALSE(HasPermission(EMemberRole::Reader, EPermission::AddMembers));
 }
 
 TEST(ReaderPermissions, CannotChangeData) {
@@ -26,21 +27,22 @@ TEST(ReaderPermissions, HasNoPermissionsAtAll) {
   EXPECT_TRUE(GetPermissions(EMemberRole::Reader).empty());
 }
 
-// ── Member ────────────────────────────────────────────────────────────────────
+// ── Writer ────────────────────────────────────────────────────────────────────
 
-TEST(MemberPermissions, CanPostMessage) {
+TEST(WriterPermissions, CanPostMessage) {
   EXPECT_TRUE(HasPermission(EMemberRole::Writer, EPermission::PostMessage));
 }
 
-TEST(MemberPermissions, CannotChangeMembers) {
-  EXPECT_FALSE(HasPermission(EMemberRole::Writer, EPermission::ChangeMembers));
+TEST(WriterPermissions, CannotChangeMembers) {
+  EXPECT_FALSE(HasPermission(EMemberRole::Writer, EPermission::DeleteMembers));
+  EXPECT_FALSE(HasPermission(EMemberRole::Writer, EPermission::AddMembers));
 }
 
-TEST(MemberPermissions, CannotChangeData) {
+TEST(WriterPermissions, CannotChangeData) {
   EXPECT_FALSE(HasPermission(EMemberRole::Writer, EPermission::ChangeData));
 }
 
-TEST(MemberPermissions, CannotGrantUsers) {
+TEST(WriterPermissions, CannotGrantUsers) {
   EXPECT_FALSE(HasPermission(EMemberRole::Writer, EPermission::GrantUsers));
 }
 
@@ -51,7 +53,8 @@ TEST(AdminPermissions, CanPostMessage) {
 }
 
 TEST(AdminPermissions, CanChangeMembers) {
-  EXPECT_TRUE(HasPermission(EMemberRole::Admin, EPermission::ChangeMembers));
+  EXPECT_TRUE(HasPermission(EMemberRole::Admin, EPermission::DeleteMembers));
+  EXPECT_TRUE(HasPermission(EMemberRole::Admin, EPermission::AddMembers));
 }
 
 TEST(AdminPermissions, CanChangeData) {
@@ -69,7 +72,8 @@ TEST(OwnerPermissions, CanPostMessage) {
 }
 
 TEST(OwnerPermissions, CanChangeMembers) {
-  EXPECT_TRUE(HasPermission(EMemberRole::Owner, EPermission::ChangeMembers));
+  EXPECT_TRUE(HasPermission(EMemberRole::Owner, EPermission::DeleteMembers));
+  EXPECT_TRUE(HasPermission(EMemberRole::Owner, EPermission::AddMembers));
 }
 
 TEST(OwnerPermissions, CanChangeData) {
@@ -83,7 +87,8 @@ TEST(OwnerPermissions, CanGrantUsers) {
 TEST(OwnerPermissions, HasAllPermissions) {
   const auto& perms = GetPermissions(EMemberRole::Owner);
   EXPECT_TRUE(perms.contains(EPermission::PostMessage));
-  EXPECT_TRUE(perms.contains(EPermission::ChangeMembers));
+  EXPECT_TRUE(perms.contains(EPermission::DeleteMembers));
+  EXPECT_TRUE(perms.contains(EPermission::AddMembers));
   EXPECT_TRUE(perms.contains(EPermission::ChangeData));
   EXPECT_TRUE(perms.contains(EPermission::GrantUsers));
 }

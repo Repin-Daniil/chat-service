@@ -5,26 +5,29 @@
 #include <userver/crypto/hash.hpp>
 
 namespace {
+using NChat::NCore::NDomain::TChatInvariantViolation;
 using NChat::NCore::NDomain::TUserId;
 
 std::string GenerateDetermenisticId(std::pair<TUserId, TUserId> users) {
   return userver::crypto::hash::Sha256(fmt::format("{}:{}", users.first, users.second));
 }
 
+std::pair<TUserId, TUserId> MakeUsersPair(std::vector<TUserId> users) {
+  if (users.size() == 1) {
+    return std::make_pair(users[0], users[0]);
+  } else if (users.size() == 2) {
+    return std::minmax(users[0], users[1]);
+  }
+
+  throw TChatInvariantViolation(fmt::format("Private chat: wrong size {}. Must be 1 or 2", users.size()));
+}
+
 }  // namespace
 
 namespace NChat::NCore::NDomain {
 
-TPrivateChat::TPrivateChat(std::vector<TUserId> users) {
-  if (users.size() == 1) {
-    Users_ = std::make_pair(users[0], users[0]);
-  } else if (users.size() == 2) {
-    Users_ = std::minmax(users[0], users[1]);
-  } else {
-    throw TChatInvariantViolation(fmt::format("Private chat: wrong size {}. Must be 1 or 2", users.size()));
-  }
-
-  Id_ = MakeChatId(EChatType::Private, GenerateDetermenisticId(Users_));
+TPrivateChat::TPrivateChat(std::vector<TUserId> users)
+    : Users_(MakeUsersPair(std::move(users))), Id_(MakeChatId(EChatType::Private, GenerateDetermenisticId(Users_))) {
 }
 
 TPrivateChat::TPrivateChat(TChatId chat_id, std::vector<TUserId> users) : TPrivateChat(users) {

@@ -1,49 +1,57 @@
 #pragma once
 
+#include <core/chats/access_control/chat_acl.hpp>
 #include <core/chats/chat.hpp>
-#include <core/chats/group/group_chat_acl.hpp>
+#include <core/chats/group/exceptions.hpp>
+#include <core/chats/group/group_delta.hpp>
 #include <core/chats/value/group_description.hpp>
 #include <core/chats/value/group_title.hpp>
 
 namespace NChat::NCore::NDomain {
 
-struct TGroupChatData {
-  TGroupTitle Title;
-  TGroupDescription Description;
-  TUserId OwnerId;
-};
-// Для восстановления из БД можно сделать RawGroupData
-
 class TGroupChat : public IChat {
  public:
-  using TGroupChatMembers = std::vector<std::pair<TUserId, EMemberRole>>;
-
-  TGroupChat(TChatId chat_id, TGroupChatData data, TGroupChatMembers members);
-  TGroupChat(std::string uuid, TGroupChatData data, TGroupChatMembers members);
+  TGroupChat(TChatId chat_id, TGroupTitle title, TGroupDescription description);
+  TGroupChat(std::string uuid, TGroupTitle title, TGroupDescription description);
 
   // Common
   TChatId GetId() const override;
   EChatType GetType() const override;
 
-  std::vector<TUserId> GetMembers() const override;
   std::vector<TUserId> GetRecipients(const TUserId& sender_id) const override;
-
-  bool CanPost(const TUserId& sender_id) const override;
-
-  // todo ACL
-  // virtual std::optional<EMemberRole> GetRole(const TUserId& user) const = 0;
+  bool CanPost(EMemberRole sender_role) const override;
 
   // Group specific
-  bool AddMember(TUserId requester, TUserId target_user);
-  bool DeleteMember(TUserId requester, TUserId target_user);
-  bool GrantUser(TUserId requester, TUserId target_user, EMemberRole role);
+  TGroupTitle GetTitle() const;
+  TGroupDescription GetDescription() const;
+
+  [[nodiscard]] static TAddMemberDelta ValidateAddMember(EMemberRole requester_role, bool target_already_member,
+                                                         const TUserId& target_user);
+
+  [[nodiscard]] static TDeleteMemberDelta ValidateDeleteMember(EMemberRole requester_role,
+                                                               std::optional<EMemberRole> target_role,
+                                                               const TUserId& requester_id, const TUserId& target_user);
+
+  [[nodiscard]] static TGrantRoleDelta ValidateGrantUser(EMemberRole requester_role,
+                                                         std::optional<EMemberRole> target_role, EMemberRole new_role,
+                                                         const TUserId& target_user);
+
+  [[nodiscard]] static TChangeOwnerDelta ValidateChangeOwner(EMemberRole requester_role,
+                                                             std::optional<EMemberRole> target_role,
+                                                             const TUserId& target_user);
+
+  [[nodiscard]] TChangeTitleDelta ChangeTitle(EMemberRole requester_role, TGroupTitle new_title);
+
+  [[nodiscard]] TChangeDescriptionDelta ChangeDescription(EMemberRole requester_role,
+                                                          TGroupDescription new_description);
 
  private:
   const TChatId Id_;
-  TGroupChatData Data_;
+  TGroupTitle Title_;
+  TGroupDescription Description_;
 
-  std::vector<TUserId> Members_;
-  std::unordered_map<TUserId, EMemberRole> Roles_;
+  // todo удаление нужно через флаг is_deleted
+  // todo MaxMembers amount
 };
 
 }  // namespace NChat::NCore::NDomain

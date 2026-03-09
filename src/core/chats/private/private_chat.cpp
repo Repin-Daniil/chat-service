@@ -1,30 +1,34 @@
 #include "private_chat.hpp"
 
+#include <core/chats/access_control/chat_acl.hpp>
 #include <core/chats/utils/chat_utils.hpp>
 
 #include <userver/crypto/hash.hpp>
 
 namespace {
+using NChat::NCore::NDomain::TChatInvariantViolation;
 using NChat::NCore::NDomain::TUserId;
 
 std::string GenerateDetermenisticId(std::pair<TUserId, TUserId> users) {
   return userver::crypto::hash::Sha256(fmt::format("{}:{}", users.first, users.second));
 }
 
+std::pair<TUserId, TUserId> MakeUsersPair(std::vector<TUserId> users) {
+  if (users.size() == 1) {
+    return std::make_pair(users[0], users[0]);
+  } else if (users.size() == 2) {
+    return std::minmax(users[0], users[1]);
+  }
+
+  throw TChatInvariantViolation(fmt::format("Private chat: wrong size {}. Must be 1 or 2", users.size()));
+}
+
 }  // namespace
 
 namespace NChat::NCore::NDomain {
 
-TPrivateChat::TPrivateChat(std::vector<TUserId> users) {
-  if (users.size() == 1) {
-    Users_ = std::make_pair(users[0], users[0]);
-  } else if (users.size() == 2) {
-    Users_ = std::minmax(users[0], users[1]);
-  } else {
-    throw TChatInvariantViolation(fmt::format("Private chat: wrong size {}. Must be 1 or 2", users.size()));
-  }
-
-  Id_ = MakeChatId(EChatType::Private, GenerateDetermenisticId(Users_));
+TPrivateChat::TPrivateChat(std::vector<TUserId> users)
+    : Users_(MakeUsersPair(std::move(users))), Id_(MakeChatId(EChatType::Private, GenerateDetermenisticId(Users_))) {
 }
 
 TPrivateChat::TPrivateChat(TChatId chat_id, std::vector<TUserId> users) : TPrivateChat(users) {
@@ -42,12 +46,8 @@ EChatType TPrivateChat::GetType() const {
   return EChatType::Private;
 }
 
-bool TPrivateChat::CanPost(const TUserId& sender_id) const {
-  return IsParticipant(sender_id);
-}
-
-std::vector<TUserId> TPrivateChat::GetMembers() const {
-  return {Users_.first, Users_.second};
+bool TPrivateChat::CanPost(EMemberRole sender_role) const {
+  return HasPermission(sender_role, EPermission::PostMessage);
 }
 
 std::pair<TUserId, TUserId> TPrivateChat::GetUsers() const {
@@ -63,7 +63,7 @@ bool TPrivateChat::IsSoloChat() const {
 }
 
 std::vector<TUserId> TPrivateChat::GetRecipients(const TUserId& sender_id) const {
-  if (!CanPost(sender_id)) {
+  if (!IsParticipant(sender_id)) {
     return {};
   }
 
@@ -72,7 +72,7 @@ std::vector<TUserId> TPrivateChat::GetRecipients(const TUserId& sender_id) const
     return {sender_id};
   }
 
-  return GetMembers();
+  return {Users_.first, Users_.second};
 }
 
 bool TPrivateChat::operator==(TPrivateChat other) const {

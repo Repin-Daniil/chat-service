@@ -15,15 +15,20 @@ NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest 
   TMessageText text(std::move(request.Text));
   auto message = NCore::NDomain::TMessage::Create(request.ChatId, request.SenderId, std::move(text), request.SentAt);
 
-  auto chat = ChatRepo_.GetChat(request.ChatId);  // Тут кэш конечно бы не помешал
+  // fixme Сюда кэш бы прикрутить
+  auto chat = ChatRepo_.GetChat(request.ChatId);
   if (!chat) {
     throw TUnknownChat(fmt::format("Chat {} doesn't exist", request.ChatId));
   }
 
-  if (!chat->CanPost(request.SenderId)) {
+  const auto roles = ChatRepo_.GetMemberRoles(chat->GetId(), {request.SenderId});
+  const auto sender_role_it = roles.find(request.SenderId);
+
+  if (sender_role_it == roles.end() || !chat->CanPost(sender_role_it->second)) {
     throw TSendForbidden(fmt::format("User {} can't send to chat {}", request.SenderId, request.ChatId));
   }
 
+  // todo Resolver, для групп сейчас вылетит исключение
   auto recipients = chat->GetRecipients(request.SenderId);
 
   auto result = Router_.Route(std::move(recipients), std::move(message));

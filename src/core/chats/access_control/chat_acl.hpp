@@ -6,16 +6,12 @@
 
 namespace NChat::NCore::NDomain {
 
-enum class EMemberRole {
-  Reader,
-  Writer,
-  Admin,
-  Owner,
-};
+enum class EMemberRole : int { Reader = 0, Writer = 1, Admin = 2, Owner = 3, Count };
 
 enum class EPermission {
   PostMessage,
-  ChangeMembers,
+  AddMembers,
+  DeleteMembers,
   ChangeData,
   GrantUsers,
 };
@@ -33,14 +29,16 @@ inline const std::map<EMemberRole, TPermissionSet> RolePermissions = {
     {EMemberRole::Admin,
      {
          EPermission::PostMessage,
-         EPermission::ChangeMembers,
+         EPermission::AddMembers,
+         EPermission::DeleteMembers,
          EPermission::ChangeData,
      }},
 
     {EMemberRole::Owner,
      {
          EPermission::PostMessage,
-         EPermission::ChangeMembers,
+         EPermission::AddMembers,
+         EPermission::DeleteMembers,
          EPermission::ChangeData,
          EPermission::GrantUsers,
      }},

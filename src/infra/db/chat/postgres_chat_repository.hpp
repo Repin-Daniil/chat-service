@@ -24,10 +24,23 @@ class TPostgresChatRepository : public NCore::IChatRepository {
 
   std::unique_ptr<NCore::NDomain::IChat> GetChat(TChatId chat_id) const override;
 
+  std::unordered_map<TUserId, NCore::NDomain::EMemberRole> GetMemberRoles(
+      NCore::NDomain::TChatId chat_id, const std::vector<NCore::NDomain::TUserId>& users) const override;
+
+  void ApplyMemberDelta(TChatId chat_id, const NCore::NDomain::TGroupMemberDelta& delta) const override;
+  void ApplyInfoDelta(TChatId chat_id, const NCore::NDomain::TGroupInfoDelta& delta) const override;
+
  private:
   std::unique_ptr<NCore::NDomain::IChat> GetPrivateChat(TChatId chat_id) const;
   std::unique_ptr<NCore::NDomain::IChat> GetGroupChat(TChatId chat_id) const;
   // std::unique_ptr<NCore::NDomain::IChat> GetChannel(TChatId chat_id) const;
+
+  void AddMember(TChatId chat_id, const NCore::NDomain::TAddMemberDelta& delta) const;
+  void DeleteMember(TChatId chat_id, const NCore::NDomain::TDeleteMemberDelta& delta) const;
+  void GrantRole(TChatId chat_id, const NCore::NDomain::TGrantRoleDelta& delta) const;
+  void ChangeOwner(TChatId chat_id, const NCore::NDomain::TChangeOwnerDelta& delta) const;
+  void ChangeTitle(TChatId chat_id, const NCore::NDomain::TChangeTitleDelta& delta) const;
+  void ChangeDescription(TChatId chat_id, const NCore::NDomain::TChangeDescriptionDelta& delta) const;
 
  private:
   userver::storages::postgres::ClusterPtr PgCluster_;

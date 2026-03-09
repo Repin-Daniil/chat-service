@@ -1,7 +1,7 @@
 #include "private_chat.hpp"
 
+#include <core/chats/chat_id_format.hpp>
 #include <core/chats/utils/chat_utils.hpp>
-#include <core/chats/value/chat_id_format.hpp>
 
 #include <gtest/gtest.h>
 
@@ -101,30 +101,6 @@ TEST_F(TPrivateChatTest, SameUserTwiceResultsInBothPositions) {
 }
 
 // ============================================================================
-// GetMembers
-// ============================================================================
-
-TEST_F(TPrivateChatTest, GetMembersReturnsBothUsers) {
-  TPrivateChat chat({user1_, user2_});
-
-  auto members = chat.GetMembers();
-
-  ASSERT_EQ(members.size(), 2);
-  EXPECT_EQ(members[0], user1_);
-  EXPECT_EQ(members[1], user2_);
-}
-
-TEST_F(TPrivateChatTest, GetMembersReturnsSortedUsers) {
-  TPrivateChat chat({user2_, user1_});
-
-  auto members = chat.GetMembers();
-
-  ASSERT_EQ(members.size(), 2);
-  EXPECT_EQ(members[0], user1_);
-  EXPECT_EQ(members[1], user2_);
-}
-
-// ============================================================================
 // GetRecipients
 // ============================================================================
 
@@ -198,46 +174,19 @@ TEST_F(TPrivateChatTest, IsParticipantWorksRegardlessOfConstructorOrder) {
 // CanPost
 // ============================================================================
 
-TEST_F(TPrivateChatTest, CanPostReturnsTrueForFirstUser) {
+TEST_F(TPrivateChatTest, CanPostReturnsTrueForWriterRole) {
   TPrivateChat chat({user1_, user2_});
-
-  EXPECT_TRUE(chat.CanPost(user1_));
+  EXPECT_TRUE(chat.CanPost(EMemberRole::Writer));
 }
 
-TEST_F(TPrivateChatTest, CanPostReturnsTrueForSecondUser) {
+TEST_F(TPrivateChatTest, CanPostReturnsTrueForOwnerRole) {
   TPrivateChat chat({user1_, user2_});
-
-  EXPECT_TRUE(chat.CanPost(user2_));
+  EXPECT_TRUE(chat.CanPost(EMemberRole::Owner));
 }
 
-TEST_F(TPrivateChatTest, CanPostReturnsFalseForNonMember) {
+TEST_F(TPrivateChatTest, CanPostReturnsFalseForReaderRole) {
   TPrivateChat chat({user1_, user2_});
-  TUserId stranger = MakeTestUserId("stranger-uuid");
-
-  EXPECT_FALSE(chat.CanPost(stranger));
-}
-
-// ============================================================================
-// Edge cases
-// ============================================================================
-
-TEST_F(TPrivateChatTest, WorksWithEmptyUserIds) {
-  TUserId empty1{""};
-  TUserId empty2{""};
-  TPrivateChat chat({empty1, empty2});
-
-  EXPECT_TRUE(chat.IsParticipant(empty1));
-  EXPECT_EQ(chat.GetMembers().size(), 2);
-}
-
-TEST_F(TPrivateChatTest, WorksWithIdenticalUsers) {
-  TPrivateChat chat({user1_, user1_});
-
-  EXPECT_TRUE(chat.IsParticipant(user1_));
-  auto members = chat.GetMembers();
-  ASSERT_EQ(members.size(), 2);
-  EXPECT_EQ(members[0], user1_);
-  EXPECT_EQ(members[1], user1_);
+  EXPECT_FALSE(chat.CanPost(EMemberRole::Reader));
 }
 
 }  // namespace NChat::NCore::NDomain

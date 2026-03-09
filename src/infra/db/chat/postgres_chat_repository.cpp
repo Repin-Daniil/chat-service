@@ -155,7 +155,7 @@ void TPostgresChatRepository::ChangeOwner(TChatId chat_id, const NCore::NDomain:
 
   auto owner = trx.Execute(sql::kLockOwner, chat_id.GetUnderlying());
   if (owner.IsEmpty()) {
-    throw NCore::TConflictException("Current owner not found");  // fixme Точно то?
+    throw NCore::TConflictException(fmt::format("You are not owner of {}", chat_id);
   }
 
   trx.Execute(sql::kDemoteOwner, chat_id.GetUnderlying());

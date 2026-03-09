@@ -15,6 +15,7 @@ NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest 
   TMessageText text(std::move(request.Text));
   auto message = NCore::NDomain::TMessage::Create(request.ChatId, request.SenderId, std::move(text), request.SentAt);
 
+  // fixme Сюда кэш бы прикрутить
   auto chat = ChatRepo_.GetChat(request.ChatId);
   if (!chat) {
     throw TUnknownChat(fmt::format("Chat {} doesn't exist", request.ChatId));

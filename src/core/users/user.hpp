@@ -77,7 +77,7 @@ class TUser {
   std::string PasswordHash_;
   std::string PasswordSalt_;
   std::string Biography_;
-  //fixme Заменить на Value Objects, порефакторить их
+  // fixme Заменить на Value Objects, порефакторить их
 };
 
 }  // namespace NChat::NCore::NDomain

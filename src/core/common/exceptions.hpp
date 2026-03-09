@@ -8,6 +8,11 @@ class TDomainException : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
+class TConflictException : public TDomainException {
+ public:
+  using TDomainException::TDomainException;
+};
+
 class TValidationException : public std::invalid_argument {
  public:
   using std::invalid_argument::invalid_argument;

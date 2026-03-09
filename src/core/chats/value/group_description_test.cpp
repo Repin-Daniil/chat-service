@@ -21,10 +21,10 @@ TEST(TGroupDescriptionTest, EmptyGroupDescription) {
 TEST(TGroupDescriptionTest, WhitespaceOnlyBecomesEmpty) {
   TGroupDescription desc1 = TGroupDescription::Create("   ");
   EXPECT_TRUE(desc1.IsEmpty());
-  
+
   TGroupDescription desc2 = TGroupDescription::Create("\t\t\t");
   EXPECT_TRUE(desc2.IsEmpty());
-  
+
   TGroupDescription desc3 = TGroupDescription::Create("\n\n");
   EXPECT_TRUE(desc3.IsEmpty());
 }
@@ -43,7 +43,7 @@ TEST(TGroupDescriptionTest, MaximumLengthGroupDescription) {
 TEST(TGroupDescriptionTest, TooLongGroupDescription) {
   std::string longDesc(MAX_GROUP_DESCRIPTION_LENGTH + 1, 'A');
   EXPECT_THROW(TGroupDescription::Create(longDesc), TGroupDescriptionInvalidException);
-  
+
   std::string veryLongDesc(MAX_GROUP_DESCRIPTION_LENGTH + 100, 'X');
   EXPECT_THROW(TGroupDescription::Create(veryLongDesc), TGroupDescriptionInvalidException);
 }
@@ -51,7 +51,7 @@ TEST(TGroupDescriptionTest, TooLongGroupDescription) {
 TEST(TGroupDescriptionTest, TrimWhitespace) {
   TGroupDescription desc1 = TGroupDescription::Create("  Welcome to our group  ");
   EXPECT_EQ(desc1.Value(), "Welcome to our group");
-  
+
   TGroupDescription desc2 = TGroupDescription::Create("\t\nThis is a description\n\t");
   EXPECT_EQ(desc2.Value(), "This is a description");
 }
@@ -72,7 +72,7 @@ TEST(TGroupDescriptionTest, NewlinesWithCarriageReturn) {
   EXPECT_NO_THROW(TGroupDescription::Create("Line 1\r\nLine 2\r\nLine 3"));
   EXPECT_NO_THROW(TGroupDescription::Create("Line 1\r\n\r\nLine 2"));
   EXPECT_NO_THROW(TGroupDescription::Create("Line 1\r\n\r\n\r\nLine 2"));
-  
+
   // 4 consecutive newlines (учитывая \r\n)
   EXPECT_THROW(TGroupDescription::Create("Line 1\r\n\r\n\r\n\r\nLine 2"), TGroupDescriptionInvalidException);
 }
@@ -97,7 +97,7 @@ TEST(TGroupDescriptionTest, InvalidUtf8) {
 TEST(TGroupDescriptionTest, Utf8Length) {
   TGroupDescription desc1 = TGroupDescription::Create("Описание");
   EXPECT_EQ(NUtils::GetUtf8Length(desc1.Value()), 8);
-  
+
   TGroupDescription desc2 = TGroupDescription::Create("日本語の説明");
   EXPECT_EQ(NUtils::GetUtf8Length(desc2.Value()), 6);
 }
@@ -106,7 +106,7 @@ TEST(TGroupDescriptionTest, EqualityOperator) {
   TGroupDescription desc1 = TGroupDescription::Create("Same description");
   TGroupDescription desc2 = TGroupDescription::Create("Same description");
   TGroupDescription desc3 = TGroupDescription::Create("Different description");
-  
+
   EXPECT_TRUE(desc1 == desc2);
   EXPECT_FALSE(desc1 == desc3);
 }
@@ -115,7 +115,7 @@ TEST(TGroupDescriptionTest, InequalityOperator) {
   TGroupDescription desc1 = TGroupDescription::Create("Same description");
   TGroupDescription desc2 = TGroupDescription::Create("Same description");
   TGroupDescription desc3 = TGroupDescription::Create("Different description");
-  
+
   EXPECT_FALSE(desc1 != desc2);
   EXPECT_TRUE(desc1 != desc3);
 }
@@ -138,7 +138,7 @@ TEST(TGroupDescriptionTest, EdgeCasesAfterTrim) {
   std::string edgeCase = "  A  ";
   EXPECT_NO_THROW(TGroupDescription::Create(edgeCase));
   EXPECT_EQ(TGroupDescription::Create(edgeCase).Value(), "A");
-  
+
   // После trim остается пустая строка - это допустимо
   std::string emptyAfterTrim = "     ";
   EXPECT_NO_THROW(TGroupDescription::Create(emptyAfterTrim));
@@ -148,7 +148,7 @@ TEST(TGroupDescriptionTest, EdgeCasesAfterTrim) {
 TEST(TGroupDescriptionTest, IsEmptyMethod) {
   TGroupDescription empty = TGroupDescription::Create("");
   TGroupDescription notEmpty = TGroupDescription::Create("Description");
-  
+
   EXPECT_TRUE(empty.IsEmpty());
   EXPECT_FALSE(notEmpty.IsEmpty());
 }

@@ -1,10 +1,8 @@
 #include "group_chat.hpp"
 
-
 #include <gtest/gtest.h>
 
 using namespace NChat::NCore::NDomain;
-
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -46,8 +44,6 @@ TEST(TGroupChatCanPost, OwnerCanPost) {
   EXPECT_TRUE(chat.CanPost(EMemberRole::Owner));
 }
 
-
-
 // ─── ValidateAddMember ───────────────────────────────────────────────────────
 
 TEST(TGroupChatValidateAddMember, OwnerCanAddNewMember) {
@@ -62,15 +58,18 @@ TEST(TGroupChatValidateAddMember, AdminCanAddNewMember) {
 }
 
 TEST(TGroupChatValidateAddMember, WriterThrowsWhenAdding) {
-  EXPECT_THROW(TGroupChat::ValidateAddMember(EMemberRole::Writer, false, MakeUser("newbie")), TPermissionDenied);
+  EXPECT_THROW(static_cast<void>(TGroupChat::ValidateAddMember(EMemberRole::Writer, false, MakeUser("newbie"))),
+               TPermissionDenied);
 }
 
 TEST(TGroupChatValidateAddMember, ReaderThrowsWhenAdding) {
-  EXPECT_THROW(TGroupChat::ValidateAddMember(EMemberRole::Reader, false, MakeUser("newbie")), TPermissionDenied);
+  EXPECT_THROW(static_cast<void>(TGroupChat::ValidateAddMember(EMemberRole::Reader, false, MakeUser("newbie"))),
+               TPermissionDenied);
 }
 
 TEST(TGroupChatValidateAddMember, ThrowsWhenTargetAlreadyMember) {
-  EXPECT_THROW(TGroupChat::ValidateAddMember(EMemberRole::Owner, true, MakeUser("existing")), TPermissionDenied);
+  EXPECT_THROW(static_cast<void>(TGroupChat::ValidateAddMember(EMemberRole::Owner, true, MakeUser("existing"))),
+               TPermissionDenied);
 }
 
 TEST(TGroupChatValidateAddMember, NewMemberGetsWriterRole) {
@@ -82,8 +81,9 @@ TEST(TGroupChatValidateAddMember, NewMemberGetsWriterRole) {
 
 TEST(TGroupChatValidateDeleteMember, OwnerThrowsCannotLeave) {
   auto owner = MakeUser("owner");
-  EXPECT_THROW(TGroupChat::ValidateDeleteMember(EMemberRole::Owner, EMemberRole::Owner, owner, owner),
-               TChatInvariantViolation);
+  EXPECT_THROW(
+      static_cast<void>(TGroupChat::ValidateDeleteMember(EMemberRole::Owner, EMemberRole::Owner, owner, owner)),
+      TChatInvariantViolation);
 }
 
 TEST(TGroupChatValidateDeleteMember, AdminCanDeleteWriter) {
@@ -100,25 +100,28 @@ TEST(TGroupChatValidateDeleteMember, OwnerCanDeleteWriter) {
 
 TEST(TGroupChatValidateDeleteMember, AdminThrowsWhenDeletingOwner) {
   auto owner = MakeUser("owner");
-  EXPECT_THROW(TGroupChat::ValidateDeleteMember(EMemberRole::Admin, EMemberRole::Owner, MakeUser("admin"), owner),
+  EXPECT_THROW(static_cast<void>(
+                   TGroupChat::ValidateDeleteMember(EMemberRole::Admin, EMemberRole::Owner, MakeUser("admin"), owner)),
                TPermissionDenied);
 }
 
 TEST(TGroupChatValidateDeleteMember, WriterThrowsWhenDeletingAnyone) {
   auto reader = MakeUser("reader");
-  EXPECT_THROW(TGroupChat::ValidateDeleteMember(EMemberRole::Writer, EMemberRole::Reader, MakeUser("writer"), reader),
+  EXPECT_THROW(static_cast<void>(TGroupChat::ValidateDeleteMember(EMemberRole::Writer, EMemberRole::Reader,
+                                                                  MakeUser("writer"), reader)),
                TPermissionDenied);
 }
 
 TEST(TGroupChatValidateDeleteMember, ThrowsWhenTargetNotMember) {
-  EXPECT_THROW(TGroupChat::ValidateDeleteMember(EMemberRole::Owner, std::nullopt, MakeUser("owner"), MakeUser("ghost")),
+  EXPECT_THROW(static_cast<void>(TGroupChat::ValidateDeleteMember(EMemberRole::Owner, std::nullopt, MakeUser("owner"),
+                                                                  MakeUser("ghost"))),
                TUserIsNotGroupMember);
 }
 
 TEST(TGroupChatValidateDeleteMember, NonMemberRequesterThrowsWhenTargetNotMember) {
-  EXPECT_THROW(
-      TGroupChat::ValidateDeleteMember(EMemberRole::Writer, std::nullopt, MakeUser("ghost"), MakeUser("writer")),
-      TUserIsNotGroupMember);
+  EXPECT_THROW(static_cast<void>(TGroupChat::ValidateDeleteMember(EMemberRole::Writer, std::nullopt, MakeUser("ghost"),
+                                                                  MakeUser("writer"))),
+               TUserIsNotGroupMember);
 }
 
 TEST(TGroupChatValidateDeleteMember, WriterCanDeleteSelf) {
@@ -150,24 +153,28 @@ TEST(TGroupChatValidateGrantUser, OwnerCanDemoteAdminToReader) {
 
 TEST(TGroupChatValidateGrantUser, AdminThrowsWhenGrantingAdmin) {
   auto writer = MakeUser("writer");
-  EXPECT_THROW(TGroupChat::ValidateGrantUser(EMemberRole::Admin, EMemberRole::Writer, EMemberRole::Admin, writer),
+  EXPECT_THROW(static_cast<void>(
+                   TGroupChat::ValidateGrantUser(EMemberRole::Admin, EMemberRole::Writer, EMemberRole::Admin, writer)),
                TPermissionDenied);
 }
 
 TEST(TGroupChatValidateGrantUser, OwnerThrowsWhenGrantingOwner) {
   auto writer = MakeUser("writer");
-  EXPECT_THROW(TGroupChat::ValidateGrantUser(EMemberRole::Owner, EMemberRole::Writer, EMemberRole::Owner, writer),
+  EXPECT_THROW(static_cast<void>(
+                   TGroupChat::ValidateGrantUser(EMemberRole::Owner, EMemberRole::Writer, EMemberRole::Owner, writer)),
                TPermissionDenied);
 }
 
 TEST(TGroupChatValidateGrantUser, ThrowsWhenTargetNotMember) {
-  EXPECT_THROW(TGroupChat::ValidateGrantUser(EMemberRole::Owner, std::nullopt, EMemberRole::Writer, MakeUser("ghost")),
+  EXPECT_THROW(static_cast<void>(TGroupChat::ValidateGrantUser(EMemberRole::Owner, std::nullopt, EMemberRole::Writer,
+                                                               MakeUser("ghost"))),
                TUserIsNotGroupMember);
 }
 
 TEST(TGroupChatValidateGrantUser, AdminThrowsWhenGrantingHigherRole) {
   auto writer = MakeUser("writer");
-  EXPECT_THROW(TGroupChat::ValidateGrantUser(EMemberRole::Admin, EMemberRole::Writer, EMemberRole::Owner, writer),
+  EXPECT_THROW(static_cast<void>(
+                   TGroupChat::ValidateGrantUser(EMemberRole::Admin, EMemberRole::Writer, EMemberRole::Owner, writer)),
                TPermissionDenied);
 }
 
@@ -180,12 +187,13 @@ TEST(TGroupChatValidateChangeOwner, OwnerCanTransferOwnership) {
 }
 
 TEST(TGroupChatValidateChangeOwner, NonOwnerThrows) {
-  EXPECT_THROW(TGroupChat::ValidateChangeOwner(EMemberRole::Admin, EMemberRole::Writer, MakeUser("writer")),
-               TPermissionDenied);
+  EXPECT_THROW(
+      static_cast<void>(TGroupChat::ValidateChangeOwner(EMemberRole::Admin, EMemberRole::Writer, MakeUser("writer"))),
+      TPermissionDenied);
 }
 
 TEST(TGroupChatValidateChangeOwner, ThrowsWhenTargetNotMember) {
-  EXPECT_THROW(TGroupChat::ValidateChangeOwner(EMemberRole::Owner, std::nullopt, MakeUser("ghost")),
+  EXPECT_THROW(static_cast<void>(TGroupChat::ValidateChangeOwner(EMemberRole::Owner, std::nullopt, MakeUser("ghost"))),
                TUserIsNotGroupMember);
 }
 
@@ -210,13 +218,13 @@ TEST(TGroupChatChangeTitle, AdminCanChangeTitle) {
 TEST(TGroupChatChangeTitle, WriterThrowsWhenChangingTitle) {
   auto chat = MakeChat();
   auto new_title = TGroupTitle::Create("Writer Tries");
-  EXPECT_THROW(chat.ChangeTitle(EMemberRole::Writer, new_title), TPermissionDenied);
+  EXPECT_THROW(static_cast<void>(chat.ChangeTitle(EMemberRole::Writer, new_title)), TPermissionDenied);
 }
 
 TEST(TGroupChatChangeTitle, ReaderThrowsWhenChangingTitle) {
   auto chat = MakeChat();
   auto new_title = TGroupTitle::Create("Reader Tries");
-  EXPECT_THROW(chat.ChangeTitle(EMemberRole::Reader, new_title), TPermissionDenied);
+  EXPECT_THROW(static_cast<void>(chat.ChangeTitle(EMemberRole::Reader, new_title)), TPermissionDenied);
 }
 
 // ─── ChangeDescription ───────────────────────────────────────────────
@@ -242,5 +250,6 @@ TEST(TGroupChatChangeDescription, AdminCanChangeDescription) {
 TEST(TGroupChatChangeDescription, WriterThrowsWhenChangingDescription) {
   auto chat = MakeChat();
   auto new_desc = TGroupDescription::Create("Writer tries");
-  EXPECT_THROW(chat.ChangeDescription(EMemberRole::Writer, new_desc), TPermissionDenied);
+  // static cast to avoid "nodiscard" warning
+  EXPECT_THROW(static_cast<void>(chat.ChangeDescription(EMemberRole::Writer, new_desc)), TPermissionDenied);
 }

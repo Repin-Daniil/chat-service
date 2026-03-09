@@ -12,14 +12,6 @@ CREATE TYPE chat.channel_type AS ENUM ('DIRECT', 'GROUP', 'BROADCAST');
 
 CREATE TYPE chat.member_role AS ENUM ('READER', 'WRITER', 'ADMIN', 'OWNER');
 
-CREATE OR REPLACE FUNCTION chat.member_role_to_int(role chat.member_role)
-RETURNS int
-LANGUAGE sql
-IMMUTABLE
-AS $$
-    SELECT array_position(enum_range(NULL::chat.member_role), role) - 1;
-$$;
-
 -- CREATE TYPE chat.member_status AS ENUM ('ACTIVE', 'LEFT', 'BANNED')
 -- ===========================
 --  FUNCTIONS
@@ -34,6 +26,14 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION chat.member_role_to_int(role chat.member_role)
+RETURNS int
+LANGUAGE sql
+IMMUTABLE
+AS $$
+    SELECT array_position(enum_range(NULL::chat.member_role), role) - 1;
+$$;
 
 -- ===========================
 --  USERS

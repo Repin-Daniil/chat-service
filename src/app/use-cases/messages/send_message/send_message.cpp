@@ -20,9 +20,10 @@ NDto::TSendMessageResult TSendMessageUseCase::Execute(NDto::TSendMessageRequest 
     throw TUnknownChat(fmt::format("Chat {} doesn't exist", request.ChatId));
   }
 
-  const auto sender_role = ChatRepo_.GetRole(chat->GetId(), request.SenderId);
+  const auto roles = ChatRepo_.GetMemberRoles(chat->GetId(), {request.SenderId});
+  const auto sender_role_it = roles.find(request.SenderId);
 
-  if (!sender_role.has_value() || !chat->CanPost(sender_role.value())) {
+  if (sender_role_it == roles.end() || !chat->CanPost(sender_role_it->second)) {
     throw TSendForbidden(fmt::format("User {} can't send to chat {}", request.SenderId, request.ChatId));
   }
 

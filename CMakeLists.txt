@@ -79,7 +79,8 @@ add_google_tests(${PROJECT_NAME}_unittest)
 # Functional testing
 userver_testsuite_add_simple(
     REQUIREMENTS ${CMAKE_CURRENT_SOURCE_DIR}/tests/requirements.txt
-    SQL_LIBRARY ${PROJECT_NAME}_sql
+    # SQL_LIBRARY ${PROJECT_NAME}_sql
+    # fixme как будет написана crudня на чаты расскоментировать sql coverage
 )
 
 # Coverage

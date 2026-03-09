@@ -1,7 +1,7 @@
 #include "private_chat.hpp"
 
-#include <core/chats/utils/chat_utils.hpp>
 #include <core/chats/chat_id_format.hpp>
+#include <core/chats/utils/chat_utils.hpp>
 
 #include <gtest/gtest.h>
 
@@ -188,6 +188,5 @@ TEST_F(TPrivateChatTest, CanPostReturnsFalseForReaderRole) {
   TPrivateChat chat({user1_, user2_});
   EXPECT_FALSE(chat.CanPost(EMemberRole::Reader));
 }
-
 
 }  // namespace NChat::NCore::NDomain

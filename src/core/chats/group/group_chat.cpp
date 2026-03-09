@@ -120,18 +120,17 @@ TChangeTitleDelta TGroupChat::ChangeTitle(EMemberRole requester_role, TGroupTitl
   if (!HasPermission(requester_role, EPermission::ChangeData)) {
     throw TPermissionDenied("Requester does not have permission to change group title");
   }
-  
+
   Title_ = new_title;
-  
+
   return TChangeTitleDelta(std::move(new_title));
 }
 
-TChangeDescriptionDelta TGroupChat::ChangeDescription(EMemberRole requester_role,
-                                                              TGroupDescription new_description) {
+TChangeDescriptionDelta TGroupChat::ChangeDescription(EMemberRole requester_role, TGroupDescription new_description) {
   if (!HasPermission(requester_role, EPermission::ChangeData)) {
     throw TPermissionDenied("Requester does not have permission to change group description");
   }
-  
+
   Description_ = new_description;
 
   return TChangeDescriptionDelta(std::move(new_description));
